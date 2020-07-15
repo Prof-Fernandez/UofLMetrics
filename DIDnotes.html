@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Linear Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear Regression
+## Difference in Differences
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2020-07-10)
+
+---
+
+class: middle, center, inverse
+# Difference in Differences
+
+---
+## An Alternative Approach
+
+We saw previously that RCT's are the ideal empirical study.
+
+When an RCT is unavailable, then provided we observe enough covariates to eliminate all forms of selection and omitted variable bias, we can use regression to estimate accurate causal effects.
+
+---
+## Alternative Strategies
+
+But sometimes we find ourselves in a situation where an RCT is not feasible, and it is impossible to observe all the important ways in which the treated and control units differ.
+
+In this case, there are three additional empirical strategies typically use:
+
+  - Difference in Differences
+  - Instrumental Variables
+  - Regression Discontinuity
+  
+Today, we will look at dif-in-dif.
+
+---
+## Framework
+
+Recall the potential outcome framework. When we estimate a treatment
+control contrast what we get is:
+`$$E(Y|D=1)-E(Y|D=0)=\delta+E(Y_0|D=1)-E(Y_0|D=0)$$`
+Where `\(\delta\)` is the ATE.
+
+This equation says that the average of the treated group minus the average of the control group is the average treatment effect plus selection
+bias (AKA omitted variable bias in the regression framework).
+
+---
+## Parallel Trends
+
+We will now explore another way to get rid of the selection bias.
+
+Suppose we have data on the outcome variable for our treatment and control group from the previous period. Call this `\(Y_{pre}\)`.
+
+Now suppose further that:
+`$$E(Y_0|D=1)-E(Y_{pre}|D=1)=E(Y_0|D=0)-E(Y_{pre}|D=0)$$`
+This assumption is known as the __parallel trends__ assumptions and is crucial for getting compelling estimates in the dif-in-dif framework.
+
+What does this assumption mean?
+
+---
+## Parallel Trends
+
+It says that if the treatment group had never been treated, the average change in the outcome variable would have been identical to the average change in the outcome variable for the control group.
+
+How plausible this assumption is depends upon the given study you are
+examining.
+
+For now, let's assume it is true, and see how this can help us kill the
+selection bias.
+
+---
+## Difference in Difference
+
+Suppose instead of just comparing the average treatment outcome to the average control outcome, we use the pre-period data to compare the average change in the treatment group to the average change in the control group.
+
+That is, we calculate:
+`$$E(Y|D=1)-E(Y_{pre}|D=1)-[E(Y|D=0)-E(Y_{pre}|D=0)]$$`
+This is a __difference in difference__ or dif-in-dif estimate.
+
+---
+## Difference in Differences: Animated
+
+&lt;img src="mydif.gif" style="display: block; margin: auto;" /&gt;
+
+---
+## Difference in Differences: Differences in Means Example
+&lt;img src="DIDtabular.png" width="150%" style="display: block; margin: auto;" /&gt;
+
+---
+## Difference in Differences: Graphical Approach
+
+`$$\begin{align*}Y&amp;= \beta_0 + \beta_1*[Time] + \beta_2*[Intervention] \\
+&amp;+ \beta_3*[Time*Intervention] + \beta_4*[Covariates]+\epsilon\end{align*}$$`
+&lt;img src="DIDregression.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+## Parallel Trend Assumption
+
+The parallel trend assumption is the most critical of the above the four assumptions to ensure internal validity of DID models and is the hardest to fulfill. 
+
+It requires that in the absence of treatment, the difference between the 'treatment' and 'control' group is constant over time. 
+
+Although there is no statistical test for this assumption, visual inspection is useful when you have observations over many time points. 
+
+It has also been proposed that the smaller the time period tested, the more likely the assumption is to hold. 
+
+Violation of parallel trend assumption will lead to biased estimation of the causal effect.
+
+---
+## Parralel Trend Assumption: Met
+
+&lt;img src="ParallelTrend.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+## Parralel Trend Assumption: Violated
+
+&lt;img src="violationparallel.png" width="80%" style="display: block; margin: auto;" /&gt;
+
+---
+## Dif-in-Dif in Practice
+
+__Case study: who pays for mandated childbirth coverage?__
+
+When the government mandates employers to provide benefits, who is really footing the bill? 
+
+  - Is it the employer? 
+  - Or is it the employee who pays for it indirectly in the form of a pay cut?
+  
+This analysis is first conducted by Jonathan Gruber in 1994, an MIT Professor who serves as the director of the Health Care Program at the National Bureau of Economic Research (NBER). To date, The Incidence of Mandated Benefits remains one of the most influential paper in healthcare economics. 
+
+---
+## Timeline
+
+Understanding the timeline is important for identifying the causal effect:
+
+Before 1978: there was limited health care coverage for childbirth.
+
+1975-1979: a subset of states passed laws, mandating the health care coverage of childbirth.
+
+Starting in 1978: federal legislation mandates the health care coverage of childbirth for all states.
+
+---
+## Difference-in-Differences Table
+
+&lt;img src="dif1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## The Legendary Triple Dif
+
+&lt;img src="dif2.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## Dif-in-Dif in R - Manual Calculation
+
+
+```r
+require(foreign)
+eitc&lt;-read.dta("https://github.com/CausalReinforcer/Stata/raw/master/eitc.dta")
+# Create two additional dummy variables to indicate before/after
+# and treatment/control groups.
+
+# the EITC went into effect in the year 1994
+eitc$post93 = as.numeric(eitc$year &gt;= 1994)
+
+# The EITC only affects women with at least one child, so the
+# treatment group will be all women with children.
+eitc$anykids = as.numeric(eitc$children &gt;= 1)
+
+# Compute the four data points needed in the DID calculation:
+a = sapply(subset(eitc, post93 == 0 &amp; anykids == 0, select=work), mean)
+b = sapply(subset(eitc, post93 == 0 &amp; anykids == 1, select=work), mean)
+c = sapply(subset(eitc, post93 == 1 &amp; anykids == 0, select=work), mean)
+d = sapply(subset(eitc, post93 == 1 &amp; anykids == 1, select=work), mean)
+
+# Compute the effect of the EITC on the employment of women with children:
+(d-c)-(b-a)
+```
+
+```
+##       work 
+## 0.04687313
+```
+
+---
+## Dif-in-Dif in R - Regression
+
+`$$work=\beta_0+\delta_0posst93+\beta_1anykids+\delta_1(anykids*post93)+\epsilon$$`
+
+```r
+reg1 = lm(work ~ post93 + anykids + post93*anykids, data = eitc)
+summary(reg1)
+```
+
+```
+## 
+## Call:
+## lm(formula = work ~ post93 + anykids + post93 * anykids, data = eitc)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -0.5755 -0.4908  0.4245  0.5092  0.5540 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     0.575460   0.008845  65.060  &lt; 2e-16 ***
+## post93         -0.002074   0.012931  -0.160  0.87261    
+## anykids        -0.129498   0.011676 -11.091  &lt; 2e-16 ***
+## post93:anykids  0.046873   0.017158   2.732  0.00631 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.4967 on 13742 degrees of freedom
+## Multiple R-squared:  0.0126,	Adjusted R-squared:  0.01238 
+## F-statistic: 58.45 on 3 and 13742 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+## Create Plot
+
+
+```r
+# Take average value of 'work' by year, conditional on anykids
+minfo = aggregate(eitc$work, list(eitc$year,eitc$anykids == 1), mean)
+# rename column headings (variables)
+names(minfo) = c("YR","Treatment","LFPR")
+
+# Attach a new column with labels
+minfo$Group[1:6] = "Single women, no children"
+minfo$Group[7:12] = "Single women, children"
+#minfo
+
+require(ggplot2)	#package for creating nice plots
+
+qplot(YR, LFPR, data=minfo, geom=c("point","line"), colour=Group,
+xlab="Year", ylab="Labor Force Participation Rate")+geom_vline(xintercept = 1994)
+```
+
+---
+## Create Plot
+
+&lt;img src="DIDnotes_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class: center, middle, inverse
+# Strengths and Limitations
+
+---
+## Strengths
+
+* Intuitive interpretation
+* Can obtain causal effect using observational data if assumptions are met
+* Can use either individual and group level data
+* Comparison groups can start at different levels of the outcome. (DID focuses on change rather than absolute levels)
+* Accounts for change/change due to factors other than intervention
+
+---
+## Limitations
+
+* Requires baseline data &amp; a non-intervention group
+* Cannot use if intervention allocation determined by baseline outcome
+* Cannot use if comparison groups have different outcome trend (Abadie 2005 has proposed solution)
+* Cannot use if composition of groups pre/post change are not stable
+
+---
+## BEST PRACTICES
+ 
+* Be sure outcome trends did not influence allocation of the treatment/intervention
+* Acquire more data points before and after to test parallel trend assumption
+* Use linear probability model to help with interpretability
+* Be sure to examine composition of population in treatment/intervention and control groups before and after intervention
+* Use robust standard errors to account for autocorrelation between pre/post in same individual
+* Perform sub-analysis to see if intervention had similar/different effect on components of the outcome
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

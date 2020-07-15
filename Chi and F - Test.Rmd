@@ -1,0 +1,87 @@
+---
+title: "Chi Squared and F Tests"
+author: "Jose M. Fernandez"
+date: "University of Louisville"
+output: slidy_presentation
+---
+
+## $\chi^2$ and F Tests 
+
+$\chi^2$ and F Tests are used to test variances. The $\chi^2$ Test considers if the sample variance is equal to a null value of the population variance, $\sigma^2$
+
+The F - test is used to test if two different sample variances are equal to one another. The F - test is very useful in linear regression to compare different models and determine which model provides the best fit.
+
+## $\chi^2$ Test
+The Chi square statistic can be used to test if a sample variance is statistically
+different than a particular value.
+We know that $$ \frac{(n-1)s^2}{\sigma^2} \sim \chi^2_{n-1} $$
+
+
+A two side interval at a confidence level of $\alpha$ then is $$ \chi^2_{n-1}(\alpha/2) < \frac{(n-1)s^2}{\sigma^2} < \chi^2_{n-1}(1-\alpha/2)$$
+
+which can be solved for $\sigma^2$ $$ \frac{(n-1)s^2}{\chi^2_{n-1}(\alpha/2)} > \sigma^2 > \frac{(n-1)s^2}{\chi^2_{n-1}(1-\alpha/2)}$$
+
+## $\chi^2$ Example
+
+Let's suppose you have sample of earnings for married couples and you want to test if wages for married women and single women have the same volatility. 
+
+- You find a study that states the wage variance for married women is $10,000.
+- You ask 21 single women their wage and find a sample variance equal to $14,400.
+
+To test if these two variance terms are the same at the 10% level, we need to find the $[\chi^2_{20}(5\%),\chi^2_{20}(95\%)]$
+
+- Using a $\chi^2$ table we find, $\chi^2_{20}(95\%)=31.41$ and $\chi^2_{20}(5\%)=10.851$.
+
+- Using 10,000 $= \sigma^2$ and 14,400 = $s^{2}$, we find the $\chi^2$ statistic to equal $$ \frac{(20)14,400}{10,000}=28.8 $$
+
+Note, this value lies between our two critical values. Therefore, we fail to reject the null hypothesis of equal variances in wages amoung married and single women.
+
+## $\chi^2$ as a Goodness of fit Measure
+The chi square distribution is also used to judge if one variable can reliably predict a second variable. In this case, the chi square statistic is equal to $$ \sum_{i}^{n} \frac{(O_{i}-E_{i})^2}{E_{i}} \sim \chi^2_{n-1} $$ where $O_{i}$ stands for *observed* and $E_{i}$ stands for expected.
+
+## Example 
+At the population level, 80% of the population is white, 12% is black, and 8% is of some other race. Are the General Social Survey data consistent with these proportions?
+
+Pop. % | Expected | Observed | $\frac{(O - E)^2}{E}$
+------ | -------- | -------- | ---------------------
+0.80   | 1908.8   | 1897     | 0.073
+0.12   | 286.32   | 322      | 4.45
+0.08   | 190.88   | 167      | 2.99
+------ | -------- |-------- | -----------
+1      | 2386     | 2386     | 7.51
+
+The critical value for the $\chi^2$ statistics at 2 df and a significance of 5% is 5.99. The test statistic is greater than the critical value, therefore we reject the null hypothesis that the GSS distribution of race is equivalent to the actual distribution of race in the population
+
+## F Test
+An F test is used to determine if there is a statistical difference between two sample variances. 
+
+- This test is very important in linear regression. In linear regression, we are trying to choose the correct set of explanatory variables that minimizes the variance between predicted and observed values of the dependent variable. 
+
+- If you consider a regression that measures educational attainment, then we may think that both family income and IQ will affect this dependent variable. 
+
+- How do we know if adding family income into the regression equation will give us more explanatory power? 
+
+- An F-test will help us determine the additional power.
+
+## Conduct an F Test
+
+1. Assume we run two regression, one which only uses IQ and the other which uses both IQ and family income. In both cases we calculate the variance between predict values of educational attainment and observed values of
+education attainment.
+
+2. Calculate the sample variance between observed and predicted variables in both cases.
+
+3. Calculate the F-statistic as $$ \frac{s_{1}^2}{s_{2}^2} = F_{n,m}$$ where n is the degrees of freedom in the numerator and m is the degrees of freedom in the denominator.
+
+4. Then compare this value to a critical value of $F_{\alpha,n,m}$. If $F_{\alpha,n,m}<F_{n,m}$ we reject the null hypothesis of equal variances and conclude that adding family income improves your prediction power in a statistically significant manner.
+
+## F Test Example
+
+Suppose you have two samples. 
+
+- The first is of size 5 and the second is of size 4. 
+- The sample variance for the first sample is 10 and the sample variance for the second sample is 8.
+- The ratio of the two sample variances is equal to 1.25. This is the observed F statistic with 4 degees of freedom in the numerator and 3 degrees of freedom in the denominator.
+```{r}
+qf(.95, df1=4, df2=3)
+```
+In this case, we would fail to reject the null hypothesis of equal variances because the critical value of 9.117 is greater than the observed value of 1.25.

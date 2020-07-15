@@ -1,0 +1,88 @@
+---
+title: "A Review of Basic Statistics"
+subtitle: "Mean, Median, and Mode"
+author: "Jose Fernandez"
+institute: "University of Louisville"
+date: "2020/6/29 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, uol, uol-fonts, "extra.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+# Mean, Median, and Mode
+
+The __mean__ (average) is the most widely used measure to describe a variable.
+$$\bar{x}=\frac{1}{n}\sum_{i=1}^{n}x_{i}$$
+Add up all of the values in your sample and divide by the number of observations. It's easy calculate, tells us the central tendency of the data, but is sensitive to outliers.
+---
+# R code for the mean
+For example, suppose you have the numbers 1, 1, 3, 5, and 100. The large outlier of x = 100 will pull the __mean__ far away from the majority of the values.
+```{r echo=TRUE}
+x<-c(1,1,3,5,100)
+# Manual Mean
+(1+1+3+5+100)/5
+# Formula Mean
+mean(x)
+```
+---
+# Median
+
+The __median__ tells us the value that is exactly in the middle. That is, 50 percent of the data are above it and 50 percent of the data are below it.
+
+In our example, the __median__ is 3, which seems much closer to most of the values than the __mean__. The advantage of __median__ is that it is insensitive to the presence of outliers, but it doesn't really tell us much more than where the center acutally is.
+
+```{r echo=TRUE}
+median(x)
+```
+---
+# Mode
+
+The __mode__ is the number that appears the most often in your sample.
+
+The word __mode__ comes from the French phrase _a la mode_, which means what is in fashion or popular.
+
+In our sample (1, 1, 3, 5, and 100) the number 1 appears the most so the mode would equal 1.
+```{r echo=TRUE}
+mode(x)
+```
+
+---
+background-image: url(https://s3.amazonaws.com/libapps/accounts/73082/images/Skeweness.jpg)
+
+---
+# Skeweness
+
+The mean, mode and median can be used to figure out if you have a positively or negatively skewed distribution.
+
+- If the mean is greater than the mode, the distribution is positively skewed.
+- If the mean is less than the mode, the distribution is negatively skewed.
+- If the mean is greater than the median, the distribution is positively skewed.
+- If the mean is less than the median, the distribution is negatively skewed.
+
+---
+# Why Does Skeweness Matter?
+
+.pull-left[People tend to treat the median and the mode interchangeably, but this is only true in a symmetric distribution (e.g. a normal distribution)
+
+But let's consider household income in the US. There is a large difference between the median and the mean.]
+
+.pull-right[![](https://qph.fs.quoracdn.net/main-qimg-1ce84d5e1d26653fe908a2c9d31e25a5.webp)
+
+]
+
+--
+.center[
+### Mean household income is $73,000 and Median household income is $53,700.
+]
+
+---
+# What's Next?
+
+- Variance, Standard Deviation, Range
+- Sampling Distribution
+- Hypothesis testing

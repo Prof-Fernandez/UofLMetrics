@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A Review of Basic Statistics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# A Review of Basic Statistics
+## Hypothesis Testing
+### Jose Fernandez
+### University of Louisville
+### 2020/6/29 (updated: 2020-06-30)
+
+---
+
+
+# Hypothesis Testing
+
+Hypothesis testing is the most important thing you learned in business statistics. It is the foundation of the statistical world.
+
+Hypothesis testing tells us if the _treatment effect_ we observed is _statistically significant_.
+
+A statistical hypothesis is an assumption about a population parameter. This assumption may or may not be true. Hypothesis testing refers to the formal procedures used by statisticians to accept or reject statistical hypotheses.
+---
+# Statistical Hypotheses
+The best way to determine whether a statistical hypothesis is true would be to examine the entire population. Since that is often impractical, researchers typically examine a random sample from the population. If sample data are not consistent with the statistical hypothesis, the hypothesis is rejected.
+
+There are two types of statistical hypotheses.
+
+- Null hypothesis. The null hypothesis, denoted by Ho, is usually the hypothesis that sample observations result purely from chance.
+- Alternative hypothesis. The alternative hypothesis, denoted by H1 or Ha, is the hypothesis that sample observations are influenced by some non-random cause. 
+
+---
+# Case Study: Birthweight and Smoking
+
+There is a lot of evidence that smoking is bad for one's health. What is less certain is the effect of smoking on birthweight. 
+
+You might ask, "how is this hard to measure or why is it controversial?"
+
+The issue is with reporting. If you are a pregnant mother, how honestly would respond to the question of "Do you smoke?"
+
+It is easy to see that mothers may lie about how much or even if they smoked while pregnant.
+
+---
+### Load the Data
+
+First, let's load the data.
+
+```r
+suppressWarnings(suppressPackageStartupMessages(library(tidyverse)))
+# Load data from MASS into a tibble
+birthwt &lt;- as_tibble(MASS::birthwt)
+
+# Rename variables
+birthwt &lt;- birthwt %&gt;%
+  rename(birthwt.below.2500 = low, 
+         mother.age = age,
+         mother.weight = lwt,
+         mother.smokes = smoke,
+         previous.prem.labor = ptl,
+         hypertension = ht,
+         uterine.irr = ui,
+         physician.visits = ftv,
+         birthwt.grams = bwt)
+
+# Change factor level names
+birthwt &lt;- birthwt %&gt;%
+  mutate(race = recode_factor(race, `1` = "white", `2` = "black", `3` = "other")) %&gt;%
+  mutate_at(c("mother.smokes", "hypertension", "uterine.irr", "birthwt.below.2500"),
+            ~ recode_factor(.x, `0` = "no", `1` = "yes"))
+```
+---
+### Difference in Birthweight by Smoking Status
+
+Compare birthweight by smoking status, we can see that smoker babies are smaller, but there is overlap.
+
+
+```r
+# Create boxplot showing how birthwt.grams varies between
+# smoking status
+qplot(x = mother.smokes, 
+      y = birthwt.grams, 
+      geom = "boxplot", data = birthwt, 
+      xlab = "Mother smokes", 
+      ylab = "Birthweight (grams)", fill = I("lightblue"))
+```
+
+---
+### Differences in Birthweight by Smoking Status
+![](BasicSTAT_Hypothesis_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+
+### Differences in Birthweight by Smoking Status
+
+__How can we assess whether this difference is statistically significant?__
+
+Let’s compute a summary table
+
+
+```r
+# Notice the consistent use of round() to ensure that our summaries 
+# do not have too many decimal values
+birthwt %&gt;%
+  group_by(mother.smokes) %&gt;%
+  summarize(mean.birthwt = round(mean(birthwt.grams), 0),
+            sd.birthwt = round(sd(birthwt.grams), 0))
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 2 x 3
+##   mother.smokes mean.birthwt sd.birthwt
+##   &lt;fct&gt;                &lt;dbl&gt;      &lt;dbl&gt;
+## 1 no                    3056        753
+## 2 yes                   2772        660
+```
+
+---
+### Differences in Birthweight by Smoking Status
+
+The standard deviation is good to have, but to assess statistical significance we really want to have the standard error.
+
+Let’s compute a summary table
+
+
+```r
+birthwt %&gt;%
+  group_by(mother.smokes) %&gt;%
+  summarize(num.obs = n(),
+            mean.birthwt = round(mean(birthwt.grams), 0),
+            sd.birthwt = round(sd(birthwt.grams), 0),
+            se.birthwt = round(sd(birthwt.grams) / sqrt(num.obs), 0))
+```
+
+```
+## `summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+## # A tibble: 2 x 5
+##   mother.smokes num.obs mean.birthwt sd.birthwt se.birthwt
+##   &lt;fct&gt;           &lt;int&gt;        &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1 no                115         3056        753         70
+## 2 yes                74         2772        660         77
+```
+
+If we use a confidence interval around the sample means, there is less overlap between the two groups.
+$$\bar{x}\pm se*t_{\alpha /2} $$
+
+---
+### T-test for Birthweight by Smoking Status
+
+In this case study, we have been looking at a sample of mothers, some who smoke and some who do not. These are samples and not populations. Therefore, we need to use a two sample t-test.
+
+This difference is looking quite significant. To run a two-sample t-test, we can simple use the t.test() function.
+
+```r
+birthwt.t.test &lt;- t.test(birthwt.grams ~ mother.smokes, data = birthwt)
+birthwt.t.test
+```
+
+```
+## 
+## 	Welch Two Sample t-test
+## 
+## data:  birthwt.grams by mother.smokes
+## t = 2.7299, df = 170.1, p-value = 0.007003
+## alternative hypothesis: true difference in means is not equal to 0
+## 95 percent confidence interval:
+##   78.57486 488.97860
+## sample estimates:
+##  mean in group no mean in group yes 
+##          3055.696          2771.919
+```
+---
+### Interpreting Output
+
+There are a few things from the output we can note.
+
+First, is the p-value. The p-value tells us the likelihood that the null hypothesis (in this case no difference between groups) is true. For p-values less than 5 percent, we can reject the null hypothesis and state there is a statistically significant difference between the two groups.
+
+The p-value in our t-test was 0.0070025, which is less than 1 percent so we can reject the null hypothesis.
+
+Our study finds that birth weights are on average higher in the non-smoking group compared to the smoking group (t-statistic 2.73, p=0.007, 95 % CI [78.6, 489]g)
+---
+# Standard Levels of significance
+
+Levels of significance, `\(\alpha\)`, are commonly
+- `\(\alpha\)` = 0.10 is marginally significant
+- `\(\alpha\)` = 0.05 is significant
+- `\(\alpha\)` = 0.01 is very significant
+
+We reject the null hypothesis `\(H_0\)` if the p-value `\(&lt; \alpha\)`.
+
+The significance level represents the probability of committing a Type I error that we are willing to accept.
+A Type I error is rejecting the null hypothesis when the null hypothesis is true.
+
+---
+# Warning
+
+### Can We Accept the Null Hypothesis?
+Some researchers say that a hypothesis test can have one of two outcomes: you accept the null hypothesis or you reject the null hypothesis. Many statisticians, however, take issue with the notion of "accepting the null hypothesis." Instead, they say: you reject the null hypothesis or you fail to reject the null hypothesis.
+
+Why the distinction between "acceptance" and "failure to reject?" Acceptance implies that the null hypothesis is true. Failure to reject implies that the data are not sufficiently persuasive for us to prefer the alternative hypothesis over the null hypothesis.
+
+Think of it this way. In court, we say a person is either guilty or not guilty. We do not say the person is innocent. That is, we conclude that either there is enough evidence to say the person is guilty or there isn't enough evidence (fail to reject).
+
+---
+
+# What Next?
+
+Read Chapter 4 in the textbook.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

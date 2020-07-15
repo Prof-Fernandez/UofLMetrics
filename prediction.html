@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Simple Linear Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Simple Linear Regression
+## Prediction and Confidence intervals
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2020-07-04)
+
+---
+
+
+class: middle, center, inverse
+# Confidence &amp; Prediction Intervals of the Dependent Variable
+
+---
+# Dependent Variable Predictions
+
+- One reason to run a linear regression is to learn the relationship between X and Y so that you can use X to __predict__ Y.
+- There are multiple examples of this practice in business applications
+  - Accuaries use data about your demongraphics to predict your death and the likelihood of an accident.
+  - Stock Brokers use news stories to predict changes in stock prices
+  - Wine experts use rainfall to predict wine quality before maturity.
+  
+---
+# But how how confident can we be in our prediction
+
+It is easy to use your model to predict. All you need to do is
+- Use current data to estimate the model.
+- Get the estimate coefficients
+- Plug in new values for your explanatory variables to predict your dependent variable.
+
+#### But there are some caveats
+
+---
+
+### Warnings about predictions
+
+- Out of sample predictions perform poorly if your X's are too far out of the range in your sample
+- __Example: Home prices__ 
+ - Small and Large home are poorly estimated.
+ - These values are too far outside of the range of the square foot variable.
+
+---
+
+### Warnings about predictions
+![](
+http://berkeley-homes.com/graphics/market_research/2012/2012/2012-mls-berkeley-single-family-home-sales-research-graph-sales-price-vs-square-foot-home.jpg)
+
+---
+## Confidence interval of a prediction
+
+We know confidence intervals for a mean or for our point estimates `\((\beta)\)`. 
+
+- What if we want a confidence interval for our prediction?
+
+Remember that Y is a function of X and some stuff we do not know (the error term).
+ - X has a variance
+ - The error term has a variance
+ - Our point estimate has a variance
+ - how do we combine all of this uncertainty?
+
+---
+## Prediction Interval formula
+
+We know that the predicted value of the dependent variable is `$$\hat{y}=\hat{\beta_0}+\hat{\beta_1}x^*$$`
+where `\(x^*\)` is the value of x we want to use to predict y.
+
+The confidence interval fromula is then, `$$\hat{\beta_0}+\hat{\beta_1}x^*+t_{\alpha/2}*s_e*\sqrt{\frac{1}{m}+\frac{1}{n}+\frac{(x^*-\bar{x})^2}{\sum(x_i-\bar{x})^2}}$$`
+- For a prediciton interval, we assume `\(m = 1\)`
+- For a confidence interval, we assume `\(m \rightarrow \infty\)`
+- Confidence intervals are smaller than prediction intervals
+
+---
+### Prediction and Confidence intervals in R
+
+#### Problem
+In the data set faithful, develop a 95% prediction interval of the eruption duration for the waiting time of 80 minutes.
+
+
+```r
+attach(faithful)     # attach the data frame 
+eruption.lm = lm(eruptions ~ waiting)
+newdata = data.frame(waiting=80) # our value of X for prediction
+predict(eruption.lm, newdata, interval="confidence")  # Confidense Interval
+```
+
+```
+##       fit      lwr      upr
+## 1 4.17622 4.104848 4.247592
+```
+
+```r
+predict(eruption.lm, newdata, interval="predict") # Prediction Interval
+```
+
+```
+##       fit      lwr      upr
+## 1 4.17622 3.196089 5.156351
+```
+- Both intervals have the same point estimate (center)
+- The prediction interval is wider than the confidence interval
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

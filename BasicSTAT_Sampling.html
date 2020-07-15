@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A Review of Basic Statistics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# A Review of Basic Statistics
+## Sampling
+### Jose Fernandez
+### University of Louisville
+### 2020/6/29 (updated: 2020-06-30)
+
+---
+
+
+# What do we cover
+
+1. Parameters versus statistics
+2. Sampling Distribution
+3. Example: Exponential Distribution
+
+---
+# Parameters versus Statistics
+
+Statistics is about inferring (learning) something about a population _parameter_, by using _statistics_ constructing from a sample of the population.
+
+--
+
+For example, the population mean is often denote by `\(\mu\)`. If we could observe the entire population, then we could calculate `\(\mu\)` by adding up all the values and dividing by the number of observations.
+
+--
+
+We do not do this beause it is often too expensive (money and/or time) to collect information on everyone in the population.
+
+--
+
+Instead, we randomly sample a smaller group from the population and calculate the mean for this group. `\(\bar{x}\)`.
+
+--
+
+The population mean, `\(\mu\)`, is the _parameter_ of interest.
+The sample mean, `\(\bar{x}\)`, is the sample statistic used to infer `\(\mu\)`.
+
+---
+# Parameters are the Truth
+
+The population parameter is the truth. The population parameter itself has no variance. Sounds weird?
+
+__Logical Concept__: If the population was made up of the following 5 numbers (1,2,3,4, and 5), then we could easily find that the population mean is 3. In fact, every single time you use __ALL__ of these numbers to calculate the mean you get the same answer, 3.
+
+The sample statistic is a guess (hopefully a good one) of the population parameter. Suppose you could only select 2 number from our population. How many different means would you find?
+
+---
+# Sample Statistics are Best Guesses
+
+.pull-left[Our samples of two are 
+- 1,2
+- 1,3
+- 1,4
+- 1,5
+- 2,3
+- 2,4
+- 2,5
+- 3,4
+- 3,5
+- 4,5]
+
+.pull-right[Our means for each sample are
+- = 1.5
+- = 2
+- = 2.5
+- = 3
+- = 2.5
+- = 3
+- = 3.5
+- = 3.5
+- = 4
+- = 4.5]
+---
+# Choose three values instead of two
+
+.pull-left[Our samples of two are 
+- 1,2,3
+- 1,2,4
+- 1,2,5
+- 1,3,4
+- 1,3,5
+- 1,4,5
+- 2,3,4
+- 2,3,5
+- 2,4,5
+- 3,4,5]
+
+.pull-right[Our means for each sample are
+- = 2
+- = 2.33
+- = 2.67
+- = 2.67
+- = 3
+- = 3.33
+- = 3
+- = 3.33
+- = 3.67
+- = 4]
+
+---
+# Sample Statistics Do have a Variance
+
+1. Notice, the means are not constant over the samples.
+2. Notice, the means do contain the population average of 3.
+3. Notice, the range of the means got smaller as we increased the sample size. This means the sample variance decreased.
+
+---
+# Central Limit Theorem
+
+One of the beautiful things about sample means is that
+- It approximates the population mean well
+- It improves in accuracy as the sample size increases
+- The distribution of sample means is approximately normal (symmetric) even if the population distribution is not.
+
+---
+# Example: Exponential Distribution
+
+We will pull random samples from an exponential distribution, which is skewed right (i.e. not symmetric) and show that the sample means are normally distributed.
+
+
+```r
+#Provided data for this exercise
+lambda&lt;-0.2
+#expected mean
+miu&lt;-1/lambda # expected mean
+sigma&lt;-1/lambda # expected std dev
+n&lt;-40 # number of observations
+nsim&lt;-500 # number of simulations
+x &lt;- rexp(10000,lambda)
+```
+
+
+---
+### Example: Exponential Distribution
+
+```r
+hist(x) # Histogram
+```
+
+![](BasicSTAT_Sampling_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+
+### Random samples of size 10 with 500 draws
+
+
+```r
+exp_means=c(1:500)
+for (i in 1 : nsim){ exp_means[i] = mean(sample(x,10)) }
+sample_mean&lt;-mean(exp_means)
+hist(exp_means,main="Histogram of 500 draws from exponential distribution",breaks=25,xlim = c(0,10))
+abline(v = miu, col= 2, lwd = 2,lty=2)
+abline(v = sample_mean, col= 3, lwd = 1)
+legend('topright', c("Expected Mean", "Sample Mean"),
+       lty= c(2,1),
+        bty = "n", col = c(col = 2, col = 3))
+```
+---
+### Random samples of size 10 with 500 draws
+
+![](BasicSTAT_Sampling_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+---
+### Random samples of size 50 with 500 draws
+
+![](BasicSTAT_Sampling_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+---
+### Random samples of size 100 with 500 draws
+
+![](BasicSTAT_Sampling_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+### Sampling Distribution Properties
+
+The expected value of the sample mean is the population mean.
+__NOTE__:E[a+b]=E[a]+E[b]
+`$$E[\bar{x}]=E[\frac{1}{n}\sum{x_{i}}]=\frac{1}{n}\sum E[x_i]=\frac{1}{n}\sum \mu = \frac{1}{n}n\mu=\mu$$`
+
+The variance of the sample mean is depedent on the sample size and the poulation variance
+__NOTE__: if "a" is a constant and x has a variance of `\(\sigma^2\)`, then `\(VAR[a*x]=a^2 VAR[x]=a^2 \sigma^2\)`
+
+`$$VAR[\bar{x}]=VAR[\frac{1}{n}\sum (x_i)]=\frac{1}{n^2}\sum VAR[x_i]=\frac{1}{n^2}*n*\sigma^2=\frac{\sigma^2}{n}$$`
+
+The __standard error (SE)__ is the standard deviation of the sample mean.
+`$$SE = \frac{\sigma}{\sqrt{n}}$$`
+The __standard error__ decreases if the sample size increases or the population standard deviation decreases.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

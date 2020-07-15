@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Linear Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear Regression
+## Dummy Variables and Transformations
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2020-07-07)
+
+---
+
+class: middle, center, inverse
+# Dummy Variables, Log Transformations, Quadratics, and Interactions
+
+---
+## Sometimes the relationship is not Linear
+
+![](quartet.png)
+
+---
+## Dummy Variables
+
+Dummy (binary) Variables allows us to capture information from non-numeric or continuous random variables.
+
+We can control for observable categories such as race, religion, gender, and state of residence.
+
+---
+## Dummy Variables (aka Binary Variables)
+We can think of sex as a dummy variable that has two values. 
+`$$female = \left\{\begin{matrix}
+1 \text{ if female}\\ 
+0 \text{ otherwise}
+\end{matrix}\right.$$`
+
+If G is the number of groups in the category, then we must include G-1 dummy variables. For the case of sex, we have two groups, male and female. Therefore, we need only one dummy variable.
+
+If we have dummy variables for states (there are 50 states), then we would have 49 dummy variables.
+
+---
+## Interpreting Dummy Variables
+
+Suppose we have the following equation `$$Test_Scores_i = \beta_0 + \beta_1 Female_i+u_i$$`
+
+In this case, `\(\beta_0\)` would tell us the average score for male test takers. Why? Because the variable Female = 0 for male test takers reducing the formula to `$$Test_Scores_i = \beta_0 + u_i$$`
+
+For Female test takers, the mean score would be `\(\beta_0+\beta_1\)`. Why? The variable for Female = 1 for female test takers so the equation becomes. `$$Test_Scores_i = \beta_0 + \beta_1+u_i$$`
+The coefficient `\(\beta_1\)` tells us by how much female test takers score more or less relative to male test takers.
+
+If `\(\beta_1\)` is not statistically significant, then we cannot conclude there is a difference in mean test scores between the two sexes.
+
+---
+### More than Two Dummy Variables
+
+Suppose we extended our test scores example to include race/ethnicity as well. Let's suppose we receive a variable called race that 
+`$$Race = \left\{\begin{matrix}
+1 \text{ if White}\\ 
+2 \text{ if Black}\\
+3 \text{ if Hispanic}
+\end{matrix}\right.$$`
+
+Since there are three categories, we need to create two dummy variables
+
+.pull-left[
+`$$Black = \left\{\begin{matrix}
+1 \text{ if Black}\\ 
+0 \text{ if otherwise}
+\end{matrix}\right.$$`
+]
+
+.pull-right[
+`$$Hispanic = \left\{\begin{matrix}
+1 \text{ if Hispanic}\\ 
+0 \text{ if otherwise}
+\end{matrix}\right.$$`
+]
+
+Now the regression equation would be `$$Test_score_i = \beta_0+\beta_1 Female_i + \beta_2 Black_i + \beta_3 Hispanic + u_i$$`
+
+The intercept `\(\beta_0\)` represents the null group. In this case, the null group is a white male because that is when Black, Female, and Hispanic all equal zero.
+
+Think of what the coefficients would be for a Hispanic Female.
+---
+## Dummy Variables
+
+&lt;img src="myZ.gif" style="display: block; margin: auto;" /&gt;
+
+---
+## Data
+
+Current Population Survey (CPS) is produced by the BLS and provides data on labor force characteristics of the population, including the level of employment, unemployment, and earnings.  
+
+* 65,000 randomly selected U.S. households are surveyed each month. 
+* The MARCH survey is more detailed than in other months and asks questions about earnings during the previous year.  
+
+---
+## Variables
+
+Variables  | Definition                           | 
+---------  | ------------------------------------ |
+gender     | 1 if female; 0 if male               | 
+Age        | Age in Years                         | 
+earnings   | Avg. Hourly Earnings                 |
+education  | Years of Education                   |
+Northeast  | 1 if from the Northeast, 0 otherwise |
+Midwest    | 1 if from the Midwest, 0 otherwise   |
+South      | 1 if from the South, 0 otherwise     |
+West	     | 1 if from the West, 0 otherwise      |
+
+---
+## Load the data 
+
+
+
+```r
+library("AER")
+library("lattice")
+data("CPSSW8")
+summary(CPSSW8)
+```
+
+```
+##     earnings         gender           age              region     
+##  Min.   : 2.003   male  :34348   Min.   :21.00   Northeast:12371  
+##  1st Qu.:11.058   female:27047   1st Qu.:33.00   Midwest  :15136  
+##  Median :16.250                  Median :41.00   South    :18963  
+##  Mean   :18.435                  Mean   :41.23   West     :14925  
+##  3rd Qu.:23.558                  3rd Qu.:49.00                    
+##  Max.   :72.115                  Max.   :64.00                    
+##    education    
+##  Min.   : 6.00  
+##  1st Qu.:12.00  
+##  Median :13.00  
+##  Mean   :13.64  
+##  3rd Qu.:16.00  
+##  Max.   :20.00
+```
+
+---
+## Histogram of Wages by Gender
+![](Dummyvariables_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+## Statistical discrimination
+
+.pull-left[One thing we can do with categorical variables is to identify statistical discrimination.
+
+A simple linear regression of Avg. Hourly Earnings on Gender will give us a quick comaprison of earnings between females and males.]
+
+.pull-right[
+
+```r
+m1 = lm(earnings ~ factor(gender), data=CPSSW8)
+stargazer(m1,type="html", single.row = TRUE, covariate.labels = c("Female"))
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;earnings&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-3.748&lt;sup&gt;***&lt;/sup&gt; (0.081)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;20.086&lt;sup&gt;***&lt;/sup&gt; (0.054)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;9.955 (df = 61393)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;2,145.295&lt;sup&gt;***&lt;/sup&gt; (df = 1; 61393)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+]
+
+---
+## Warning about Statistical Discrimination
+Although, we estimate that women earn less than men. It would be incorrect to say that this definitely proves women earn less than men do to discriminiation.
+
+- The dummy variable does not take on all the attritubes of the group. It simply labels them
+- There could still be difference in amount of education, type of education, amount of experience, age, race, etc. 
+- All of these could be contributing to the differences between the genders, but since we are not controlling for them it appears as if there is gender discrimination.
+- This problem is even worse for race.
+- [See a large twitter fight about the subject here amoung economists](https://twitter.com/jodiecongirl/status/1268758788062040065)
+- Summary if you think there is systemic racisim then the amount of education receive will not be independent of the error term. 
+
+---
+### Let's add some controls
+In this second regression we include some addtional explanatory variables.
+
+`$$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age + \beta_3 education$$`
+
+
+```r
+m2 = lm(earnings ~ factor(gender)+age+education, data=CPSSW8)
+stargazer(m1,m2,type="html",omit.stat = c("f","ser"),single.row = TRUE, covariate.labels = c("Female","Age","Educ."))
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;earnings&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-3.748&lt;sup&gt;***&lt;/sup&gt; (0.081)&lt;/td&gt;&lt;td&gt;-4.250&lt;sup&gt;***&lt;/sup&gt; (0.071)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.157&lt;sup&gt;***&lt;/sup&gt; (0.003)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Educ.&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.748&lt;sup&gt;***&lt;/sup&gt; (0.014)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;20.086&lt;sup&gt;***&lt;/sup&gt; (0.054)&lt;/td&gt;&lt;td&gt;-10.026&lt;sup&gt;***&lt;/sup&gt; (0.237)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+---
+## Quadratic function
+
+Economic theory tells us that there are diminishing returns to productivity. 
+
+As we age we become more productivity, but at a decreasing rate. 
+
+One way to account for this change is by including a quadratic term in our specification.
+
+`$$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age + \beta_3 age^2 +\beta_4 education$$`
+
+
+```r
+CPSSW8$age2=CPSSW8$age*CPSSW8$age
+m3 = lm(earnings ~ factor(gender)+age+age2+education, data=CPSSW8)
+stargazer(m1,m2,m3,type="html",omit.stat = c("f","ser"),single.row = TRUE)
+```
+
+---
+#### Quadratic function
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Statistical models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 3&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Intercept&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;20.09 (0.05)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-10.03 (0.24)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-25.76 (0.52)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Female&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-3.75 (0.08)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.25 (0.07)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.24 (0.07)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Age&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.16 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.99 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Education&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.75 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.72 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Age Sq&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.01 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.03&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.25&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.03&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.25&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="4"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+## Interaction term 
+
+Potentially, the returns from education are different by gender. We add this feature to the model by including an interaction term. 
+
+We multiply gender and education. 
+
+`$$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age+ \beta_3 age^2 \\
++\beta_4 education+ \beta_5 education *Female$$`
+
+We see from the regression results that there are not much difference with respect to education
+
+---
+#### Interaction Term
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Statistical models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 3&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 4&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Intercept&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;20.09 (0.05)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-10.03 (0.24)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-25.76 (0.52)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-25.53 (0.54)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Female&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-3.75 (0.08)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.25 (0.07)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.24 (0.07)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.85 (0.40)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Age&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.16 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.99 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.99 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Education&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.75 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.72 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.71 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Age Sq&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.01 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.01 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Education*Female&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.04 (0.03)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.03&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.25&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.03&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.25&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="5"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+#### Location, Location, Location
+
+There are often unobservable characteristics about markets that we would like to capture, but we just don't have this variable (i.e. unemployment rate by gender or sector, culture, laws, etc). 
+
+One way to handle this problem is to use categorical variables for the location of the person or firm. 
+
+These categorical variables will capture any time invariant differences between locations.  
+
+---
+#### Location, Location, Location
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Statistical models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 3&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Intercept&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-25.76 (0.52)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-25.53 (0.54)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-24.60 (0.55)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Female&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.24 (0.07)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.85 (0.40)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-4.80 (0.40)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Age&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.99 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.99 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.98 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Age Sq&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.01 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.01 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.01 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Education&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.72 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.71 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.70 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Education*Female&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.04 (0.03)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.04 (0.03)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;MidWest&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-1.26 (0.11)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;South&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-1.22 (0.10)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;West&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.42 (0.11)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.27&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.26&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.27&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;61395&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="4"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+## Log Transformation
+
+The normality assumption about the error term implies the dependent variable can potentially take on both negative and positive values. 
+
+However, there are some variables we use often that are always positive
+
+* price
+* quantity
+* income
+* wages 
+
+One method used to insure that we have a positive depedent variable is to transform the dependent variable by taking the natural log. 
+
+---
+#### Log Transformation
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;earnings&lt;/td&gt;&lt;td&gt;log(earnings)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;***&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.983&lt;sup&gt;***&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.062&lt;sup&gt;***&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Age Squared&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;***&lt;/sup&gt; (0.000)&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;***&lt;/sup&gt; (0.000)&lt;/td&gt;&lt;td&gt;-0.001&lt;sup&gt;***&lt;/sup&gt; (0.000)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;1.706&lt;sup&gt;***&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;1.701&lt;sup&gt;***&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;0.084&lt;sup&gt;***&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-4.847&lt;sup&gt;***&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;td&gt;-4.797&lt;sup&gt;***&lt;/sup&gt; (0.404)&lt;/td&gt;&lt;td&gt;-0.507&lt;sup&gt;***&lt;/sup&gt; (0.022)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Education*Female&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.257&lt;sup&gt;***&lt;/sup&gt; (0.105)&lt;/td&gt;&lt;td&gt;-0.056&lt;sup&gt;***&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;MidWest&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.217&lt;sup&gt;***&lt;/sup&gt; (0.101)&lt;/td&gt;&lt;td&gt;-0.073&lt;sup&gt;***&lt;/sup&gt; (0.005)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;South&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.425&lt;sup&gt;***&lt;/sup&gt; (0.106)&lt;/td&gt;&lt;td&gt;-0.027&lt;sup&gt;***&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;West&lt;/td&gt;&lt;td&gt;0.044 (0.029)&lt;/td&gt;&lt;td&gt;0.042 (0.029)&lt;/td&gt;&lt;td&gt;0.020&lt;sup&gt;***&lt;/sup&gt; (0.002)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-25.529&lt;sup&gt;***&lt;/sup&gt; (0.544)&lt;/td&gt;&lt;td&gt;-24.603&lt;sup&gt;***&lt;/sup&gt; (0.550)&lt;/td&gt;&lt;td&gt;0.375&lt;sup&gt;***&lt;/sup&gt; (0.030)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:left"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:left"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+
+---
+#### Log Transformation
+
+A classic place where we see log transformation is when estimating supply and demand curves.
+
+- Price and quantity are both positive values
+- Economist love talking about elasticity
+- Elasticity is the percent change in quantity over the precent change in price.
+
+`$$Quantity_i = \beta_0 + \beta_1*Price+u_i$$`
+This equation tells us how much quantity changes per unit for a given change in price per dollar.
+`$$\log{Quantity_i} = \beta_0 + \beta_1*\log{Price_i}+u_i$$`
+This equation tells us the percent change in quantity for a percent change in price.
+- `\(\beta_1\)` is the elasticity term in this equation.
+
+---
+#### More on Log Transformations
+
+Different cases lead to different interpretations
+
+Both X and Y are continuous
+- log Y and X = a one unit change in X leads to a `\(\beta\)` percent change in Y.
+  - Special Case if X is a dummy variable, then `\(\beta\)` is the percent change in Y for that category.
+- Y and log X = a one percent change in X (i.e. log (X1)-log(X2)=.01) leads to a `\(.01*\beta\)` change in Y
+- log Y and log X = a one percent change in X leads to a `\(.01*\beta\)` percent change in Y.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

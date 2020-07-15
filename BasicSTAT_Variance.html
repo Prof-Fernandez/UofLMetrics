@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>A Review of Basic Statistics</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# A Review of Basic Statistics
+## Variance, Standard Deviation, and Range
+### Jose Fernandez
+### University of Louisville
+### 2020/6/29 (updated: 2020-06-30)
+
+---
+
+
+# What do we cover
+
+1. Range
+2. Variance
+3. Standard Deviation
+4. Z score
+
+---
+# Measures of Spread
+
+In the previous set of notes, we talk about measures of central tendancy: __mean, median, and mode.__
+
+In these notes, we will talk about how spread out the data is.
+
+The Range of the data is the simplest to calculate.
+
+.center[Range = Maximum Value - Minimum Value]
+
+We will use a dataset on extramarital affairs (yes, it is a real economics paper found in the _Journal of Political Economy_)
+
+
+```r
+suppressWarnings(suppressPackageStartupMessages(library(AER)))
+data("Affairs")
+range(Affairs$affairs)
+```
+
+```
+## [1]  0 12
+```
+
+---
+# Population Variance
+
+The variance of a random variable is the __average squared deviation from the mean__.
+
+The formula for the population variance is `$$\sigma^{2}=\frac{1}{N}\sum (X_{i}-\mu)^{2}$$`
+Let's take this formula into parts so that we understand it.
+- Deviation from the mean `\((X_{i}-\mu)\)`
+- Squared Deviation from the mean `\((X_{i}-\mu)^{2}\)`
+- Average squared deviation from the mean. If we say that `\(u_{i}=(X_{i}-\mu)^{2}\)` then the formula looks a lot like a mean. `$$\sigma^{2}=\frac{1}{n}\sum u_{i}$$`
+
+---
+# Sample Variance
+
+The sample variance formula is `$$s^{2}=\frac{1}{n-1}\sum (X_{i}-\bar{x})^{2}$$`
+
+There are two differences between the population variance and the sample variance.
+1. The population variance uses the population mean, `\(\mu\)`, but the sample variance uses the sample mean, `\(\bar{x}\)`.
+2. The population variance divides by the full size of the population N. The sample variance divides by the sample size n - 1.
+
+In the appendix of the text (and on blackboard), we show that `$$E[s^{2}]=\sigma^2$$`
+
+---
+# Standard Deviation (sd)
+
+The standard deviation is simply the square root of the variance. Because the variance represents square terms, it is hard to compare with the mean.
+
+The standard deviation converts the squared terms into univariate terms so that it matches the same units as the mean.
+
+- population standard deviation `\(\sigma = \sqrt{\sigma^2}\)`
+- sample standard deviation `\(s=\sqrt{s}\)`
+
+---
+# Z score
+
+Normal distributions have a few nice properties.
+- The distribution is symmetric with the mean, median, and mode at the center.
+- Approximately 98 percent of the data are found within two standard deviations of the mean.
+- A standard normal distribution has a mean of zero and a standard deviation of 1.
+- All normally distributed random variables can be changed into a standard normal using the Z-score.
+
+The formula for the Z score is `$$Z = \frac{X-\mu}{\sigma}$$`
+
+---
+# Properties of a Z score
+- The Z score a unit of measurement. 
+- It tells us how far away an observation X is from the mean. 
+- The distance is measured in standard deviations.
+- Remember that 98 percent of the data is found within 2 standard deviations of the mean for a normal distribution.
+- An outlier is an observation with a Z score greater than 3.
+
+---
+
+# The mechanics of a Z score
+The Z score first subtracts the mean from every observation. By default, the new mean must be zero. 
+
+Next, it divides every observation by the standard deviation. This forces the new standard deviation to be equal to 1.
+
+So if X had a mean of 10 and a standard deviation of 2. 
+1. subtract 10 from all of the observations. Our new mean must be zero now.
+2. Divide all of the observation by 2. The new SD is equal to 2.
+
+---
+# Z scores in action with R
+
+
+```r
+x &lt;- rnorm(1000, mean = 10, sd = 2) # normal distribution with mean 10 and std 2
+mean(x) #Mean of X
+```
+
+```
+## [1] 9.97795
+```
+
+```r
+sd(x) #Standard Deviation of X
+```
+
+```
+## [1] 1.964039
+```
+
+```r
+y &lt;- (x - mean(x))/sd(x) #Z score of X
+mean(y) #Mean of Y
+```
+
+```
+## [1] 1.680661e-16
+```
+
+```r
+sd(y) #Standard Deviation of Y
+```
+
+```
+## [1] 1
+```
+
+---
+#Z scores and probability
+
+- Pr(Z &lt; 0)=0.5
+- Pr(-1&lt; Z &lt; 1)=0.6826895
+- Pr(-2&lt; Z &lt; 2)=0.9544997
+- Pr(-3&lt; Z &lt; 3)=0.9973002
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

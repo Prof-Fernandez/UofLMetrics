@@ -1,0 +1,475 @@
+---
+title: "Causal Inference"
+subtitle: "Simple Linear Regression"
+author: "Jose Fernandez"
+institute: "University of Louisville"
+date: "2020/6/29 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, uol, uol-fonts, "extra.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: center, inverse, middle
+# Simple Linear Regression
+
+---
+## Introduction
+
+- We are interested in the causal relationship between two random variables \(X\) and \(Y\)
+- We assume that \(X\) (the regressor or the independent variable) causes changes in \(Y\) (the dependent variable)
+- We assume that the relationship between them is linear
+- We are interested in estimating the slope of this linear relationship
+
+---
+## Example: The Effect of Class Size on Student Performance (1)
+
+- Suppose the superintendent of an elementary school district wants to know the effect of class size on student performance
+- She decides that test scores are a good measure of performance
+
+---
+## The Effect of Class Size on Student Performance (2)
+
+What she wants to know is what is the value of $$\beta_{ClassSize} = \frac{\text{change in }TestScore}{\text{change in }ClassSize} = \frac{\Delta TestScore}{\Delta ClassSize}$$
+If we knew $\beta_{ClassSize}$ we could answer the question of how student test scores would change in response to a specific change in the class sizes $$\Delta TestScore = \beta_{ClassSize} \times \Delta ClassSize$$
+If $\beta_{ClassSize} = -0.6$ then a reduction in class size by two students would yield a change of test scores of $(-0.6)\times(-2) = 1.2$.
+
+---
+## Linear Equation of Relationship (1)
+
+$\beta_{ClassSize}$ would be the slope of the straight line describing the linear relationship between $TestScore$ and $ClassSize$
+
+$$TestScore = \beta_0 + \beta_{ClassSize} \times ClassSize$$
+
+If we knew the parameters $\beta_0$ and $\beta_{ClassSize}$, not only would we be able to predict the change in student performance, we would be able to predict the average test score for any class size
+
+---
+## Linear Equation of Relationship (2)
+
+We can't predict exact test scores since there are many __other factors__ that influence them that are not included here 
+- teacher quality 
+- better textbooks 
+- different student populations 
+- etc.
+
+The equation of the model that includes all these other factors and predicts exact test scores we write
+
+$$TestScore = \underbrace{\beta_0 + \beta_{ClassSize} \times ClassSize}_{\text{Average }TestScore} + \text{ other factors}$$
+
+---
+## General Form
+
+More generally, if we have $n$ observations for $X_i$ and $Y_i$ pairs (e.g. $Y_i$ is the average test score and $X_i$ is the average class size, for district $i$)
+
+$$Y_i = \beta_0 + \beta_1 X_i + u_i$$
+
+- $\beta_0$ (intercept) and $\beta_1$ (slope) are the model parameters
+- $\beta_0 + \beta_1 X_i$ is the population regression line (function)
+- $u_i$ is the error term. It contains all the other factors beyond $X$ that influence $Y$. 
+
+We refer to this relationship as: $Y_i$ regressed on $X_i$
+
+---
+## Regression Model Plot
+![](ch4pic1.png)
+
+---
+## Parameter Estimation
+
+Typically, for our model
+
+$$Y_i = \beta_0 + \beta_1 X_i + u_i$$
+
+We don't know the parameters $\beta_0$ and $\beta_1$
+
+__What is the best way to draw a line through the points?__
+
+---
+class: center, inverse, middle
+# The Math of Simple Linear Regression
+
+---
+## Ordinary Least Squares
+
+We use statistical models to predict the value of a random variable, $y_i$.
+$$y_i = model_i+ u_i$$
+where i indexes an observation and $u_i$ is the error.
+
+The simplest model is the mean of the random variable, $$\overline{y} = \frac{1}{n}\sum y_{i}.$$
+
+How good our model is depends on how close our prediction, $\overline{y}$, is to actual values, $y_i$. 
+
+We call the difference between these two value the error, $u_i$.  $$u_i = y_i -\overline{y}$$
+
+---
+## Minimizing the Variance
+A familiar way to quantify this deviation is the variance. $$var(y)=\frac{1}{n}\sum (y_{i}-\overline{y})^{2}=\frac{1}{n}\sum u_{i}^{2}$$
+
+A simple regression makes an improvement over the mean of y. $$y_i = \beta_0 + \beta_1 X_i + u_i$$
+
+We choose the value of $\beta_0$ and $\beta_1$, which minimize the variance. A smaller variance implies a better prediction. 
+$$var(y)=\frac{1}{n}\sum u_{i}^{2}=\frac{1}{n}\sum (y_{i}-\beta_0 - \beta_1 X_i)^{2}$$
+
+
+
+---
+### The Betas
+The estimated values of our $\beta$'s are $\widehat{\beta}_{0}$ and $\widehat{\beta}_{1}$. 
+
+The regression line improves on the model fit over just using the mean. $$\widehat{y}_{i} = \widehat{\beta}_{0}+\widehat{\beta}_{1}X_i$$
+
+![[Image Credit](https://cnx.org/contents/zddObXQQ@1.1:Ae4araUY@1/The-Regression-Equation)](https://cnx.org/resources/440525fca3a9401f5b93021c76e2e27839e7e46b/variation.PNG)
+
+---
+## SSR and SSE
+
+- You can think of the SSR (Sum of Square Regression) as the amount of the total variation that the regression line explains. 
+- Essentially, it tells us how much better using a line is over just using the mean of the dependent variable. 
+- The SSE (Sum of Square Error) tells us how much of the total variation is left unexplained. 
+
+---
+## The OLS Assumptions
+
+1. The error term $u_i$ has a mean of zero, $E[u_i]=0$.
+2. The error term is independent of the X's, $E[X_i u_i]=COV(X_i,u_i)=0$.
+3. The error term has a constant variance, $Var[u_i|X_i]=\sigma^2$.
+4. The variables $Y_i$ and $X_i$ are independently identically distributed (i.e. they are a random sample)
+
+We will use these assumptions along with some algebra/calculus to solve for the optimal values of the $\beta$'s.
+
+---
+## Method of Momments
+
+We will use the OLS assumptions to find the optimal values of the $\beta$'s.
+
+The first assumption states the mean of the error term is zero. $$\frac{1}{n}\sum u_i = \frac{1}{n}\sum y_i-\beta_0-\beta_1 X_i = 0$$
+We can simplify this equation.
+$$\frac{1}{n}\sum y_i-\beta_0-\beta_1 X_i = \frac{1}{n}\sum y_i - \beta_0 -\beta_1 \frac{1}{n}\sum X_i = 0$$
+Which can be simplified further to $$\frac{1}{n}\sum y_i - \beta_0 -\beta_1 \frac{1}{n}\sum X_i = \bar{y}-\beta_0-\beta_1 \bar{X}=0$$
+
+And we can solve this equation for $\beta_0$. $$\beta_0 = \bar{y}-\beta_1 \bar{X}$$
+
+---
+# Now for the slope
+We will use the second assumption that states $COV(X_i,u_i)=\frac{1}{n}\sum (X_i-\bar{X}) u_i=0$
+
+We can replace the error term with the regression equation.
+$$\frac{1}{n}\sum (X_i-\bar{X}) u_i=\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\beta_0-\beta_1 X_i)=0 $$
+Recall, the optimal value $\beta_0=\bar{Y}-\beta \bar{X}$. We can substitute this value into our equation.
+$$\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\beta_0-\beta_1 X_i)=\frac{1}{n}\sum (X_i-\bar{X})(Y_i -(\bar{Y}-\beta \bar{X})-\beta_1 X_i) $$
+We can simplify this further, $$\frac{1}{n}\sum (X_i-\bar{X})(Y_i -(\bar{Y}-\beta \bar{X})-\beta_1 X_i)= \frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y}-\beta(X_i-\bar{X}))=0$$
+
+---
+### The Slope Estimate Continued
+
+We are almost there. We can solve this equation for the slope parameter, $\beta_1$. $$\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y}-\beta_1(X_i-\bar{X}))=\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y})-\beta_1\frac{1}{n}\sum(X_i-\bar{X})^2=0$$
+I want to point out two things.
+1. $\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y})$ is the $COV(X,Y)$.
+2. $\frac{1}{n}\sum(X_i-\bar{X})^2$ is the $VAR(X)$.
+
+We can rewrite the equation as $$COV(X,Y)-\beta_1 VAR(X)\Rightarrow \beta_1 = COV(X,Y)/VAR(X)$$
+
+Summary
+- The estimate of the constant, $\widehat{\beta_0}=\bar{Y}-\widehat{\beta_1}\bar{X_i}$
+- The estimate of the slope, $\widehat{\beta_1}=COV(X,Y)/VAR(X)=\frac{\sum(X_i-\bar{X})(Y_i-\bar{Y})}{\sum(X_i-\bar{X})^2}$
+
+---
+class: inverse, middle, center
+# The Calculus Method
+
+---
+# Minimizing the variance with calculus
+
+Remember that the error term represents everything that effects the dependent variable that we do not observe. 
+
+We want to choose $\beta_0$ and $\beta_1$ that minimize the variance of the error term, $u_i$.
+
+$$L = \min_{\beta_0,\beta_1} \frac{1}{n} \sum u^2_i =\min_{\beta_0,\beta_1} \frac{1}{n}\sum[Y_i-\beta_0-\beta_1X_i]^2$$
+
+We will take the derrivative the equation with respect to $\beta_0$ and $\beta_1$.
+
+The principle is similar to finding the minimum of parable.
+---
+### Two equations and Two Unknowns
+
+We need to use partial derrivatives 
+
+Here is the partial derrivative with respect to the constant.
+
+$$\frac{\partial L}{\partial \beta_0}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)=0$$
+
+Here is the partial derrivative with respect to the slope
+
+$$\frac{\partial L}{\partial \beta_1}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)X_i=0$$
+
+We need to choose $\beta_0$ and $\beta_1$ such that both equations are equal to zero simultaneously. So we have two equations and two unknowns.
+
+---
+# Solve for the Constant
+
+We can simplify the first equation to $$\frac{\partial L}{\partial \beta_0}=\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)=0$$
+We know that addition has the communitative property (it doesn't matter if you add 1+2 or 2+1 in order to get 3). So we re-write the equation and simplify again.
+$$\frac{1}{n}\sum Y_i-\frac{1}{n}\sum \beta_0-\frac{1}{n}\sum \beta_1 X_i=0$$
+The mean of a constant is the just the constant so $\frac{1}{n}\sum \beta_0=\beta_0$ so we can simplify again. $$\hat{\beta_0}=\bar{Y}-\hat{\beta_1}\bar{X}$$
+
+---
+### Slope
+
+Now we can use the formula for the constant in the equation for the slope.
+$$\frac{\partial L}{\partial \beta_1}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)X_i=\sum (Y_i-(\bar{Y}-\hat{\beta_1}\bar{X})-\beta_1X_i)X_i=0$$
+We will re-arrange some terms
+$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))(X_i-\bar{X}+\bar{X})=0$$
+It can be shown that $$\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))\bar{X}=0$$
+1. $\bar{X}$ is a constant so it can be pulled out.
+2. Remember that the mean of Y is $\bar{Y}=\frac{1}{n}\sum Y_i$ so $n\bar{Y}=\sum Y_i$ and $\sum \bar{Y}=n\bar{Y}$.
+
+Now if you look at the first term $\sum (Y_i-\bar{Y})=n\bar{Y}-n\bar{Y}=0$
+3. You can do the same thing as above for $\sum(X_i-\bar{X})=0$
+
+Therefore, $\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))\bar{X}=0$
+
+---
+# Solving for Slope
+
+Now, we can solve for slope $$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))(X_i-\bar{X})=0$$
+$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y})(X_i-\bar{X})-\hat{\beta_1}(X_i-\bar{X})^2=0$$
+$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y})(X_i-\bar{X})-\hat{\beta_1}\sum(X_i-\bar{X})^2=0$$
+$$\hat{\beta_1}=\frac{\sum (Y_i-\bar{Y})(X_i-\bar{X})}{\sum(X_i-\bar{X})^2}=\frac{COV(X,Y)}{VAR(X)}$$
+---
+class: center, inverse, middle
+# Return to Notes
+
+---
+
+## Class Size Data
+
+To estimate the model parameters of the class size/student performance model we have data from 420 California school districts in 1999
+![](ch4pic2.png)
+
+---
+## Correlation and Scatterplot (1)
+
+The sample correlation is found to be -0.23, indicating a weak negative relationship. 
+
+However, we need a better measure of causality. 
+
+We want to be able to draw a straight line through these dots characterizing the linear regression line, and from that we get the slope.
+
+---
+## Correlation and Scatterplot (2)
+```{r warning=FALSE, message=FALSE}
+suppressPackageStartupMessages(library(AER,quietly=TRUE,warn.conflicts=FALSE))
+library(ggplot2,quietly=TRUE,warn.conflicts=FALSE)
+data("CASchools")
+CASchools$str=CASchools$students/CASchools$teachers
+CASchools$testscr=(CASchools$read+CASchools$math)/2
+qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher Ratio", ylab="Test Scores")
+```
+
+---
+## The Ordinary Least Squares Estimator (1)
+
+- The _ordinary least squares (OLS)_ estimator selects estimates for the model parameters that minimize the distance between the sample regression line (function) and the observed data.
+- Recall that we use $\bar{Y}$ as an estimator of $E[Y]$ since it minimizes $\sum_i (Y_i - m)^2$
+- With OLS we are interested in minimizing $$\min_{b_0,b_1} \sum_i [Y_i - (b_0 + b_1 X_i)]^2$$ We want to find $b_0$ and $b_1$ such that the mistakes between the observed $Y_i$ and the predicted value $b_0 + b_1 X_i$ are minimized.
+
+---
+## The Ordinary Least Squares Estimator (2)
+
+The OLS estimator of $\beta_1$ is $$\hat{\beta}_1 = \frac{\sum_i (X_i - \bar{X})(Y_i - \bar{Y})}{\sum_i (X_i - \bar{X})^2} = \frac{s_{XY}}{s_X^2}$$
+
+The OLS estimator of $\beta_0$ is $$\hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X}$$
+
+The predicted value of $Y_i$ is $$\hat{Y}_i = \hat{\beta}_0 + \hat{\beta}_1 X_i$$
+
+The error in predicting $Y_i$ is called the residual $$\hat{u}_i = Y_i - \hat{Y}_i$$
+
+---
+## OLS Regression of Test Scores on Student-Teacher Ratio (1)
+
+Using data from the 420 school districts an OLS regression is run to estimate the relationship between test score and teacher-student ratio (STR).
+
+$$\widehat{TestScore} = 698.9 - 2.28 \times STR$$
+
+where $\widehat{TestScore}$ is the predicted value. (This is referred to as test scores regressed on STR)
+
+---
+## OLS Regression of Test Scores on Student-Teacher Ratio (2)
+```{r}
+qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher Ratio", ylab="Test Scores") + geom_abline(intercept=698.9, slope=-2.28, color='blue')
+```
+
+---
+class: center, inverse, middle
+# Goodness of Fit
+
+---
+## Goodness of Fit
+
+Now that we've run an OLS regression we want to know
+
+- How much does the regressor account for variation in the dependent variable?
+- Are the observations tightly clustered around the regression line?
+
+We have two useful measures
+
+- The regression $R^2$
+- The standard error of the regression ($SER$)
+
+---
+## The R Squared (1)
+
+  __The $R^2$ is the fraction of the sample variance of $Y_i$ (dependent variable) explained by $X_i$ (regressor)__
+
+- From the definition of the regression predicted value $\hat{Y}_i$ we can write $$Y_i = \hat{Y}_i + \hat{u}_i$$ and $R^2$ is the ratio of the sample variance of $\hat{Y}_i$ and the sample variance of $Y_i$
+- $R^2$ ranges from 0 to 1. $R^2 = 0$ indicates that $X_i$ has no explanatory power at all, while $R^2 = 1$ indicates that it explains $Y_i$ fully.
+
+---
+## The R Squared (2)
+
+Let us define the total sum of squares ($TSS$), the explained sum of squares ($ESS$), and the sum of squared residuals ($SSR$)
+
+$$\begin{align*} Y_i &= \hat{Y}_i + \hat{u}_i \\ Y_i - \bar{Y} &= \hat{Y}_i - \bar{Y} + \hat{u}_i \\ (Y_i - \bar{Y})^2 &= (\hat{Y}_i - \bar{Y} + \hat{u}_i)^2 \\ (Y_i - \bar{Y})^2 &= (\hat{Y}_i - \bar{Y})^2 + (\hat{u}_i)^2 + 2(\hat{Y}_i - \bar{Y})\hat{u}_i \\ \underbrace{\sum_i(Y_i - \bar{Y})^2}_{TSS} &= \underbrace{\sum_i(\hat{Y}_i - \bar{Y})^2}_{ESS} + \underbrace{\sum_i(\hat{u}_i)^2}_{SSR} + \underbrace{2\sum_i(\hat{Y}_i - \bar{Y})\hat{u}_i}_{=0} \\ TSS &= ESS + SSR \end{align*}$$
+
+---
+## The R Squared (3)
+
+$$TSS = ESS + SSR$$
+
+$R^2$ can be defined as $$R^2 = \frac{ESS}{TSS} = 1 - \frac{SSR}{TSS}$$
+
+---
+## The Standard Error of the Regression
+
+The standard error of the regression $(SER)$ is an estimator of the standard deviation of the population regression error $u_i$.
+
+Since we don't observe $u_1,\dots, u_n$ we need to estimate this standard deviation
+We use $\hat{u}_1,\dots, \hat{u}_n$ to calculate our estimate
+
+$$SER = s_{\hat{u}}$$ where $$s_{\hat{u}}^2 = \frac{1}{n-2}\sum_i \hat{u}_i^2 = \frac{SSR}{n-2}$$
+
+---
+## Measure of Fit of Test Score on STR Regression
+
+- The $R^2$ is calculated to be 0.051. This means that the $STR$ explains 5.1\% of the variance in $TestScore$.
+- The $SER$ is calculated to be 18.6. This is an estimate of the standard deviation of $u_i$ which shows a large spread.
+- Low $R^2$ (or low $SER$) does not mean that the regression is bad: it means that there are other factors that have a strong influence on the dependent variable that have not been included in the regression.
+
+---
+class: center, inverse, middle
+# Regression in R
+
+---
+## Load the data
+If you haven't done so already, then let's load the data into R.
+We want the CA Schools data from the AER library.
+
+Enter the following code into R
+
+- library(AER)
+- data(CASchools)
+
+---
+## Let's run a regression
+```{r}
+regress.results=lm(formula = testscr ~ str, data=CASchools)
+summary(regress.results)
+```
+
+---
+class: center, inverse, middle
+# The Least Squares Assumptions
+
+---
+## Assumption A.1
+
+$$E[u_i|X_i] = 0$$
+
+- Other factors unaccounted for in the regression are unrelated to the regressor $X_i$
+- While the dependent variable varies around the population regression line, on average the predicted value is correct
+
+---
+## Assumption A.1 Plot
+![](ch4pic3.png)
+
+---
+## Randomized Controlled Experiment
+
+- In a randomized controlled experiment, subjects are placed in treatment group $(X_i = 1)$ or the control group ($X_i = 0$) randomly, not influenced by their characteristics. Hence, $E[u_i|X_i] = 0$.
+- Using observational data, $X_i$ is not assigned randomly, therefore we must then think carefully about making assumption A.1.
+
+---
+## Correlation and Conditional Mean
+
+- Recall that if $E[u_i|X_i] = 0$ then $Corr(u_i, X_i) = 0$
+- However, $u_i$ and $X_i$ being uncorrelated is not sufficient for assumption A.1 to hold.
+
+---
+## Assumption A.2
+
+For all $i$, $(X_i, Y_i)$ are i.i.d.
+
+- Since all observation pairs $(X_i, Y_i)$ are picked from the same population, then they are identically distributed.
+- Since all observations are randomly picked, then they should be independent.
+- The majority of data we will encounter will be i.i.d., except for data collected from the same entity over time (panel data, time series data)
+
+---
+## Assumption A.3: Large Outliers are Unlikely
+
+$$0 < E[Y_i^4] < \infty$$
+
+- None of observed data should have extreme and "unexpected" values
+- Technically, this means that the fourth moment should be positive and finite
+- You should look at your data (plot it) to see if any of the observations are suspicious, and then double check there was no error in the data
+
+---
+## Assumption A.3 Plot
+![](ch4pic4.png)
+
+---
+class: center, inverse, middle
+# Sampling Distribution of the OLS Estimators
+
+---
+## Coefficients are Random Variables
+
+- Since our regression coefficient estimates, $\beta_0$ and $\beta_1$, depend on a random sample $(X_i, Y_i)$ they are random variables
+- While their distributions might be complicated for small samples, for large samples, using the __Central Limit Theorem__, they can be approximated by a normal distribution.
+- It is important for us to have a way to describe their distribution, in order for us to carry out our inferences about the population.
+
+---
+## Review of Sampling Distribution of the Sample Mean of Y
+
+When we have a large sample, we can approximate the distribution of the random variable $\bar{Y}$ by a normal distribution with mean $\mu_Y$.
+
+---
+## The Sampling Distribution of the Model Coefficient Estimators (1)
+
+- Both estimates are unbiased: $E[\hat{\beta}_0] = \beta_0$ and $E[\hat{\beta}_1] = \beta_1$.
+- Using the same reasoning as we did with $\bar{Y}$, we can use the CLT to argue that $\hat{\beta}_0$ and $\hat{\beta}_1$ are both approximately normal
+- The large sample variance of $\hat{\beta}_1$ is $$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$
+- If the error terms are homoscedastic (constant variance), then the equation simplifies to $$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[u_i]}{[Var(X_i)]^2}$$
+- Since $\sigma_{\hat{\beta}_1}^2$ decreases to zero the large the sample, $\hat{\beta}_1$ is said to be consistent
+
+---
+## The Sampling Distribution of the Model Coefficient Estimators (2)
+
+Another implication of the variance of $\hat{\beta}_1$ $$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$
+
+is the larger $Var(X_i)$ the smaller is $\sigma_{\hat{\beta}_1}^2$ and hence tighter is our prediction of $\beta_1$.
+
+---
+## The Effect of Greater Variance in X
+![](ch4pic5.png)
+
+---
+## The Sampling Distribution of the Model Coefficient Estimators (3)
+
+Yet another implication of the variance of $\hat{\beta}_1$
+
+$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$
+
+is that the smaller the variance $u_i$ the smaller is $\sigma_{\hat{\beta}_1}^2$ and hence tighter is our prediction of $\beta_1$.

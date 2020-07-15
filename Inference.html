@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Causal Inference</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Causal Inference
+## Simple Linear Regression - Inference
+### Jose Fernandez
+### University of Louisville
+### 2020/6/29 (updated: 2020-07-05)
+
+---
+
+## Outline
+
+1.  The standard error of `\(\hat{\beta_i}\)` 
+2.  Hypothesis tests concerning `\(\beta_1\)`
+3.  Confidence intervals for `\(\beta_1\)`
+4.  Regression when `\(X\)` is binary
+5.  Heteroskedasticity and homoskedasticity
+6.  Efficiency of OLS and the Student t distribution
+
+---
+## A big picture review of where we are going
+
+1.  We want to learn about the slope of the population regression line. We have data from a sample, so there is sampling uncertainty. There are five steps towards this goal:
+2.  State the population object of interest 
+3.  Provide an estimator of this population object
+4.  Derive the sampling distribution of the estimator (this requires certain assumptions). In large samples this sampling distribution will be normal by the CLT.
+5.  The square root of the estimated variance of the sampling distribution is the standard error (SE) of the estimator
+6.  Use the SE to construct t-statistics (for hypothesis tests) and confidence intervals.
+
+---
+## Object of Interest
+
+`$$Y_i = \beta_0+\beta_1 X_i +u_i, i=1,\dots,n$$`  
+`\(\beta=\frac{\Delta Y}{\Delta X}\)`, for an autonomous change in __X (causal effect)__
+ 
+__ESTIMATOR__: the OLS estimator `\(\hat{\beta_1}\)`.
+
+__The Sampling Distribution of `\(\hat{\beta_1}\)`:__
+To derive the large-sample distribution of `\(\hat{\beta_1}\)`, we make the following assumptions:
+The Least Squares Assumptions:
+
+1.  `\(E(u|X = x) = 0.\)`
+2.  `\((X_i,Y_i), i=1,\dots,n\)` are i.i.d.
+3.  Large outliers are rare `\((E(X4) &lt; \infty, E(Y4) &lt; \infty\)`.
+
+---
+## The Sampling Distribution
+
+Under the Least Squares Assumptions, for n large, `\(\hat{\beta_1}\)` is approximately distributed,
+
+`$$\hat{\beta_1} ~ N(\beta_1,\frac{\sigma^{2}_{v}}{n(\sigma^{2}_{x})^{2}})$$`
+
+---
+## General approach: construct t-statistic, and compute p-value 
+
+- __In General__ : `\(t=\frac{\text{esimator}-\text{hypothesis value}}{\text{standard error of the estimator}}\)`
+
+where the SE of the estimator is the square root of an estimator of the variance of the estimator.
+
+- For testing the mean of Y: `$$t=\frac{\bar{Y}-\mu_Y}{s_y/\sqrt{n}}$$`
+- For testing the mean of `\(\beta\)`: `$$t=\frac{\hat{\beta}-\beta}{SE(\hat{\beta})}$$`
+
+---
+## Example:  Test Scores and STR, California data 
+
+Estimated regression line: `\(\hat{Test Score}=698.9-2.28STR\)`
+
+Regression software reports the standard errors: `\(SE(\hat{\beta_0})=10.4\)` and `\(SE(\hat{\beta_1})=0.52\)`
+`$$t=\frac{\hat{\beta}-\beta}{SE(\hat{\beta})}=\frac{-2.28-0}{0.52}=-4.38$$`
+
+- The 1% 2-sided critical t-statistic is 2.58, so we reject the null at the 1% significance level.
+- Alternatively, we can compute the p-value.
+
+---
+## P-value
+![The p-value is 0.00001 (10-5)](ch5pic1.png)
+
+
+---
+## Confidence Intervals for `\(\beta\)` 
+
+Recall that a 95% confidence is, equivalently:
+
+- The set of points that cannot be rejected at the 5% significance level;
+- A set-valued function of the data (an interval that is a function of the data) that contains the true parameter value 95% of the time in repeated samples.
+
+Because the t-statistic for `\(\beta_1\)` is N(0,1) in large samples, construction of a 95% confidence for `\(\beta_1\)` is just like the case of the sample mean:  
+
+95% confidence interval for `\(\beta_1\)` = { `\(\hat{\beta_1}\pm 1.96 *SE(\hat{\beta_1}\)`)}
+
+---
+## Confidence interval example:  Test Scores and STR
+
+Recall, we estimated an equation relating student/teacher ratio to test scores
+
+- Estimated regression line: `\(\hat{Test Score}=698.9-2.28STR\)`
+- Regression software reports the standard errors: `\(SE(\hat{\beta_0})=10.4\)` and `\(SE(\hat{\beta_1})=0.52\)`
+
+95% confidence interval for `\(\hat{\beta_1}\)`:
+
+`\((\hat{\beta_1} \pm 1.96*SE(\hat{\beta_1})) = {-2.28 \pm 1.96*0.52} = (-3.30, -1.26)\)`
+
+__The following two statements are equivalent (why?)__
+
+- The 95% confidence interval does not include zero;
+- The hypothesis `\(\beta\)` is rejected at the 5% level
+
+---
+## Hypothesis testing and confidence intervals in R (1)
+In this section, we perform hypothesis test with R. 
+
+First, we need to estimate the regression equation again and save the results as regress.results.
+
+
+```
+## 
+## Call:
+## lm(formula = testscr ~ str, data = CASchools)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -47.727 -14.251   0.483  12.822  48.540 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 698.9329     9.4675  73.825  &lt; 2e-16 ***
+## str          -2.2798     0.4798  -4.751 2.78e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 18.58 on 418 degrees of freedom
+## Multiple R-squared:  0.05124,	Adjusted R-squared:  0.04897 
+## F-statistic: 22.58 on 1 and 418 DF,  p-value: 2.783e-06
+```
+
+---
+## Hypothesis testing and confidence intervals in R (2)
+In this section, we perform hypothesis with R. 
+
+Second, we can use the following commands to find a CI.
+
+
+```r
+confint(regress.results, level=0.95) # CIs for model parameters 
+```
+
+```
+##                 2.5 %     97.5 %
+## (Intercept) 680.32312 717.542775
+## str          -3.22298  -1.336636
+```
+
+---
+## Heteroskedasticity vs Homoskedasticity Standard Errors
+
+1.  What is it?
+2.  Consequences of homoskedasticity
+3.  Implication for computing standard errors
+
+__What do these two terms mean?__
+
+- If var(u|X=x) is constant 
+- that is, if the variance of the conditional distribution of u given X does not depend on X 
+- then u is said to be __homoskedastic__. 
+- Otherwise, u is __heteroskedastic__.
+
+---
+## Homoskedasticity in a picture: 
+![](ch5pic2.png)
+
+- E(u|X=x) = 0 (u satisfies Least Squares Assumption #1)
+- The variance of u does not depend on x 
+
+---
+## Heteroskedastic or homoskedastic?
+![](ch5pic3.png)
+
+A real-data example from labor economics:  average hourly earnings vs. years of education (data source: Current Population Survey)
+
+---
+## Heteroskedastic or homoskedastic?
+![](ch5pic4.png)
+
+The Class Size Data
+
+---
+## Practical Implications
+
+- The homoskedasticity-only formula for the standard error of  and the "heteroskedasticity-robust" formula differ - so in general, you get different standard errors using the different formulas.
+- Homoskedasticity-only standard errors are the default setting in regression software 
+- sometimes the only setting (e.g. Excel).  To get the general "heteroskedasticity-robust" standard errors you must override the default.
+- _If you don't override the default and there is in fact heteroskedasticity, your standard errors (and t-statistics and confidence intervals) will be wrong 
+- typically, homoskedasticity-only SEs are too small.
+
+---
+## How to get robust standard errors in R
+
+Most statistical package have very simple and convienent ways to deal with heteroskedastic standard errors. However, R makes you do a little bit more work.
+
+First, we need to install a package called sandwitch. 
+
+Second, we will calculate the SE's for all of the potential alternative specifications.
+
+---
+## How to get robust standard errors in R
+
+```r
+library(sandwich) # package needed to construct robust SE's
+
+# check that "sandwich" returns HC0
+coeftest(regress.results, vcov = sandwich)                # robust; sandwich
+```
+
+```
+## 
+## t test of coefficients:
+## 
+##              Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) 698.93295   10.33966  67.597 &lt; 2.2e-16 ***
+## str          -2.27981    0.51825  -4.399 1.382e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```r
+coeftest(regress.results, vcov = vcovHC(regress.results, "HC0"))    # robust; HC0 
+```
+
+```
+## 
+## t test of coefficients:
+## 
+##              Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) 698.93295   10.33966  67.597 &lt; 2.2e-16 ***
+## str          -2.27981    0.51825  -4.399 1.382e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+## How to get robust standard errors in R
+
+
+```r
+# check that the default robust var-cov matrix is HC3
+coeftest(regress.results, vcov = vcovHC(regress.results))           # robust; HC3 
+```
+
+```
+## 
+## t test of coefficients:
+## 
+##              Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) 698.93295   10.46054 66.8162 &lt; 2.2e-16 ***
+## str          -2.27981    0.52436 -4.3478 1.729e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```r
+coeftest(regress.results, vcov = vcovHC(regress.results, "HC3"))    # robust; HC3 (default)
+```
+
+```
+## 
+## t test of coefficients:
+## 
+##              Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) 698.93295   10.46054 66.8162 &lt; 2.2e-16 ***
+## str          -2.27981    0.52436 -4.3478 1.729e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+## How to get robust standard errors in R
+
+
+```r
+# reproduce the Stata default
+coeftest(regress.results, vcov = vcovHC(regress.results, "HC1"))    # robust; HC1 (Stata default)
+```
+
+```
+## 
+## t test of coefficients:
+## 
+##              Estimate Std. Error t value  Pr(&gt;|t|)    
+## (Intercept) 698.93295   10.36436 67.4362 &lt; 2.2e-16 ***
+## str          -2.27981    0.51949 -4.3886 1.447e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+---
+## The Bottom Line
+
+- If the errors are either homoskedastic or heteroskedastic and you use heteroskedastic-robust standard errors, you are OK
+- If the errors are heteroskedastic and you use the homoskedasticity-only formula for standard errors, your standard errors will be wrong (the homoskedasticity-only estimator of the variance of `\(\hat{\beta}\)` is inconsistent if there is heteroskedasticity).
+- The two formulas coincide (when n is large) in the special case of homoskedasticity
+- So, you should always use heteroskedasticity-robust standard errors.
+
+---
+## The Extended Least Squares Assumptions
+
+These consist of the three LS assumptions, plus two more:
+
+1.  E(u|X = x) = 0.
+2.  `\((X_i,Y_i)\)`, i =1,.,n, are i.i.d.
+3.  Large outliers are rare `\((E(Y^4) &lt; \infty, E(X^4) &lt; \infty).\)`
+4.  u is homoskedastic
+5.  u is distributed `\(N(0,\sigma^2)\)`
+
+Assumptions 4 and 5 are more restrictive - so they apply to fewer cases in practice.  
+
+However, if you make these assumptions, then certain mathematical calculations simplify and you can prove strong results 
+- results that hold if these additional assumptions are true.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

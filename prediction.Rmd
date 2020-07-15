@@ -1,0 +1,92 @@
+---
+title: "Simple Linear Regression"
+subtitle: "Prediction and Confidence intervals"
+author: "Jose M. Fernandez"
+institute: "University of Louisville"
+date: "2020-7-4 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, uol, uol-fonts, "extra.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+class: middle, center, inverse
+# Confidence & Prediction Intervals of the Dependent Variable
+
+---
+# Dependent Variable Predictions
+
+- One reason to run a linear regression is to learn the relationship between X and Y so that you can use X to __predict__ Y.
+- There are multiple examples of this practice in business applications
+  - Accuaries use data about your demongraphics to predict your death and the likelihood of an accident.
+  - Stock Brokers use news stories to predict changes in stock prices
+  - Wine experts use rainfall to predict wine quality before maturity.
+  
+---
+# But how how confident can we be in our prediction
+
+It is easy to use your model to predict. All you need to do is
+- Use current data to estimate the model.
+- Get the estimate coefficients
+- Plug in new values for your explanatory variables to predict your dependent variable.
+
+#### But there are some caveats
+
+---
+
+### Warnings about predictions
+
+- Out of sample predictions perform poorly if your X's are too far out of the range in your sample
+- __Example: Home prices__ 
+ - Small and Large home are poorly estimated.
+ - These values are too far outside of the range of the square foot variable.
+
+---
+
+### Warnings about predictions
+![](
+http://berkeley-homes.com/graphics/market_research/2012/2012/2012-mls-berkeley-single-family-home-sales-research-graph-sales-price-vs-square-foot-home.jpg)
+
+---
+## Confidence interval of a prediction
+
+We know confidence intervals for a mean or for our point estimates $(\beta)$. 
+
+- What if we want a confidence interval for our prediction?
+
+Remember that Y is a function of X and some stuff we do not know (the error term).
+ - X has a variance
+ - The error term has a variance
+ - Our point estimate has a variance
+ - how do we combine all of this uncertainty?
+
+---
+## Prediction Interval formula
+
+We know that the predicted value of the dependent variable is $$\hat{y}=\hat{\beta_0}+\hat{\beta_1}x^*$$
+where $x^*$ is the value of x we want to use to predict y.
+
+The confidence interval fromula is then, $$\hat{\beta_0}+\hat{\beta_1}x^*+t_{\alpha/2}*s_e*\sqrt{\frac{1}{m}+\frac{1}{n}+\frac{(x^*-\bar{x})^2}{\sum(x_i-\bar{x})^2}}$$
+- For a prediciton interval, we assume $m = 1$
+- For a confidence interval, we assume $m \rightarrow \infty$
+- Confidence intervals are smaller than prediction intervals
+
+---
+### Prediction and Confidence intervals in R
+
+#### Problem
+In the data set faithful, develop a 95% prediction interval of the eruption duration for the waiting time of 80 minutes.
+
+```{r}
+attach(faithful)     # attach the data frame 
+eruption.lm = lm(eruptions ~ waiting)
+newdata = data.frame(waiting=80) # our value of X for prediction
+predict(eruption.lm, newdata, interval="confidence")  # Confidense Interval
+predict(eruption.lm, newdata, interval="predict") # Prediction Interval
+```
+- Both intervals have the same point estimate (center)
+- The prediction interval is wider than the confidence interval

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Linear Regression</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Linear Regression
+## Regression Discontinuity
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2020-07-10)
+
+---
+
+class: middle, center, inverse
+# Regression Discontinuity Design 
+
+---
+## Quick Review of diff-in-diff
+
+_This document replicates the Table 4.1 and Figures 4.2 4.4 4.5 found in Mastering Metrics (based on data from Carpenter and Dobkin 2009)_
+
+Will adding controls affect diff-in-diff estimates if treatment assignment was random?
+
+- __Answer__ = Not unless you've added 'bad controls', which are controls also affected by treatment.
+
+---
+## Quick Review of diff-in-diff
+
+When you've done this, you're no longer estimating the causal effect of treatment
+
+- __Control__ (that are exogenous) will just improve precision, but shouldn't affect estimates
+
+---
+## Quick Review of diff-in-diff
+
+What are some standard falsification tests you might want to run with diff-in-diff?
+
+ __Answer__
+ 
+-  Compare ex-ante characteristics of treated &amp; untreated
+- Check timing of treatment effect
+- Run regression using dep. variables that shouldn't be affected by treatment (if it is what we think it is)
+- Check whether reversal of treatment has opposite effect
+- Triple-difference estimation
+
+---
+## Quick Review of diff-in-diff
+
+If you find ex-ante differences in treated and treated, is internal validity gone?
+
+- __Answer__ = Not necessarily but it could suggest non-random assignment of treatment that is problematic. E.g. observations with characteristic 'z' are more likely to be treated and observations with this characteristic are also likely to be trending differently for other reasons
+
+---
+## Quick Review of diff-in-diff
+
+Does the absence of a pre-trend in diff-in-diff ensure that differential trends assumption holds and causal inferences can be made?
+
+ __Answer__ = Sadly, no. We can never prove causality with 100% confidence. It could be that trend was going to change after treatment for reasons unrelated to treatment
+
+---
+## Quick Review of diff-in-diff
+ 
+How are triple differences helpful and reducing concerns about violation of parallel trends assumption?
+
+ __Answer__ = Before, an "identification policeman" would just need a story about why treated might be trending differently after event for other reasons. Now, he/she would need story about why that different trend would be particularly true for subset of firms that are more sensitive to treatment
+
+---
+## Basic idea of RDD
+
+The basic idea of regression discontinuity RDD is the following:
+
+- Observations (e.g. firm, individual, etc.) are "treated" based on a known cutoff rule.
+- The cutoff is what creates the discontinuity.
+
+Researcher is interested in how this treatment affects outcome variable of interest, `\(y\)`.
+
+---
+## Examples of RDD settings
+
+- If you think about it, these type of cutoff rules are commonplace in finance
+    - A borrower FICO score &gt; 620 makes securitization of the loan more likely
+        + Keys, et al (QJE 2010)
+    
+- Accounting variable x exceeding some threshold causes loan covenant violation
+    + Roberts and Sufi (JF 2009)
+
+---
+## RDD is like difference-in-difference
+
+- Has similar flavor to diff-in-diff natural experiment setting in that you can illustrate identification with a figure
+- Plot outcome y against independent variable that determines treatment assignment, x.
+- Should observe sharp, discontinuous change in y at the cutoff value of x.
+
+---
+## But, RDD is different
+
+- RDD has some key differences. 
+    - Assignment to treatment is NOT random;
+    - Assignment is based on value of x
+    - When treatment only depends on x (what I'll later call "sharp RDD", there is no overlap in treatment &amp; controls; i.e. we never observe the same x for a treatment and a control)
+
+---
+## Randomized Experiment
+&lt;img src="RDtable4.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+## RDD randomization assumption
+
+- Assignment to treatment and control isn't random, but whether _individual_ observation is treated is assumed to be random.
+  - i.e. researcher assumes that observations (e.g. firm, person, etc.) can't perfectly manipulate their x value
+  - Therefore, whether an observation's x falls immediately above or below key cutoff x is random
+
+---
+## Two types of RDD
+
+__Sharp RDD__
+
+- Assignment to treatment only depends on x; i.e. if `\(x &gt;= x'\)` you are treated with probability 1
+
+__Fuzzy RDD__
+
+- Having `\(x &gt;= x'\)` only increases probability of treatment; i.e. other factors (besides x) will influence whether you are actually treated or not
+
+---
+## Sharp RDD
+&lt;img src="RDtable1.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## Fuzzy RDD
+&lt;img src="RDtable2.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## Sharp versus Fuzzy RDD
+
+This subtle distinction affects exactly how you estimate the causal effect of treatment
+
+- With Sharp RDD, we will basically compare average `\(y\)` immediately above and below `\(x'\)`
+- With fuzzy RDD, the average change in y around the threshold understate causal effect __[why?]__
+
+    - __Answer__ = Comparision assumes all observations were treated, but this isn't true; if all observations had been treated, observed change in y would be even larger; we will need to rescale based on change in probability
+
+---
+## Parrallel Trends    
+&lt;img src="RDtable3.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## Bias vs Noise
+&lt;img src="RDtable3a.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+## RDD Animated
+
+&lt;img src="myrdd.gif" style="display: block; margin: auto;" /&gt;
+
+---
+## RDD in R
+
+
+```r
+library(AER)
+library(foreign)
+library(rdd)
+library(stargazer)
+AEJfigs=read.dta("AEJfigs.dta")
+# All = all deaths
+AEJfigs$age = AEJfigs$agecell - 21
+AEJfigs$over21 = ifelse(AEJfigs$agecell &gt;= 21,1,0)
+reg.1=RDestimate(all~agecell,data=AEJfigs,cutpoint = 21)
+plot(reg.1)
+title(main="All Causes of Death", xlab="AGE",
+      ylab="Mortality rate from all causes (per 100,000)")
+```
+
+---
+## RDD in R
+
+&lt;img src="RDDnotes_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## RDD in R
+
+```
+## 
+## Call:
+## RDestimate(formula = all ~ agecell, data = AEJfigs, cutpoint = 21)
+## 
+## Type:
+## sharp 
+## 
+## Estimates:
+##            Bandwidth  Observations  Estimate  Std. Error  z value  Pr(&gt;|z|) 
+## LATE       1.6561     40            9.001     1.480       6.080    1.199e-09
+## Half-BW    0.8281     20            9.579     1.914       5.004    5.609e-07
+## Double-BW  3.3123     48            7.953     1.278       6.223    4.882e-10
+##               
+## LATE       ***
+## Half-BW    ***
+## Double-BW  ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## F-statistics:
+##            F      Num. DoF  Denom. DoF  p        
+## LATE       33.08  3         36          3.799e-10
+## Half-BW    29.05  3         16          2.078e-06
+## Double-BW  32.54  3         44          6.129e-11
+```
+
+---
+## RDD in R
+&lt;img src="RDDnotes_files/figure-html/unnamed-chunk-10-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## RDD in R 
+
+```
+## 
+## Call:
+## RDestimate(formula = mva ~ agecell, data = AEJfigs, cutpoint = 21)
+## 
+## Type:
+## sharp 
+## 
+## Estimates:
+##            Bandwidth  Observations  Estimate  Std. Error  z value  Pr(&gt;|z|) 
+## LATE       1.2109     30            4.977     1.0590      4.700    2.607e-06
+## Half-BW    0.6054     14            4.956     1.3767      3.600    3.182e-04
+## Double-BW  2.4218     48            4.566     0.7086      6.444    1.162e-10
+##               
+## LATE       ***
+## Half-BW    ***
+## Double-BW  ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## F-statistics:
+##            F      Num. DoF  Denom. DoF  p        
+## LATE       13.32  3         26          3.692e-05
+## Half-BW    12.76  3         10          1.879e-03
+## Double-BW  26.99  3         44          9.322e-10
+```
+
+---
+## RDD in R
+&lt;img src="RDDnotes_files/figure-html/unnamed-chunk-12-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## RDD in R
+
+
+```
+## 
+## Call:
+## RDestimate(formula = internal ~ agecell, data = AEJfigs, cutpoint = 21)
+## 
+## Type:
+## sharp 
+## 
+## Estimates:
+##            Bandwidth  Observations  Estimate  Std. Error  z value  Pr(&gt;|z|)   
+## LATE       0.8809     22            1.4128    0.8206      1.722    0.08513   .
+## Half-BW    0.4405     10            1.8691    1.0203      1.832    0.06698   .
+## Double-BW  1.7618     42            0.7652    0.6179      1.239    0.21553    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## F-statistics:
+##            F       Num. DoF  Denom. DoF  p        
+## LATE        6.830  3         18          5.734e-03
+## Half-BW     1.765  3          6          5.068e-01
+## Double-BW  22.695  3         38          2.750e-08
+```
+
+---
+#### List of Papers that use RDD
+&lt;img src="RDtable5aaa.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+#### List of Papers that use RDD
+&lt;img src="RDtable5aa.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+#### List of Papers that use RDD
+&lt;img src="RDtable5a.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+#### List of Papers that use RDD
+&lt;img src="RDtable5.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+## References
+
+C. Carpenter and C. Dobkin, "The Effect of Alcohol Consumption on Mortality: Regression Discontinuity Evidence from the MLDA", American Economic Journal: Applied Economics 1 (2009), 164-182.
+
+A. Abdulkadiroglu, et al., "The Elite Illusion: Achievement Effects at Boston and New York Exam Schools", Econometrica, 2014.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+---
+title: "A Review of Basic Statistics"
+subtitle: "Variance, Standard Deviation, and Range"
+author: "Jose Fernandez"
+institute: "University of Louisville"
+date: "2020/6/29 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, uol, uol-fonts, "extra.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+# What do we cover
+
+1. Range
+2. Variance
+3. Standard Deviation
+4. Z score
+
+---
+# Measures of Spread
+
+In the previous set of notes, we talk about measures of central tendancy: __mean, median, and mode.__
+
+In these notes, we will talk about how spread out the data is.
+
+The Range of the data is the simplest to calculate.
+
+.center[Range = Maximum Value - Minimum Value]
+
+We will use a dataset on extramarital affairs (yes, it is a real economics paper found in the _Journal of Political Economy_)
+
+```{r echo=TRUE}
+suppressWarnings(suppressPackageStartupMessages(library(AER)))
+data("Affairs")
+range(Affairs$affairs)
+```
+
+---
+# Population Variance
+
+The variance of a random variable is the __average squared deviation from the mean__.
+
+The formula for the population variance is $$\sigma^{2}=\frac{1}{N}\sum (X_{i}-\mu)^{2}$$
+Let's take this formula into parts so that we understand it.
+- Deviation from the mean $(X_{i}-\mu)$
+- Squared Deviation from the mean $(X_{i}-\mu)^{2}$
+- Average squared deviation from the mean. If we say that $u_{i}=(X_{i}-\mu)^{2}$ then the formula looks a lot like a mean. $$\sigma^{2}=\frac{1}{n}\sum u_{i}$$
+
+---
+# Sample Variance
+
+The sample variance formula is $$s^{2}=\frac{1}{n-1}\sum (X_{i}-\bar{x})^{2}$$
+
+There are two differences between the population variance and the sample variance.
+1. The population variance uses the population mean, $\mu$, but the sample variance uses the sample mean, $\bar{x}$.
+2. The population variance divides by the full size of the population N. The sample variance divides by the sample size n - 1.
+
+In the appendix of the text (and on blackboard), we show that $$E[s^{2}]=\sigma^2$$
+
+---
+# Standard Deviation (sd)
+
+The standard deviation is simply the square root of the variance. Because the variance represents square terms, it is hard to compare with the mean.
+
+The standard deviation converts the squared terms into univariate terms so that it matches the same units as the mean.
+
+- population standard deviation $\sigma = \sqrt{\sigma^2}$
+- sample standard deviation $s=\sqrt{s}$
+
+---
+# Z score
+
+Normal distributions have a few nice properties.
+- The distribution is symmetric with the mean, median, and mode at the center.
+- Approximately 98 percent of the data are found within two standard deviations of the mean.
+- A standard normal distribution has a mean of zero and a standard deviation of 1.
+- All normally distributed random variables can be changed into a standard normal using the Z-score.
+
+The formula for the Z score is $$Z = \frac{X-\mu}{\sigma}$$
+
+---
+# Properties of a Z score
+- The Z score a unit of measurement. 
+- It tells us how far away an observation X is from the mean. 
+- The distance is measured in standard deviations.
+- Remember that 98 percent of the data is found within 2 standard deviations of the mean for a normal distribution.
+- An outlier is an observation with a Z score greater than 3.
+
+---
+
+# The mechanics of a Z score
+The Z score first subtracts the mean from every observation. By default, the new mean must be zero. 
+
+Next, it divides every observation by the standard deviation. This forces the new standard deviation to be equal to 1.
+
+So if X had a mean of 10 and a standard deviation of 2. 
+1. subtract 10 from all of the observations. Our new mean must be zero now.
+2. Divide all of the observation by 2. The new SD is equal to 2.
+
+---
+# Z scores in action with R
+
+```{r echo = TRUE}
+x <- rnorm(1000, mean = 10, sd = 2) # normal distribution with mean 10 and std 2
+mean(x) #Mean of X
+sd(x) #Standard Deviation of X
+y <- (x - mean(x))/sd(x) #Z score of X
+mean(y) #Mean of Y
+sd(y) #Standard Deviation of Y
+```
+
+---
+#Z scores and probability
+
+- Pr(Z < 0)=`r pnorm(0,0,1)`
+- Pr(-1 < Z < 1)=`r pnorm(1,0,1)-pnorm(-1,0,1)`
+- Pr(-2 < Z < 2)=`r pnorm(2,0,1)-pnorm(-2,0,1)`
+- Pr(-3 < Z < 3)=`r pnorm(3,0,1)-pnorm(-3,0,1)`

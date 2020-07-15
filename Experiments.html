@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Causal Inference</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose Fernandez" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Causal Inference
+## Experiments
+### Jose Fernandez
+### University of Louisville
+### 2020/6/29 (updated: 2020-07-02)
+
+---
+
+
+# Causal Inference
+
+## Predictive vs Prescriptive
+
+In Data Analytics there are often three types of answers
+
+* Descriptive - Aim is to aggregate and describe your current data (a snapshot)
+  - Tables, Charts, Maps, Tableau
+    
+  * Predictive - Aim is to predict the dependent variable. How will it change in the near future?
+    - Machine Learning
+    - Time Series Forecast
+    
+  * Prescriptive - Aim is to explain the dependent variable. What is the effect of your advertising campaign? Why are workers leaving your firm?
+  
+    - What this course is about!
+    
+---
+## Linear Regression Models for Causal Inference
+
+This semester we will cover:
+
+  - Randomized Experiments
+  - Simple Linear Regression
+  - Multiple Regression
+  - Difference-in-Differences
+  - Instrumental Variables
+  - Regression Discontinuity
+  
+---
+
+## Two Types of Causal Questions
+
+Two types of causal questions (Gelman and Imbens 2013):
+
+* Reverse causal inference: search for causes of effects (Why?).
+    - Why does the United States perform so poorly in Math standardized exams?
+  
+* Forward causal questions: estimation of effects of causes (What if ...?).
+    - Does teacher's IQ affect students performance? Class size?
+    
+---
+
+## Causal effects
+We are motivated by why questions but, when conducting our analysis, we tend to proceed by addressing what if questions.
+
+Examples:
+
+* How does taking this course affect your earnings in 3-years?
+    * Note that this is different from a predictive question: "What will be the earnings of students taking this course?"
+* If Uber increases prices, how would it affect demand?
+* Does the death penalty decrease crime rates?
+* Would it be profitable for a firm to allow employees to work from home? (Yahoo 2013)
+* Are employees more satisfied if they are informed about the salaries of their colleagues? (Card, Mas, Moretti and Saez 2012)
+
+---
+## Correlation Does not Imply Causation
+
+* Two well known properties
+    1. Correlation does not imply causation
+    2. y can cause x even if x takes place before y
+--
+* Less known property
+    - y can cause x
+    - x can cause y
+    - z can cause both x and y
+    
+---
+
+## Examples
+
+Potentially confusing examples:
+
+  * Red cars are more likely to get involved in accidents
+  * People that sleep less tend to live longer
+  * Students living in households where there are more books tend to have higher GPA's.
+  * Countries that eat more chocolate receive more Nobel prizes (Messerli 2012)
+  
+---
+
+## Examples
+
+
+```
+## Warning: package 'kableExtra' was built under R version 4.0.2
+```
+
+&lt;img src="sociology.png" width="2773" style="display: block; margin: auto;" /&gt;&lt;img src="kymarriage.png" width="2773" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Examples
+
+&lt;img src="correlation.png" width="100%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Randomized Experiments
+
+## How to Estimate Causal Effects
+
+In the physical sciences:
+- Often, one can answer this type of question by running an experiment on a specific unit.
+- Example: Galileo Galilei Leaning Tower of Pisa experiment
+    + Necessary conditions (ceteris paribus, other things being equal):
+    + Temporal stability: the response does not change if we change the moment when the treatment is applied.
+    + Causal transience: the response of one treatment is not affected by prior exposure of the unit to the other treatment.
+    + Unit homogeneity: homogeneity with respect to treatments and responses.
+    
+---
+## Leaning Tower of Pisa experiment
+
+&lt;img src="galileo.jpg" width="55%" style="display: block; margin: auto;" /&gt;
+
+---
+## How to Estimate Causal Effects
+In the social sciences:
+- None of these assumptions is plausible.
+- We use the statistical solution: we estimate the average causal effect of the treatment over the population of units.
+- Intuition: "All Other things being equal" conditions are likely to be satisfied on average across treated and non-treated if the treatment is randomly assigned.
+
+---
+## Health Insurance Experiment
+
+Suppose we are interested in the effect of health insurance on a person's health
+
+Let's think of a treatment (getting insurance) of individual `\(i\)` as a binary random variable `\(D_i = {0, 1}\)`
+And potential outcomes (counterfactuals): `\(Y_{0i}\)`, `\(Y_{1i}\)`
+
+`\(Y_{1i}\)` = A measure of person `\(i\)`'s health given they _have_ insurance `\((D_i=1)\)`.
+
+`\(Y_{0i}\)` = A measure of person `\(i\)`'s health given they _do not have_ insurance `\((D_i=0)\)`.
+
+The individual treatment effect is `\(Y_{1i} , Y_{0i}\)`
+
+Unfortunately, for `\(i\)`, we only observe `\(Y_{1i}\)` if `\(D_i\)` = 1 and `\(Y_{0i}\)` if `\(D_i\)` = 0
+
+For any individual `\(i\)`, we only observe `\(Y_i=D_iY_{1i}+(1-D_i)Y_{0i}\)`
+
+---
+
+## No Schrodinger's Cat
+&lt;img src="maxresdefault.jpg" width="100%" /&gt;
+
+[Learn more about Schrodinger's Cat at the link](https://youtu.be/IOYyCHGWJq4)
+
+---
+## AVERAGE TREATMENT EFFECT
+
+The problem is we cannot observe you as both having and not having insurance.
+
+Solution is to look for the __AVERAGE TREATMENT EFFECT__ (ATE)!
+`$$E[Y_{1i}] - E[Y_{0i}]$$`
+And a naive comparison of averages does not tell us what we want to
+know:
+`$$E[Y_{1i}|D_{i} = 1] - E[Y_{0i}|D_{i} = 0]$$`
+`$$=\begin{array}{c}\underbrace{E[Y_{1i}|D_{i} = 1] - E[Y_{0i}|D_{i} = 1] }\\ ATE\end{array}+\begin{array}{c}\underbrace{E[Y_{0i}|D_{i} = 1] - E[Y_{0i}|D_{i} = 0] }\\ Sample \, Selection \, Bias\end{array}$$`
+
+---
+## Average Treatment effect on the Treated
+
+Average treatment effect (ATE) and average treatment effect on the treated (ATT) need not to be the same and the distinction is sometimes important
+
+They will be the same only if treatment is homogeneous across groups:
+`$$E[Y_{1i} - Y_{0i}|D_i = 1] = E[Y_{1i} - Y_{0i}|D_i = 0] = E[Y_{1i} - Y_{0i}]$$`
+
+That is, the treatment is assigned randomly.
+
+---
+## Random Assigment
+
+We want to understand what would have happened to the treated in the absence of treatment and thus overcome the selection problem...
+
+Solution : __Random assignment__
+
+&lt;img src="rct1.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+---
+## Random Assignment
+
+Random assignment makes Di independent of potential outcomes,
+hence: 
+- the selection effect is zeroed out and 
+- the treatment effect on the treated is equal to the ATE.
+
+---
+## Types of randomized experiments
+
+Randomized experiment is designed and implemented consciously by
+social scientists. It entails conscious use of a treatment and control group
+with random assignment.
+  * __Lab experiments__
+      - The effect of feedback on relative performance (Azmat and Iriberri, 2012). **Yes you work harder**
+  * __Field experiments__ (Lab-in-the-field or artefactual experiments)
+      - The effect of feedback on relative performance: (Bagues et al, work in progress) **Yes Students work harder**
+  * __Natural experiments__ - has a source of randomization that is as if randomly assigned, but this variation was not part of a conscious randomized treatment and control design
+      - Vietnam-era service effect on education and earnings (Flory, Leibbrandt and List 2010) **Women Shy away from competitive work settings**
+      
+---      
+## Who uses Experiments in Business?
+
+Tech Companies like Google, Facebook, and Amazon are positioned to use experiments.
+
+They embraced the idea of "Data-Base Management" where the results of experiments were taken over the advice of HiPPO's (Highest Paid Person's Opinion)
+
+[THE A/B TEST: INSIDE THE TECHNOLOGY THAT'S CHANGING THE RULES OF BUSINESS, Wire Magazine 4 2012](https://www.wired.com/2012/04/ff-abtesting/)
+
+[In Praise of Data-Driven Management (AKA "Why You Should be Skeptical of HiPPO's")](https://hexawise.com/posts/in-praise-of-data-driven-management-aka-why-you-should-be-skeptical-of-hippos)
+
+---
+## Potential drawbacks of RCTs
+Experiments provide a very transparent and simple empirical strategy. They solve the _selection bias_ problem. However, there are a number of potential problems:
+  1. Problems of implementation
+      * Compliance and attrition
+      * Cost, political issues (policy makers need to acknowledge ignorance),...
+  2. Ethical issues
+      * Note that the ethical argument is not obvious when (i) the treatment cannot be applied to everybody (maybe due to some budget constraints) and (ii) the optimal assignment rule is unknown.
+  3. Hawthorne effect
+      * The Illumination Experiment (Landsberger 1950, Levitt and List 2011)
+      * Audit study in France (Behaghel et al. 2015)
+
+---
+## Rand Health Insurance Study
+
+Conducted between 1974 and 1982
+
+Randomly assigned thousands of non-elderly individuals and families to different insurance plan designs
+
+Plans ranged from free care to $1,000 deductible (basically) with variations in between 
+
+Comparable deductible today is at least $4,000
+
+Studied effects on health spending and health outcomes
+
+---
+## Rand Health Insurance
+
+&lt;table&gt;
+&lt;caption&gt;Plan Types&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; plantype &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; n &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; pct &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Catastrophic &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 759 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.1918120 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Deductible &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 881 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2226434 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Coinsurance &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1022 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.2582765 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Free &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1295 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.3272681 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Patient Characteristics
+
+&lt;table&gt;
+&lt;caption&gt;Patinet Characteristics&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; variable &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Mean &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Std. Dev. &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 32.36 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.92 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pct. Black or Hispanic &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.17 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12.10 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2.88 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.56 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.50 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Real Income &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 70.86 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.91 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hospital &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; General Health Index &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31603.21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18148.25 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mental Health Index &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.85 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14.25 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Patient Characteristics by Plan 
+
+&lt;table&gt;
+&lt;caption&gt;Plan Demographics - Catastrophic&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; response &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; (Intercept) &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Coinsurance &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Deductible &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Free &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 32.4 (0.485) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.966 (0.655) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.561 (0.676) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.435 (0.614) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Black/Hisp. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.172 (0.0199) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.0269 (0.025) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.0188 (0.0266) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.0281 (0.0245) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Educ. &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 12.1 (0.14) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.0613 (0.186) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.157 (0.191) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.263 (0.183) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.56 (0.0118) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.0247 (0.0153) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.0231 (0.016) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.0379 (0.015) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gen. Health &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 70.9 (0.694) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.211 (0.922) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -1.44 (0.952) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -1.31 (0.872) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Hospital &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.115 (0.0117) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.00249 (0.0152) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.00449 (0.016) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.00117 (0.0146) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Income &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 31,603 (1,073) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 970 (1,391) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -2,104 (1,386) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -976 (1,346) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mental Health &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 73.8 (0.619) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1.19 (0.81) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; -0.12 (0.822) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.89 (0.766) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## Patient Health by Plan
+
+&lt;table&gt;
+&lt;caption&gt;Patient Health Spending by Plan&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; response &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; (Intercept) &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Cost Sharing &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Deductible &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Free &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ftf &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2.78 (0.178) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.481 (0.24) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.193 (0.247) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1.66 (0.248) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Inpatient &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 388 (44.9) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 92.5 (72.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 72.2 (68.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 116 (59.8) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Outpatient &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 248 (14.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 59.8 (20.7) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 41.8 (20.8) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 169 (19.9) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Total Cost &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 636 (54.5) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 152 (84.6) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 114 (79.1) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 285 (72.4) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Admissions &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0991 (0.00785) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0023 (0.0108) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0159 (0.0109) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 0.0288 (0.0105) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## References
+
+Experiments and Potential Outcomes MM, Chapter 1
+
+J. Angrist, D. Lang, and P. Oreopoulos, "Incentives and Services for College Achievement: Evidence from a Randomized Trial", American Economic Journal: Applied Economics, Jan. 2009.
+
+A. Aron-Dine, L. Einav, and A. Finkelstein, "The RAND Health Insurance Experiment Three Decades Later", J. of Economic Perspectives 27 (Winter 2013), 197-222.
+
+R.H. Brook, et al., "Does Free Care Improve Adults' Health?", New England J. of Medicine 309 (Dec. 8, 1983), 1426-1434.
+
+S. Taubman, et al., "Medicaid Increases Emergency-Department Use: Evidence from Oregon's Health Insurance Experiment", Science, Jan 2, 2014.
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
