@@ -57,8 +57,8 @@ Multiple Regression allows us to answer these questions.
   $$wages_{i}=\beta_0+\beta_1Education_{i}+\beta_2Experience_{i}+e_{i}$$
 
 
-* $\beta_2$ tells us the effect 1 additional year of schooling has on your wages, holding your level of Experience constant
-* $\beta_1$ tells us the effect 1 additional year of work experience has on your wages, holding your level of Education constant
+* $\beta_1$ tells us the effect 1 additional year of schooling has on your wages, holding your level of Experience constant
+* $\beta_2$ tells us the effect 1 additional year of work experience has on your wages, holding your level of Education constant
 * $\beta_0$ tells us your level of wages if you had no schooling and no work experience. (You can think of this as minimum wage)
     + Note, each variable is index by (i), this index represent a specific person in our data set.
     + The observed levels of education, experience, and wages changes with each person.  The index give us a method to keep track of these changes.
