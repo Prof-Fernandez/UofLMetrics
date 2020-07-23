@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 ## Introduction Mulitiple Regression
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2020-07-16)
+### 2020-7-4 (updated: 2020-07-23)
 
 ---
 
@@ -87,6 +87,10 @@ The relative increase in wages for an additional year of experience is given by 
 `$$\frac{\partial wages_i}{\partial Experience}=\beta_2+2\beta_3 *Experience$$`
 
 If `\(\beta_2 &lt;0\)`, then wages are increasing at a decreasing rate (and may eventually decrease altogether)
+
+---
+class: center, inverse, middle
+# Omitted Variable Bias
 
 ---
 ## Omitted Factors in the Test Score Regression (1)
@@ -216,10 +220,13 @@ In otherwords, we can minimize the OVB by including variables in the regression 
 ---
 Look at what happens when we break down scores by Pct. English and Student-Teacher Ratio
 &lt;img src="STR_groups.png" width="100%" style="display: block; margin: auto;" /&gt;
----
-## Multiple Regression Model
 
-Regressing On More Than One Variable
+---
+class: center, middle, inverse
+# Multiple Regression Model
+
+---
+## Regressing On More Than One Variable
 
 In a multiple regression model we allow for __more than one regressor__. 
 
@@ -287,6 +294,10 @@ is constant for all `\(i=1,\dots,n\)`. Otherwise, it is heteroskedastic.
 In most cases (read virtually always), you will have heteroskedastic errors.
 
 ---
+class: middle, inverse, center
+# OLS Multiple Regression estimator
+
+---
 ## The OLS Estimator (1)
 
 Similar to the single regressor case, we do not observe the true population parameters `\(\beta_0,\dots,\beta_k\)`.
@@ -330,6 +341,10 @@ The predicted values would be
 The OLS residuals would be
 
 `$$\hat{u}_i = Y_i - \hat{Y}_i,~i=1,\dots, n$$`
+
+---
+class: center, middle, inverse
+# Application to Test Scores and the STR
 
 ---
 ## Application to Test Scores and the STR (1)

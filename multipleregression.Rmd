@@ -83,6 +83,10 @@ $$\frac{\partial wages_i}{\partial Experience}=\beta_2+2\beta_3 *Experience$$
 If $\beta_2 <0$, then wages are increasing at a decreasing rate (and may eventually decrease altogether)
 
 ---
+class: center, inverse, middle
+# Omitted Variable Bias
+
+---
 ## Omitted Factors in the Test Score Regression (1)
 Recall that our regression model was
 $$TestScore = \beta_0 + \beta_1 STR + u_i,~i=1,\dots,n$$
@@ -200,10 +204,13 @@ Look at what happens when we break down scores by Pct. English and Student-Teach
 ```{r out.width="100%", fig.align='center',echo=FALSE}
 include_graphics('STR_groups.png' )
 ```
----
-## Multiple Regression Model
 
-Regressing On More Than One Variable
+---
+class: center, middle, inverse
+# Multiple Regression Model
+
+---
+## Regressing On More Than One Variable
 
 In a multiple regression model we allow for __more than one regressor__. 
 
@@ -271,6 +278,10 @@ is constant for all $i=1,\dots,n$. Otherwise, it is heteroskedastic.
 In most cases (read virtually always), you will have heteroskedastic errors.
 
 ---
+class: middle, inverse, center
+# OLS Multiple Regression estimator
+
+---
 ## The OLS Estimator (1)
 
 Similar to the single regressor case, we do not observe the true population parameters $\beta_0,\dots,\beta_k$.
@@ -314,6 +325,10 @@ $$\hat{Y}_i = \hat{\beta}_0 + \hat{\beta}_1 X_{1i} + \cdots + \hat{\beta}_k X_{k
 The OLS residuals would be
 
 $$\hat{u}_i = Y_i - \hat{Y}_i,~i=1,\dots, n$$
+
+---
+class: center, middle, inverse
+# Application to Test Scores and the STR
 
 ---
 ## Application to Test Scores and the STR (1)
