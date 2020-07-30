@@ -14,7 +14,7 @@ output:
       countIncrementalSlides: false
 ---
 class: middle, center, inverse
-# Regression Discontinuity Design 
+# Quick Review of Difference-in-Differences 
 
 ---
 ## Quick Review of diff-in-diff
@@ -67,6 +67,10 @@ How are triple differences helpful and reducing concerns about violation of para
  __Answer__ = Before, an "identification policeman" would just need a story about why treated might be trending differently after event for other reasons. Now, he/she would need story about why that different trend would be particularly true for subset of firms that are more sensitive to treatment
 
 ---
+class: middle, inverse, center
+# Regression Discontinuity Design
+
+---
 ## Basic idea of RDD
 
 The basic idea of regression discontinuity RDD is the following:
@@ -116,7 +120,11 @@ include_graphics('RDtable4.png')
   - Therefore, whether an observation's x falls immediately above or below key cutoff x is random
 
 ---
-## Two types of RDD
+class: middle, center, inverse
+# Two Types of RDD
+
+---
+## Fuzzy & Sharp
 
 __Sharp RDD__
 
@@ -166,6 +174,10 @@ include_graphics('RDtable3a.png')
 ```{r echo=FALSE, fig.align='center'}
 include_graphics('myrdd.gif')
 ```
+
+---
+class: center, middle, inverse
+# RDD in R Example
 
 ---
 ## RDD in R
@@ -237,6 +249,10 @@ title(main="Internal Causes of Death", xlab="AGE",ylab="Mortality rate from all 
 ```{r echo=FALSE}
 summary(reg.3)
 ```
+
+---
+class: middle, center, inverse
+# List of RDD papers and their Running Variables
 
 ---
 #### List of Papers that use RDD
