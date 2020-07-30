@@ -27,7 +27,7 @@ class: middle, center, inverse
   - Wine experts use rainfall to predict wine quality before maturity.
   
 ---
-# But how how confident can we be in our prediction
+# But how how confident can we be in our prediction?
 
 It is easy to use your model to predict. All you need to do is
 - Use current data to estimate the model.
