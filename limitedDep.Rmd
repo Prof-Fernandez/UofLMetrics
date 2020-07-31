@@ -16,10 +16,12 @@ output:
 ## Introduction (1)
 
 * Previously, we learned how to use binary variables as regressors (independent variables)
-* But in some cases we might be interested in learning how entity characteristics influence a binary dependent variable
-* For example, we might be interested in studying whether there is racial discrimination in the provision of loans
-    * We are interested in comparing individuals who are identify with different races, but are otherwise identical
-    * It is not sufficient to compare average loan denial rates
+* But in some cases we might be interested in learning how entity characteristics (X's) influence a binary dependent variable.
+* The dependent variable will represent a category.
+  - How politicians vote on a bill?
+  - Your choice to enter the labor market?
+  - Your choice to buy a product?
+  - How does a person's race affects loan approval?
 
 ---
 ## Introduction (2)
