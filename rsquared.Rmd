@@ -1,0 +1,134 @@
+---
+title: "Causal Inference"
+subtitle: "Simple Linear Regression"
+author: "Jose Fernandez"
+institute: "University of Louisville"
+date: "2020/6/29 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, uol, uol-fonts, "extra.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: center, inverse, middle
+# Simple Linear Regression
+
+---
+## Goodness of Fit
+
+Now that we've run an OLS regression we want to know
+
+- How much does the regressor account for variation in the dependent variable?
+- Are the observations tightly clustered around the regression line?
+
+We have two useful measures
+
+- The regression $R^2$
+- The standard error of the regression ($SER$)
+
+---
+## The R Squared (1)
+
+  __The $R^2$ is the fraction of the sample variance of $Y_i$ (dependent variable) explained by $X_i$ (regressor)__
+
+- From the definition of the regression predicted value $\hat{Y}_i$ we can write $$Y_i = \hat{Y}_i + \hat{u}_i$$ and $R^2$ is the ratio of the sample variance of $\hat{Y}_i$ and the sample variance of $Y_i$
+- $R^2$ ranges from 0 to 1. $R^2 = 0$ indicates that $X_i$ has no explanatory power at all, while $R^2 = 1$ indicates that it explains $Y_i$ fully.
+
+---
+## The R Squared (2)
+
+Let us define the total sum of squares ($TSS$), the sum of squares Regression ($SSR$), and the sum of squared Error ($SSE$)
+
+$$\begin{align*} Y_i &= \hat{Y}_i + \hat{u}_i \\ Y_i - \bar{Y} &= \hat{Y}_i - \bar{Y} + \hat{u}_i \\ (Y_i - \bar{Y})^2 &= (\hat{Y}_i - \bar{Y} + \hat{u}_i)^2 \\ (Y_i - \bar{Y})^2 &= (\hat{Y}_i - \bar{Y})^2 + (\hat{u}_i)^2 + 2(\hat{Y}_i - \bar{Y})\hat{u}_i \\ \underbrace{\sum_i(Y_i - \bar{Y})^2}_{TSS} &= \underbrace{\sum_i(\hat{Y}_i - \bar{Y})^2}_{SSR} + \underbrace{\sum_i(\hat{u}_i)^2}_{SSE} + \underbrace{2\sum_i(\hat{Y}_i - \bar{Y})\hat{u}_i}_{=0} \\ TSS &= SSR + SSE \end{align*}$$
+
+---
+## The R Squared (3)
+
+$$TSS = SSR + SSE$$
+
+$R^2$ can be defined as $$R^2 = \frac{SSR}{TSS} = 1 - \frac{SSE}{TSS}$$
+
+---
+## The Standard Error of the Regression
+
+The standard error of the regression $(SER)$ is an estimator of the standard deviation of the population regression error $u_i$.
+
+Since we don't observe $u_1,\dots, u_n$ we need to estimate this standard deviation
+We use $\hat{u}_1,\dots, \hat{u}_n$ to calculate our estimate
+
+$$SER = s_{\hat{u}}$$ where $$s_{\hat{u}}^2 = \frac{1}{n-k-1}\sum_i \hat{u}_i^2 = \frac{SSE}{n-k-2}=MSE$$
+Mean Squared Error (MSE) is the estimated variance of the error term. Noticed that the denominator is $n-k-1$ where $k$ is the number of regressors. This is just like the sample variance of x, except $k=0$ in that case. In the case of simple linear regression $k=1$.
+
+---
+## Mean Squared Regression and the F-test
+
+The mean squared regression tells us the average of the variation explained by the regression slopes.
+
+If we want to know whether or not the regression line is better than just using the mean. We need to conduct an F-test. The F-test assumes that all of the regression slopes are equal to zero.
+
+$$F = \frac{MSR}{MSE}$$
+Remember the F statistic is the ration of two variances. SSE is a variance and so is SSR. The degrees of freedom in the numerator are $k$ and the degrees of freedom in the denominator are $n-k-1$.
+---
+## Measure of Fit of Test Score on STR Regression
+
+- The $R^2$ is calculated to be 0.051. This means that the $STR$ explains 5.1\% of the variance in $TestScore$.
+- The $SER$ is calculated to be 18.6. This is an estimate of the standard deviation of $u_i$ which shows a large spread.
+- Low $R^2$ (or low $SER$) does not mean that the regression is bad: it means that there are other factors that have a strong influence on the dependent variable that have not been included in the regression.
+
+---
+class: center, inverse, middle
+# Regression in R
+
+---
+## Load the data
+If you haven't done so already, then let's load the data into R.
+We want the CA Schools data from the AER library.
+
+Enter the following code into R
+
+- library(AER)
+- data(CASchools)
+
+---
+## Let's run a regression
+```{r warning=FALSE, message=FALSE}
+library(AER)
+data(CASchools)
+CASchools$str=CASchools$students/CASchools$teachers
+CASchools$testscr=(CASchools$read+CASchools$math)/2
+regress.results=lm(formula = testscr ~ str, data=CASchools)
+summary(regress.results)
+```
+
+---
+## Here is the Annova Table
+```{r}
+anova(regress.results)
+```
+
+---
+## Let's make it table look nice
+```{r warning=FALSE, message=FALSE, results='asis'}
+# My favorite package is stargazzer. Be sure to include the option results = 'asis'
+library(stargazer)
+stargazer(regress.results, type="html", single.row=TRUE, covariate.labels = c("Student-Teacher Ratio"))
+```
+
+---
+## Let's make it look nice
+```{r warning=FALSE, message=FALSE, results='asis'}
+# Another option is sjplot. Be sure to include the option results = 'asis'
+library(sjPlot)
+tab_model(regress.results, show.se=TRUE, pred.labels =c( "Constant","Student-Teacher Ratio"), dv.labels = "test scores")
+```
+
+---
+## Let's make it look nice
+```{r warning=FALSE, message=FALSE}
+library(broom)
+library(knitr)
+kable(tidy(regress.results))
+```

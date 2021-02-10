@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 ## Instrumental Variables
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2020-07-29)
+### 2020-7-4 (updated: 2020-07-10)
 
 ---
 
@@ -208,9 +208,6 @@ Since `$$\begin{align*} s_{ZY} &amp;\overset{p}{\longrightarrow} Cov(Z_i, Y_i) \
 therefore
 
 `$$\hat{\beta}_1^{TSLS} = \frac{s_{ZY}}{s_{ZX}} \overset{p}{\longrightarrow} \frac{Cov(Z_i, Y_i)}{Cov(Z_i, X_i)} = \beta_1$$`
----
-class: inverse, middle, center
-# Application to the Demand for Cigarettes
 
 ---
 ## Application to the Demand for Cigarettes (1)
@@ -252,6 +249,13 @@ with `\(R^2 = 0.47\)`.
 
 ```r
 suppressMessages(library("AER"))
+```
+
+```
+## Warning: package 'survival' was built under R version 4.0.2
+```
+
+```r
 suppressMessages(library("plm"))
 data("CigarettesSW")
 ```
@@ -459,10 +463,6 @@ coeftest(iv.res.3, vcov.=vcovHAC(iv.res.3)) # For Robust Standard Errors
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
-
----
-class: middle, center, inverse
-# Instrument Validity
 
 ---
 ## Checking Instrument Validity

@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Limited Dependent Variables</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Limited Dependent Variables
+## Count Models
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2021-02-10)
+
+---
+
+
+## Count Models
+
+In these notes, we will discuss several types of count models
+
+- Ordered Probit/Logit
+- Poisson Model
+- Negative Binomial
+- Hurdle Model
+- Zero Inflated Poisson Model
+---
+class: inverse, middle, center
+# Ordered Probit/Logit
+---
+## Oridinal Categorical Variables
+
+Suppose your dependent is categorical in nature and these categories show an ordinal proper (i.e. you can order them)
+
+Examples: Surveys including Likert Scales (strongly agree, agree, neither, disagree, strongly disagree)
+
+Medalling in the olympics (Gold, Silver, Bronze)
+
+Soda size preference (small, medium, large, extra large)
+---
+## Ordered Probit/Logit
+
+In these cases of ordinal categorical variables, we use an ordered probit/logit model.
+
+Notice, these responses, while they can be ordered, the distance between levels is not constant. 
+
+That is, we do not know what increase is necessary to move someone from _strongly disagree_ to just _disagree_.
+---
+## Ordered Probit/Logit Math
+
+The math of the ordered probit/logit is very similar to a simple binary model
+
+There is just one difference, we need to estimate level parameters.
+---
+## Ordered Probit/Logit Math
+
+The math to the ordered probit/logit is very similar to a simple binary model
+
+There is just one difference, we need to estimate level parameters.
+
+Consider three observed outcomes: y = 0,1,2.
+Consider the latent variable model without a constant:
+`$$y^{*} = \beta_1 x_1 +...+\beta_k x_k +\epsilon$$`
+where `\(\epsilon \rightarrow N(0,1)\)`. Define two cut-off points: `\(\alpha_1 &lt; \alpha_2\)`
+We do not observe `\(y^{*}\)`, but we do observe choices according to the following rule
+
+- y = 0 if `\(y^{*} &lt; \alpha_1\)`;
+- y = 1 if `\(\alpha_1 &lt; y^{*} &lt; \alpha_2\)`;     
+- y = 2 if `\(\alpha_2 &lt; y^{*}\)`
+
+---
+## Analytical Example
+
+y = 0 if inactive, y = 1 if part-time, and y = 2 if full-time
+
+`\(y* = \beta_e educ +\beta_k kids +\epsilon\)`, where `\(\epsilon \rightarrow N (0,1)\)`
+
+Then
+y = 0 if `\(\beta_e  educ +\beta_k  kids +\epsilon\)` &lt; `\(\alpha_1\)`
+
+y = 1 if `\(\alpha_1 &lt; \beta_e educ +\beta_k kids +\epsilon\)` &lt; `\(\alpha_2\)`
+
+y = 2 if `\(\alpha_2 &lt; \beta_e  educ +\beta_k kids +\epsilon\)`
+
+We could alternatively introduce a constant `\(\beta_0\)` and assume that `\(\alpha_1\)` = 0.
+
+---
+## Log Likelihood Function
+
+`$$Log \, L=\sum_{i=1}^{n} \sum_j Z_{ij}[F_{ij}-F_{ij-1}]$$`
+
+where `\(F_{ij}=F(\alpha_j-\beta_e  educ -\beta_k  kids)\)` and `\(Z_{ij}\)` is an indicator that equals 1 if person i select option j and zero otherwise.
+
+We choose the values of `\(\alpha\)` and `\(\beta\)` that maximize the value of the log likelihood function.
+
+---
+## Ordered Logit in R
+
+A study looks at factors that influence the decision of whether to apply to graduate school. 
+
+College juniors are asked if they are unlikely, somewhat likely, or very likely to apply to graduate school. 
+
+Hence, our outcome variable has three categories. 
+
+Data on parental educational status, whether the undergraduate institution is public or private, and current GPA is also collected.
+
+---
+## Example: Data
+
+```r
+library(foreign)
+dat &lt;- read.dta("https://stats.idre.ucla.edu/stat/data/ologit.dta")
+head(dat)
+```
+
+```
+##             apply pared public  gpa
+## 1     very likely     0      0 3.26
+## 2 somewhat likely     1      0 3.21
+## 3        unlikely     1      1 3.94
+## 4 somewhat likely     0      0 2.81
+## 5 somewhat likely     0      0 2.53
+## 6        unlikely     0      1 2.59
+```
+
+---
+## Example: Some Descriptive Stats
+
+
+```r
+## one at a time, table apply, pared, and public
+lapply(dat[, c("apply", "pared", "public")], table)
+```
+
+```
+## $apply
+## 
+##        unlikely somewhat likely     very likely 
+##             220             140              40 
+## 
+## $pared
+## 
+##   0   1 
+## 337  63 
+## 
+## $public
+## 
+##   0   1 
+## 343  57
+```
+
+---
+## Example: Estimation
+
+```r
+library(MASS)
+m &lt;- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE)
+## view a summary of the model
+summary(m)
+```
+
+```
+## Call:
+## polr(formula = apply ~ pared + public + gpa, data = dat, Hess = TRUE)
+## 
+## Coefficients:
+##           Value Std. Error t value
+## pared   1.04769     0.2658  3.9418
+## public -0.05879     0.2979 -0.1974
+## gpa     0.61594     0.2606  2.3632
+## 
+## Intercepts:
+##                             Value   Std. Error t value
+## unlikely|somewhat likely     2.2039  0.7795     2.8272
+## somewhat likely|very likely  4.2994  0.8043     5.3453
+## 
+## Residual Deviance: 717.0249 
+## AIC: 727.0249
+```
+
+---
+## Predicting probabailities
+
+Let's say we want to know the probability that someone who's parents are educated is likely very likely to go to graduate school.
+
+We want to know `$$Pr(y=2|pared=1, public=0)$$`
+
+---
+## Calculating probabilities
+
+```r
+## First let's find the cumulative probability of being less than 2.
+gpa&lt;-as.vector(seq(0,4,.1))
+pared.f&lt;-rep(1,length(gpa))
+public.f&lt;-rep(0,length(gpa))
+fakedata=as.matrix(rbind(pared.f,public.f,gpa))
+p2=exp(m$zeta[2]-t(fakedata)%*%m$coefficients)/(1+exp(m$zeta[2]
+                +t(fakedata)%*%m$coefficients))
+## but we want to know Pr(y=2)=1-Pr(y&lt;2)
+p2=1-p2
+```
+
+---
+## Calculating probabilities
+&lt;img src="Count-Models_files/figure-html/unnamed-chunk-5-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+class: inverse, center, middle
+# Poisson and Negative Binomial Model
+---
+## Count Models
+
+Count data are integer counts of the outcome variable that can include the number zero.
+
+These data present problems for typical linear regression methods because the outcome variable is non-negative, but the regression error is bounded by `\(-\infty\)` and `\(\infty\)`.
+
+We cannont simply take a the natural log of the outcome variable because zero's are present.
+
+Also, the integer values are more discrete in nature.
+
+---
+## Examples of count data
+
+Count data capture the number of occurrences over a fixed time intervals such as:
+
+- Number of Suicides in a state over a year
+- Number of cars served through a fast food drive thru in a day
+- Number of children in a family
+- Number of doctors visits
+- Number of website visitors
+
+---
+## Poisson Distribution
+
+The Poisson density function is `$$Pr(Y=y)=\frac{e^{-\lambda}\lambda^y}{y!}$$`
+
+where the `\(E[y|X]=Var[y|X]=\lambda\)`
+
+For our purposes, we assume `\(\lambda=exp(X\beta)\)`
+
+Interpretation of `\(\beta\)` is the percentage change in `\(\lambda\)` for a one unit increase in `\(X\)`.
+
+---
+## Properties of the Poisson Distribution
+
+The _equidispersion property_ of the Poisson distribution: Implies `\(E[y|X]=Var[y|X]=\lambda\)`, which is very often violated.
+
+When this property fails to hold, we state that there is _overdispersion_ in the data. In this case, the negative binomial can be used.
+
+_Overdispersion_ causes the standard errors estimated using the Poisson distribution to be too small. An alternative approach is to estimate heterosckedastic (robust) standard errors. 
+
+Woolridge (1999) had demonstrated that using robust standard errors compensates for the overdispersion problem and often performs better than the negative binomial distribution.
+
+---
+## Negative Binomial Distribution
+
+The Negative Binomail distribution has a less restrictive relationship between the mean and variance of y. `$$Var(y)=\lambda+\alpha \lambda^2$$`
+
+We can think of `\(\alpha\)` as the _overdispersion parameter_.
+
+---
+## Testing for Overdispersion
+
+Step 1. Estimate the count model using the negative binomial distribution.
+
+Step 2. Test `\(H_o:\alpha=0\)` vs `\(H_a:\alpha\neq0\)`
+
+Step 3. Determine which case you are in
+
+  * If `\(\alpha=0\)`, then the Poisson model holds
+  * If `\(\alpha&gt;0\)`, then we have _overdispersion_ (very common)
+  * If `\(\alpha&lt;0\)`, then we have _underdispersion_ (rare)
+
+---
+## Poisson and Negative Binomial in
+
+```r
+library(MASS); library(AER) #MASS contains the negative binomial model
+data("NMES1988") 
+plot(table(NMES1988$visits),xlab="Physician Office Visits", ylab="Counts")
+```
+
+&lt;img src="Count-Models_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+
+---
+## Issues with the data
+
+First, notice the shape of Physician office visits. Does this look normally distributed to you?
+
+Should we be concerned with the mass of zero's?
+
+How about those outliers?
+
+---
+## Standard Poisson and Negative Binomial Model
+
+```r
+pformu&lt;-visits~hospital+chronic+insurance+gender+school
+fm_pois &lt;- glm(pformu, data = NMES1988, family = poisson)
+cov.m1 &lt;- vcovHC(fm_pois, type="HC0")
+std.err &lt;- sqrt(diag(cov.m1))
+fm_qpois &lt;- glm(pformu, data = NMES1988, family = quasipoisson) 
+fm_nbin &lt;- glm.nb(pformu, data = NMES1988)  
+texreg::htmlreg(list(fm_pois,fm_pois,fm_qpois,fm_nbin),custom.model.names = c("Poisson","Poisson Robust","Quasi Poisson","Neg. Bin"), override.se = list(NULL,std.err,NULL,NULL), single.row = TRUE, custom.coef.names = c("Intercept","Hospital","Chronic","Insurance Eyes","School","Male","Theta"))
+```
+
+---
+### Standard Poisson and Negative Binomial Model 
+
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Statistical models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Poisson&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Poisson Robust&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Quasi Poisson&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Neg. Bin&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Intercept&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.05 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.05 (0.06)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.05 (0.06)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.99 (0.05)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Hospital&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.24 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Chronic&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.17 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.17 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.17 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.20 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Insurance Eyes&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18 (0.04)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18 (0.04)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.19 (0.04)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;School&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.12 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.12 (0.04)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.12 (0.03)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.14 (0.03)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Male&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.02 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.02 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.02 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.02 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AIC&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;36314.70&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;36314.70&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;24430.49&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;BIC&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;36353.05&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;36353.05&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;24475.22&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Log Likelihood&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-18151.35&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-18151.35&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-12208.24&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Deviance&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;23527.28&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;23527.28&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;23527.28&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;5046.63&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4406&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4406&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4406&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4406&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="5"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+
+---
+## Excessive Zeros
+
+A problem that plagues both the Poisson and Negative Binomial Models is when there are excessive zeros in the data.
+
+There a two appoaches to address these zeros
+
+1. Hurdle Model or Two Part Model
+
+2. Zero Inflated Model
+
+---
+## Hurdle Model 
+
+The Hurdle Model treats the distribution of zeros separately from the distribution of positive values.
+
+For example, your choice to start exercising may be different than your choice about how often to exercise. 
+
+The first part of the model is typical captured by a probit or logit model.
+
+The second part of the model is captured by a poisson or negative binomial model that is trunctated at 1. 
+
+---
+## Hurdle Model
+
+Let the process generating the zeros be `\(f_1(0)\)` and the process generating the positive responses be `\(f_2(0)\)`, then the two part density distribution is
+`$$g(y)=\left\{\begin{matrix}
+f_1(0) &amp; y=0 \\ 
+\frac{1-f_1(0)}{1-f_2(0)}f_2(y) &amp; y&gt;0
+\end{matrix}\right.$$`
+
+If `\(f_1(0)=f_2(0)\)`, then the hurdle model reduces to the standard count model. 
+
+---
+## Zero Inflated Model
+
+The zero inflated model treats zeros differently than the hurdle model. 
+
+Zeros are produce for two reasons.
+
+1. There is an exogenous mass of zeros that are independent of the count process.
+
+2. There are a set of zeros that are caused by the count process.
+
+Example: You may drink alchohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
+
+---
+## Zero Inflated Model
+
+Let the process generating the structural zeros be `\(f_1(.)\)` and the process generating the random counts including zero be `\(f_2(.)\)`, then the two part density distribution is
+
+`$$g(y)=\left\{\begin{matrix}
+f_1(0)+(1-f_1(0))f_2(0) &amp; y=0 \\ 
+(1-f_1(0))f_2(y) &amp; y&gt;0
+\end{matrix}\right.$$`
+
+Think of this model as a finite mixture of a zero mass and the count model.
+
+Next, we will use R to estimate these models.
+
+The package you will need is pscl: zero-inflation and hurdle models via zeroinfl() and hurdle()
+
+---
+### Hurdle Model and Zero Inflated Model in R
+
+```r
+library(pscl)
+dt_hurdle &lt;- hurdle(visits ~ hospital + chronic + insurance + school + gender |
+ hospital + chronic + insurance + school + gender,
+ data = NMES1988, dist = "negbin")
+dt_zinb &lt;- zeroinfl(visits ~ hospital + chronic + insurance + school + gender |
++ hospital + chronic + insurance + school + gender,
+ data = NMES1988, dist = "negbin")
+texreg::htmlreg(list(dt_hurdle,dt_zinb), single.row = TRUE, omit.coef = "Zero", custom.coef.names = c("Intercept","Hospital","Chronic","Insurance Eyes","School","Male","Theta"))
+```
+
+---
+### Hurdle Model and Zero Inflated Model in R
+&lt;tiny&gt;
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Statistical models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Intercept&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.26 (0.06)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.25 (0.06)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Hospital&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.24 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.22 (0.02)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Chronic&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.15 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.16 (0.01)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Insurance Eyes&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.06 (0.04)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.10 (0.04)&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;School&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.01 (0.00)&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.02 (0.00)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Male&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.08 (0.03)&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.09 (0.03)&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Theta&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.30 (0.04)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.37 (0.03)&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AIC&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;24277.81&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;24278.15&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Log Likelihood&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-12125.90&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-12126.07&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4406&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;4406&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="3"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+&lt;/tiny&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

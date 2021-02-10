@@ -14,23 +14,23 @@ output:
       countIncrementalSlides: false
 ---
 class: middle, center, inverse
-# Quick Review of Difference-in-Differences 
+# Regression Discontinuity Design 
 
 ---
 ## Quick Review of diff-in-diff
 
 _This document replicates the Table 4.1 and Figures 4.2 4.4 4.5 found in Mastering Metrics (based on data from Carpenter and Dobkin 2009)_
 
-Will adding control variables affect diff-in-diff estimates if treatment assignment was random?
+Will adding controls affect diff-in-diff estimates if treatment assignment was random?
 
-- __Answer__ = Not unless you've added 'bad controls', which are controls that also are affected by treatment.
+- __Answer__ = Not unless you've added 'bad controls', which are controls also affected by treatment.
 
 ---
 ## Quick Review of diff-in-diff
 
 When you've done this, you're no longer estimating the causal effect of treatment
 
-- __Control Variables__ that are exogenous will just improve precision, but shouldn't affect estimates
+- __Control__ (that are exogenous) will just improve precision, but shouldn't affect estimates
 
 ---
 ## Quick Review of diff-in-diff
@@ -39,7 +39,7 @@ What are some standard falsification tests you might want to run with diff-in-di
 
  __Answer__
  
-- Compare ex-ante characteristics of treated & untreated
+-  Compare ex-ante characteristics of treated & untreated
 - Check timing of treatment effect
 - Run regression using dep. variables that shouldn't be affected by treatment (if it is what we think it is)
 - Check whether reversal of treatment has opposite effect
@@ -48,9 +48,9 @@ What are some standard falsification tests you might want to run with diff-in-di
 ---
 ## Quick Review of diff-in-diff
 
-If you find ex-ante differences in treated and untreated, is internal validity gone?
+If you find ex-ante differences in treated and treated, is internal validity gone?
 
-- __Answer__ = Not necessarily but it could suggest non-random assignment of treatment that is problematic. E.g. observations with characteristic 'z' are more likely to be treated and observations with this characteristic are also more likely to be trending differently for other reasons
+- __Answer__ = Not necessarily but it could suggest non-random assignment of treatment that is problematic. E.g. observations with characteristic 'z' are more likely to be treated and observations with this characteristic are also likely to be trending differently for other reasons
 
 ---
 ## Quick Review of diff-in-diff
@@ -64,13 +64,7 @@ Does the absence of a pre-trend in diff-in-diff ensure that differential trends 
  
 How are triple differences helpful and reducing concerns about violation of parallel trends assumption?
 
- __Answer__ = Triple differences introduce a second control group. This second control group should have a similar trend to the initial control group, but not be affected at all by the treatment. 
- 
-An "identification policeman" would just need a story about why treated might be trending differently after event for other reasons. Now, he/she would need story about why that different trend would be particularly true for the subset of firms/individuals that are more sensitive to treatment
-
----
-class: middle, inverse, center
-# Regression Discontinuity Design
+ __Answer__ = Before, an "identification policeman" would just need a story about why treated might be trending differently after event for other reasons. Now, he/she would need story about why that different trend would be particularly true for subset of firms that are more sensitive to treatment
 
 ---
 ## Basic idea of RDD
@@ -80,7 +74,7 @@ The basic idea of regression discontinuity RDD is the following:
 - Observations (e.g. firm, individual, etc.) are "treated" based on a known cutoff rule.
 - The cutoff is what creates the discontinuity.
 
-A researcher is interested in how this treatment (i.e. the cutoff) affects the outcome variable of interest, $y$.
+Researcher is interested in how this treatment affects outcome variable of interest, $y$.
 
 ---
 ## Examples of RDD settings
@@ -95,9 +89,9 @@ A researcher is interested in how this treatment (i.e. the cutoff) affects the o
 ---
 ## RDD is like difference-in-difference
 
-- Has a similar flavor to diff-in-diff natural experiment setting in that you can illustrate identification with a figure
+- Has similar flavor to diff-in-diff natural experiment setting in that you can illustrate identification with a figure
 - Plot outcome y against independent variable that determines treatment assignment, x.
-- Should observe a sharp discontinuous change in y at the cutoff value of x.
+- Should observe sharp, discontinuous change in y at the cutoff value of x.
 
 ---
 ## But, RDD is different
@@ -105,7 +99,7 @@ A researcher is interested in how this treatment (i.e. the cutoff) affects the o
 - RDD has some key differences. 
     - Assignment to treatment is NOT random;
     - Assignment is based on value of x
-    - When treatment only depends on x (what I'll later call "sharp RDD", there is no overlap in treatment & controls; i.e. we never observe the same x for a treatment unit and a control unit)
+    - When treatment only depends on x (what I'll later call "sharp RDD", there is no overlap in treatment & controls; i.e. we never observe the same x for a treatment and a control)
 
 ---
 ## Randomized Experiment
@@ -117,16 +111,12 @@ include_graphics('RDtable4.png')
 ---
 ## RDD randomization assumption
 
-- Assignment to treatment and control isn't random, but whether an _individual_ observation is treated is assumed to be random.
-  - i.e. the researcher assumes that observations (e.g. firm, person, etc.) can't perfectly manipulate their x value
-  - Therefore, whether an observation _x_ falls immediately above or below key cutoff _appears_ random
+- Assignment to treatment and control isn't random, but whether _individual_ observation is treated is assumed to be random.
+  - i.e. researcher assumes that observations (e.g. firm, person, etc.) can't perfectly manipulate their x value
+  - Therefore, whether an observation's x falls immediately above or below key cutoff x is random
 
 ---
-class: middle, center, inverse
-# Two Types of RDD
-
----
-## Fuzzy & Sharp
+## Two types of RDD
 
 __Sharp RDD__
 
@@ -176,10 +166,6 @@ include_graphics('RDtable3a.png')
 ```{r echo=FALSE, fig.align='center'}
 include_graphics('myrdd.gif')
 ```
-
----
-class: center, middle, inverse
-# RDD in R Example
 
 ---
 ## RDD in R
@@ -251,10 +237,6 @@ title(main="Internal Causes of Death", xlab="AGE",ylab="Mortality rate from all 
 ```{r echo=FALSE}
 summary(reg.3)
 ```
-
----
-class: middle, center, inverse
-# List of RDD papers and their Running Variables
 
 ---
 #### List of Papers that use RDD

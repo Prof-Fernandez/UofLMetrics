@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 ## Simple Linear Regression
 ### Jose Fernandez
 ### University of Louisville
-### 2020/6/29 (updated: 2020-07-23)
+### 2020/6/29 (updated: 2020-07-02)
 
 ---
 
@@ -129,7 +129,7 @@ The estimated values of our `\(\beta\)`'s are `\(\widehat{\beta}_{0}\)` and `\(\
 
 The regression line improves on the model fit over just using the mean. `$$\widehat{y}_{i} = \widehat{\beta}_{0}+\widehat{\beta}_{1}X_i$$`
 
-&lt;img src="https://cnx.org/resources/440525fca3a9401f5b93021c76e2e27839e7e46b/variation.PNG" width="75%" style="display: block; margin: auto;" /&gt;
+![[Image Credit](https://cnx.org/contents/zddObXQQ@1.1:Ae4araUY@1/The-Regression-Equation)](https://cnx.org/resources/440525fca3a9401f5b93021c76e2e27839e7e46b/variation.PNG)
 
 ---
 ## SSR and SSE
@@ -230,9 +230,6 @@ Now we can use the formula for the constant in the equation for the slope.
 `$$\frac{\partial L}{\partial \beta_1}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)X_i=\sum (Y_i-(\bar{Y}-\hat{\beta_1}\bar{X})-\beta_1X_i)X_i=0$$`
 We will re-arrange some terms
 `$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))(X_i-\bar{X}+\bar{X})=0$$`
----
-### Slope (Continued)
-
 It can be shown that `$$\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))\bar{X}=0$$`
 1. `\(\bar{X}\)` is a constant so it can be pulled out.
 2. Remember that the mean of Y is `\(\bar{Y}=\frac{1}{n}\sum Y_i\)` so `\(n\bar{Y}=\sum Y_i\)` and `\(\sum \bar{Y}=n\bar{Y}\)`.
@@ -263,11 +260,7 @@ To estimate the model parameters of the class size/student performance model we 
 ---
 ## Correlation and Scatterplot (1)
 
-The sample correlation is found to be -0.23, indicating a weak negative relationship. 
-
-However, we need a better measure of causality. 
-
-We want to be able to draw a straight line through these dots characterizing the linear regression line, and from that we get the slope.
+The sample correlation is found to be -0.23, indicating a weak negative relationship. However, we need a better measure of causality: we want to be able to draw a straight line through these dots characterizing the linear regression line, and from that we get the slope.
 
 ---
 ## Correlation and Scatterplot (2)
@@ -281,7 +274,7 @@ CASchools$testscr=(CASchools$read+CASchools$math)/2
 qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher Ratio", ylab="Test Scores")
 ```
 
-&lt;img src="Simplelinearregression_files/figure-html/unnamed-chunk-2-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+![](Simplelinearregression_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
 
 ---
 ## The Ordinary Least Squares Estimator (1)
@@ -317,7 +310,7 @@ where `\(\widehat{TestScore}\)` is the predicted value. (This is referred to as 
 qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher Ratio", ylab="Test Scores") + geom_abline(intercept=698.9, slope=-2.28, color='blue')
 ```
 
-&lt;img src="Simplelinearregression_files/figure-html/unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+![](Simplelinearregression_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 
 ---
 class: center, inverse, middle
@@ -334,7 +327,7 @@ Now that we've run an OLS regression we want to know
 We have two useful measures
 
 - The regression `\(R^2\)`
-- The standard error of the regression `\((SER)\)`
+- The standard error of the regression ($SER$)
 
 ---
 ## The R Squared (1)
@@ -361,7 +354,7 @@ Let us define the total sum of squares ($TSS$), the explained sum of squares ($E
 ---
 ## The Standard Error of the Regression
 
-The standard error of the regression `\((SER)\)` is an estimator of the standard deviation of the population regression error `\(u_i\)`.
+The standard error of the regression ($SER$) is an estimator of the standard deviation of the population regression error `\(u_i\)`.
 
 Since we don't observe `\(u_1,\dots, u_n\)` we need to estimate this standard deviation
 We use `\(\hat{u}_1,\dots, \hat{u}_n\)` to calculate our estimate
@@ -371,9 +364,9 @@ We use `\(\hat{u}_1,\dots, \hat{u}_n\)` to calculate our estimate
 ---
 ## Measure of Fit of Test Score on STR Regression
 
-- The `\(R^2\)` is calculated to be 0.051. This means that the `\(STR\)` explains 5.1% of the variance in `\(TestScore\)`.
+- The `\(R^2\)` is calculated to be 0.051. This means that the `\(STR\)` explains 5.1\% of the variance in `\(TestScore\)`.
 - The `\(SER\)` is calculated to be 18.6. This is an estimate of the standard deviation of `\(u_i\)` which shows a large spread.
-- Low `\(R^2\)` (or low `\(SER)\)` does not mean that the regression is bad: it means that there are other factors that have a strong influence on the dependent variable that have not been included in the regression.
+- Low `\(R^2\)` (or low `\(SER\)`) does not mean that the regression is bad: it means that there are other factors that have a strong influence on the dependent variable that have not been included in the regression.
 
 ---
 class: center, inverse, middle
@@ -437,7 +430,7 @@ class: center, inverse, middle
 ---
 ## Randomized Controlled Experiment
 
-- In a randomized controlled experiment, subjects are placed in treatment group `\((X_i = 1)\)` or the control group `\((X_i = 0)\)` randomly, not influenced by their characteristics. Hence, `\(E[u_i|X_i] = 0\)`.
+- In a randomized controlled experiment, subjects are placed in treatment group `\((X_i = 1)\)` or the control group ($X_i = 0$) randomly, not influenced by their characteristics. Hence, `\(E[u_i|X_i] = 0\)`.
 - Using observational data, `\(X_i\)` is not assigned randomly, therefore we must then think carefully about making assumption A.1.
 
 ---
@@ -490,7 +483,6 @@ When we have a large sample, we can approximate the distribution of the random v
 - Both estimates are unbiased: `\(E[\hat{\beta}_0] = \beta_0\)` and `\(E[\hat{\beta}_1] = \beta_1\)`.
 - Using the same reasoning as we did with `\(\bar{Y}\)`, we can use the CLT to argue that `\(\hat{\beta}_0\)` and `\(\hat{\beta}_1\)` are both approximately normal
 - The large sample variance of `\(\hat{\beta}_1\)` is `$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$`
-- If the error terms are homoscedastic (constant variance), then the equation simplifies to `$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[u_i]}{[Var(X_i)]^2}$$`
 - Since `\(\sigma_{\hat{\beta}_1}^2\)` decreases to zero the large the sample, `\(\hat{\beta}_1\)` is said to be consistent
 
 ---

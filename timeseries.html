@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 ## Time Series
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2020-08-03)
+### 2020-7-4 (updated: 2020-07-13)
 
 ---
 
@@ -31,8 +31,6 @@ class: center, middle, inverse, title-slide
 - A prior knowledge of the statistical theory behind Time Series is useful before Time series Modeling
 
 - ARMA and ARIMA are important models for performing Time Series Analysis
-
-- Acknowledgement: These notes are from an excellent blog post entitled, ["A Complete Tutorial on Time Series Modeling in R" by TAVISH SRIVASTAVA, DECEMBER 16, 2015](https://www.analyticsvidhya.com/blog/2015/12/complete-tutorial-time-series-modeling/)
 
 ---
 ## Introduction
@@ -61,11 +59,8 @@ One such method, which deals with time based data is Time Series Modeling.
 - Exploration of Time Series Data in R
 - Introduction to ARMA Time Series Modeling
 - Framework and Application of ARIMA Time Series Modeling
+- Time to get started!
  
----
-class: middle, center, inverse
-# The Basics
-
 ---
 # 1. Basics – Time Series Modeling
 Let’s begin from basics.  This includes 
@@ -251,10 +246,6 @@ Let’s now consider an example to show you what a time series looks like.
 
  
 ---
-class: middle, center, inverse
-# Exploration of Time Series Data in R
-
----
 ### 2. Exploration of Time Series Data in R
 Here we’ll learn to handle time series data on R. Our scope will be restricted to data exploring in a time series type of data set and not go to building time series models.
 
@@ -395,16 +386,13 @@ boxplot(AirPassengers~cycle(AirPassengers))
 
 ---
 ### Important Inferences
-- The year on year trend clearly shows that the number of passengers have been increasing without fail.
+- The year on year trend clearly shows that the #passengers have been increasing without fail.
 - The variance and the mean value in July and August is much higher than rest of the months.
 - Even though the mean value of each month is quite different their variance is small. Hence, we have strong seasonal effect with a cycle of 12 months or less.
 - Exploring data becomes most important in a time series model – without this exploration, you will not know whether a series is stationary or not. As in this case we already know many details about the kind of model we are looking out for.
 - Let’s now take up a few time series models and their characteristics. We will also take this problem forward and make a few predictions.
 
  
----
-class: middle, center, inverse
-# Introduction to ARMA Time Series Modeling
 ---
 ### 3. Introduction to ARMA Time Series Modeling
 ARMA models are commonly used in time series modeling. In ARMA model, AR stands for auto-regression and MA stands for moving average. If these words sound intimidating to you, worry not – I’ll simplify these concepts in next few minutes for you!
@@ -420,7 +408,7 @@ First, I’ll explain each of these two models (AR &amp; MA) individually. Next,
 ### Auto-Regressive Time Series Model
 Let’s understanding AR models using the case below:
 
-The current GDP of a country say `\(X(t)\)` is dependent on the last year’s GDP i.e. `\(X(t – 1)\)`. 
+The current GDP of a country say x(t) is dependent on the last year’s GDP i.e. x(t – 1). 
 
 The hypothesis being that the total cost of production of products &amp; services in a country in a fiscal year (known as GDP) is dependent on the set up of manufacturing plants / services in the previous year and the newly set up industries / plants / services in the current year. 
 
@@ -431,9 +419,9 @@ But the primary component of the GDP is the former one.
 
 Hence, we can formally write the equation of GDP as:
 
-`$$x(t) = \rho * x(t – 1) + error (t)$$`
+`$$x(t) = alpha *  x(t – 1) + error (t)$$`
 
-This equation is known as AR(1) formulation. The numeral one (1) denotes that the next instance is solely dependent on the previous instance.  The `\(\rho\)` is a coefficient which we seek so as to minimize the error function. Notice that `\(x(t- 1)\)` is indeed linked to `\(x(t-2)\)` in the same fashion. Hence, any shock to `\(x(t)\)` will gradually fade off in future.
+This equation is known as AR(1) formulation. The numeral one (1) denotes that the next instance is solely dependent on the previous instance.  The alpha is a coefficient which we seek so as to minimize the error function. Notice that `\(x(t- 1)\)` is indeed linked to `\(x(t-2)\)` in the same fashion. Hence, any shock to `\(x(t)\)` will gradually fade off in future.
 
 ---
 ### Juice Bottles Time Series
@@ -472,14 +460,13 @@ Let’s take another case to understand Moving average time series model.
 ### Apply the senario to time series
 Following is a simple formulation to depict the scenario :
 
-`$$x(t) = \theta *  Er(t-1) + Er (t)$$`
+`$$x(t) = beta *  error(t-1) + error (t)$$`
 
 If we try plotting this graph, it will look something like this :
 
-![](https://www.analyticsvidhya.com/wp-content/uploads/2015/02/MA1.png)
 Did you notice the difference between MA and AR model? 
-- MA model, noise / shock quickly vanishes with time. 
-- AR model has a much lasting effect of the shock.
+
+In MA model, noise / shock quickly vanishes with time. The AR model has a much lasting effect of the shock.
 
  
 ---
@@ -545,28 +532,8 @@ Hence, the partial correlation function (PACF) will drop sharply after the 1st l
 
 The blue line above shows significantly different values than zero. Clearly, the graph above has a cut off on PACF curve after 2nd lag which means this is mostly an AR(2) process.
 
----
-### Determining an MA process
-
-.pull-left[
-![](https://www.analyticsvidhya.com/wp-content/uploads/2015/02/cut-off.gif)
-.caption[
-.center[ACF]
-]
-]
-
-.pull-right[
-![PACF](https://www.analyticsvidhya.com/wp-content/uploads/2015/02/Gradual-decline.gif)
-.caption[
-.center[PACF]
-]
-]
-
 Clearly, the graph above has a cut off on ACF curve after 2nd lag which means this is mostly a MA(2) process.
 
----
-class: middle, center, inverse
-# Framework and Application of ARIMA Time Series Modeling
 ---
 ### 4. Framework and Application of ARIMA Time Series Modeling
 A quick revision, Till here we’ve learnt basics of time series modeling, time series in R and ARMA modeling. Now is the time to join these pieces and make an interesting story.
@@ -713,25 +680,11 @@ acf(log(AirPassengers))
 ### What do you see in the chart shown above?
 Clearly, the decay of ACF chart is very slow, which means that the population is not stationary. We have already discussed above that we now intend to regress on the difference of logs rather than log directly. Let’s see how ACF and PACF curve come out after regressing on the difference.
 
----
-### ACF
 
-```r
-acf(diff(log(AirPassengers)))
-```
 
-![](timeseries_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 
----
-### PACF
 
-```r
-pacf(diff(log(AirPassengers)))
-```
 
-![](timeseries_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
-
----
 Clearly, ACF plot cuts off after the first lag. Hence, we understood that value of p should be 0 as the ACF is the curve getting a cut off. While value of q should be 1 or 2. After a few iterations, we found that (0,1,1) as (p,d,q) comes out to be the combination with least AIC and BIC.
 
 ---
@@ -752,7 +705,7 @@ pred &lt;- predict(fit, n.ahead = 10*12)
 ts.plot(AirPassengers,2.718^pred$pred, log = "y", lty = c(1,3))
 ```
 
-&lt;img src="timeseries_files/figure-html/unnamed-chunk-16-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="timeseries_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
  
 ---
 ### Projects

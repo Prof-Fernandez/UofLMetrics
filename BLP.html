@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Limited Dependent Variables</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Limited Dependent Variables
+## Demand Estimation
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2021-02-10)
+
+---
+
+class: inverse, center, middle
+# Demand Estimation with aggregate market shares
+---
+## Micro versus Market level data
+One of the advantages of having microdata is that you can estimate demand directly from individual consumer choices.
+
+But often times, we do not get to observe individual transaction data. 
+
+Instead, we observe market level data where we know the market share for a certain product and product characteristics. 
+
+---
+## Another problem: price endogeneity?
+
+Note: in deriving all these examples, an implicit assumption is that the distribution of the `\(\epsilon_{ij}\)`'s are independent of the prices. This is analogous to assuming that prices are exogenous.
+
+Case study: Trajtenberg (1989) study of demand for CAT scanners. Disturbing finding: coefficient on price is positive, implying that people prefer more expensive machines!
+
+Possible explanation: quality differentials across products not adequately controlled for. In differentiated product markets, where each product is valued on the basis of its characteristics, brands with highly-desired characteristics (higher quality) may command higher prices. If any of these characteristics are not observed, and hence not controlled for, we can have endogeneity problems. `\(E[p\epsilon] \ne 0\)`
+
+---
+## Estimation with aggregate market shares
+
+Next we consider how to estimate demand functions in the presence of price endogeneity, and when the researcher only has access to aggregate market shares. 
+
+This summarizes findings from Berry (1994).
+
+---
+## Data
+
+Our data for a particular market looks like this
+
+j | `\(\widehat{s}_{mj}\)` | `\(p_j\)` | `\(X_{1j}\)` | `\(X_{2j}\)`
+---|---------|-------|------|------
+A | 25% | $1.50 | red | large
+B | 35% | $2.00 | blue | small
+C | 45% | $2.50 | green | large
+
+Total Market size = `\(M\)`
+Total number of brands = `\(J\)`
+
+We want to use these data to estimate demand for different products using differences in market share and characteristics across different brands and different markets.
+---
+## Model
+
+Let a consumer's utility function be `$$U_{ijm}=X_{jm}\beta-\alpha p_{jm}+\xi_{jm}+\epsilon_{ijm}$$`
+where i indexes consumer, j indexes product, and m indexes market.
+
+Let `\(\delta_{jm}=X_{jm}\beta-\alpha p_{jm}+\xi_{jm}\)`
+
+Econometrician observes neither `\(\xi_{jm}\)` or `\(\epsilon_{ij}\)`, but household i observes both.
+
+You can think of `\(\xi_{jm}\)` as a product specific unobserved quality shock. It is easy to see that high quality products (high `\(\xi\)`) would imply consumers are willing to pay more for the good so price would be higher as well. `\(E[\xi p \neq 0]\)`
+
+The other error is an idiosyncratic shock, which we will assume is distributed Type I Extreme Value across all consumers, brands, and markets.
+---
+## Probabilities
+
+Given our assumption of the idiosyncratic error, we can write the choice probabilities as a conditional logit probability.
+
+`$$Pr(y_{ijm}=j)=\frac{exp(\delta_{jm})}{\sum_{k=1}^J exp(\delta_{km})}$$`
+---
+## Predicted market shares
+
+We can't estimate this probability directly, but we do observe the actual market shares. So we can transform this probability into a _predicted market share_
+
+That is, if we knew the values of the `\(\delta\)`'s, then we could construct the actual market shares. 
+
+### Predicted market share
+
+`$$\widetilde{s}_{jm}=Pr(y_{ijm}=j)=\frac{exp(\delta_{jm})}{\sum_{k=1}^J exp(\delta_{km})}$$`
+
+We need to normalize one product such that `\(\delta_{0m}=0\)`
+
+`$$\widetilde{s}_{0m}=Pr(y_{ijm}=0)=\frac{1}{1+\sum_k exp(\delta_{km})}$$`
+---
+## Transform shares
+
+We can then use these predicted shares to make a linear equation by taking logs
+
+`$$log(\widetilde{s}_{jm})-log(\widetilde{s}_{0m})=\delta_{jm}=X_{jm}\beta-\alpha p_{jm}+\xi_{jm}$$`
+__Construct our new dependent variable__
+
+Since we actually observe the market shares of each product in each market, we can construct our actual values of `\(\delta_{jm}\)`.
+
+Let `\(s_{jm}\)` be the actual market share of product j in market m.
+
+Then the actual mean utility is  `\(\widehat{\delta}_{jm}=log({s}_{jm})-log({s}_{0m})\)`
+---
+## Objective Function
+
+We calculate this for every market. Our objective function becomes 
+`$$\begin{align*}E[\xi Z]&amp;=\frac{1}{MM}\frac{1}{J}\sum_{m=1}^M \sum_{j=1}^J \xi_{jm}Z_{jm} \\ \\ 
+&amp;=\frac{1}{MM}\frac{1}{J}\sum_{m=1}^M \sum_{j=1}^J [\widehat{\delta}_{jm}-X_{jm}\beta-\alpha p_{jm}]Z_{jm}\end{align*}$$`
+
+Where Z is a set of instrumental variables and MM is the total number of markets.
+
+Basically, we reduce the whole problem down to an instrumentals variable problem.
+---
+## What are appropriate instruments
+
+* Cost shifters (prices of raw materials or workers; industry dependent)
+* Characteristics of competitors' products
+* If panel, the price of the same good, but in other markets
+
+---
+## Berry 1994 in R: Data
+
+
+```r
+library(AER)
+blpdata&lt;-hdm::BLP$BLP #BLP Data
+blpZ&lt;-hdm::BLP$Z #Instrumental Variables
+blpZ&lt;-as.data.frame(blpZ)
+blp.var.names=c("model name","model id","firm id","cdid",
+                "log price","miles per gallon","miles per dollar",
+                "horse power per weight","air conditioning",
+                "size of the car","market share","outside option share",
+                "log share j - log share 0","time trend")
+ols.1&lt;-lm(y~price+hpwt+space+mpg+air+mpd+factor(model.id), data=blpdata)
+iv.1&lt;-ivreg(y~price+hpwt+space+mpg+air+mpd+factor(model.id)|hpwt+space+mpg
+            +air+mpd+factor(model.id)+blpZ$sum.other.1+blpZ$sum.other.hpwt
+            +blpZ$sum.other.air+blpZ$sum.other.mpd
+            +blpZ$sum.other.space+blpZ$sum.rival.1+blpZ$sum.rival.hpwt
+            +blpZ$sum.rival.air+blpZ$sum.rival.mpd+blpZ$sum.rival.space, data=blpdata)
+```
+---
+## Berry 1994 in R: Results 
+&lt;small&gt;
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;OLS&lt;/td&gt;&lt;td&gt;IV&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;price&lt;/td&gt;&lt;td&gt;-0.085&lt;sup&gt;c&lt;/sup&gt; (0.009)&lt;/td&gt;&lt;td&gt;-0.197&lt;sup&gt;c&lt;/sup&gt; (0.021)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Horse power per wgt&lt;/td&gt;&lt;td&gt;0.065 (0.246)&lt;/td&gt;&lt;td&gt;0.754&lt;sup&gt;c&lt;/sup&gt; (0.285)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;size of car&lt;/td&gt;&lt;td&gt;0.945&lt;sup&gt;c&lt;/sup&gt; (0.197)&lt;/td&gt;&lt;td&gt;0.952&lt;sup&gt;c&lt;/sup&gt; (0.207)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;miles per gallon&lt;/td&gt;&lt;td&gt;0.016 (0.063)&lt;/td&gt;&lt;td&gt;0.004 (0.067)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;air conditioning&lt;/td&gt;&lt;td&gt;0.165&lt;sup&gt;b&lt;/sup&gt; (0.067)&lt;/td&gt;&lt;td&gt;0.457&lt;sup&gt;c&lt;/sup&gt; (0.087)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;miles per dollar&lt;/td&gt;&lt;td&gt;-0.018 (0.040)&lt;/td&gt;&lt;td&gt;0.018 (0.043)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-1.030&lt;sup&gt;b&lt;/sup&gt; (0.419)&lt;/td&gt;&lt;td&gt;-1.734&lt;sup&gt;c&lt;/sup&gt; (0.457)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;2,217&lt;/td&gt;&lt;td&gt;2,217&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.874&lt;/td&gt;&lt;td&gt;0.861&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;20.446&lt;sup&gt;c&lt;/sup&gt; (df = 562; 1654)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/small&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

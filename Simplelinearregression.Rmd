@@ -121,10 +121,7 @@ The estimated values of our $\beta$'s are $\widehat{\beta}_{0}$ and $\widehat{\b
 
 The regression line improves on the model fit over just using the mean. $$\widehat{y}_{i} = \widehat{\beta}_{0}+\widehat{\beta}_{1}X_i$$
 
-```{r message=FALSE, warning=FALSE, echo=FALSE, fig.align='center', out.width="75%"}
-library(knitr)
-include_graphics("https://cnx.org/resources/440525fca3a9401f5b93021c76e2e27839e7e46b/variation.PNG")
-```
+![[Image Credit](https://cnx.org/contents/zddObXQQ@1.1:Ae4araUY@1/The-Regression-Equation)](https://cnx.org/resources/440525fca3a9401f5b93021c76e2e27839e7e46b/variation.PNG)
 
 ---
 ## SSR and SSE
@@ -225,9 +222,6 @@ Now we can use the formula for the constant in the equation for the slope.
 $$\frac{\partial L}{\partial \beta_1}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)X_i=\sum (Y_i-(\bar{Y}-\hat{\beta_1}\bar{X})-\beta_1X_i)X_i=0$$
 We will re-arrange some terms
 $$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))(X_i-\bar{X}+\bar{X})=0$$
----
-### Slope (Continued)
-
 It can be shown that $$\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))\bar{X}=0$$
 1. $\bar{X}$ is a constant so it can be pulled out.
 2. Remember that the mean of Y is $\bar{Y}=\frac{1}{n}\sum Y_i$ so $n\bar{Y}=\sum Y_i$ and $\sum \bar{Y}=n\bar{Y}$.
@@ -266,7 +260,7 @@ We want to be able to draw a straight line through these dots characterizing the
 
 ---
 ## Correlation and Scatterplot (2)
-```{r warning=FALSE, message=FALSE, fig.align='center', out.width="50%"}
+```{r warning=FALSE, message=FALSE}
 suppressPackageStartupMessages(library(AER,quietly=TRUE,warn.conflicts=FALSE))
 library(ggplot2,quietly=TRUE,warn.conflicts=FALSE)
 data("CASchools")
@@ -304,7 +298,7 @@ where $\widehat{TestScore}$ is the predicted value. (This is referred to as test
 
 ---
 ## OLS Regression of Test Scores on Student-Teacher Ratio (2)
-```{r fig.align='center', out.width="50%"}
+```{r}
 qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher Ratio", ylab="Test Scores") + geom_abline(intercept=698.9, slope=-2.28, color='blue')
 ```
 
@@ -323,7 +317,7 @@ Now that we've run an OLS regression we want to know
 We have two useful measures
 
 - The regression $R^2$
-- The standard error of the regression $(SER)$
+- The standard error of the regression ($SER$)
 
 ---
 ## The R Squared (1)
@@ -360,9 +354,9 @@ $$SER = s_{\hat{u}}$$ where $$s_{\hat{u}}^2 = \frac{1}{n-2}\sum_i \hat{u}_i^2 = 
 ---
 ## Measure of Fit of Test Score on STR Regression
 
-- The $R^2$ is calculated to be 0.051. This means that the $STR$ explains 5.1% of the variance in $TestScore$.
+- The $R^2$ is calculated to be 0.051. This means that the $STR$ explains 5.1\% of the variance in $TestScore$.
 - The $SER$ is calculated to be 18.6. This is an estimate of the standard deviation of $u_i$ which shows a large spread.
-- Low $R^2$ (or low $SER)$ does not mean that the regression is bad: it means that there are other factors that have a strong influence on the dependent variable that have not been included in the regression.
+- Low $R^2$ (or low $SER$) does not mean that the regression is bad: it means that there are other factors that have a strong influence on the dependent variable that have not been included in the regression.
 
 ---
 class: center, inverse, middle
@@ -404,7 +398,7 @@ $$E[u_i|X_i] = 0$$
 ---
 ## Randomized Controlled Experiment
 
-- In a randomized controlled experiment, subjects are placed in treatment group $(X_i = 1)$ or the control group $(X_i = 0)$ randomly, not influenced by their characteristics. Hence, $E[u_i|X_i] = 0$.
+- In a randomized controlled experiment, subjects are placed in treatment group $(X_i = 1)$ or the control group ($X_i = 0$) randomly, not influenced by their characteristics. Hence, $E[u_i|X_i] = 0$.
 - Using observational data, $X_i$ is not assigned randomly, therefore we must then think carefully about making assumption A.1.
 
 ---

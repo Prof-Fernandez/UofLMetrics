@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Survival Analysis</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Survival Analysis
+## An Introduction
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2021-02-10)
+
+---
+
+class: inverse, middle, center
+
+
+# Introduction
+---
+
+## What is survival data?
+
+Time-to-event data that consists of a distinct start time and end time. These data are common in the medical field.
+
+Examples from cancer:
+
+- Time from surgery to death
+- Time from start of treatment to progression
+- Time from response to recurrence
+---
+
+## Examples from other fields
+
+Time-to-event data is common in many fields including, but not limited to:
+
+- Time from HIV infection to development of AIDS
+- Time to heart attack
+- Time to onset of substance abuse
+- Time to initiation of sexual activity
+- Time to machine malfunction
+- Time to employee resignation/termination
+---
+
+## Aliases for survival analysis
+
+Because survival analysis is common in many other fields, it also goes by other names:
+
+- Reliability analysis
+- Duration analysis
+- Event history analysis
+- Time-to-event analysis
+
+---
+## Questions of interest
+
+The two most common questions I encounter related to survival analysis are:
+
+1. What is the probability of survival to a certain point in time?
+2. What is the average survival time?
+---
+class: inverse, center, middle
+# Censoring
+---
+
+## What is censoring?
+
+In survival analysis it is common for the exact event time to be unknown, or unobserved, which is called censoring. A subject may be censored due to:
+
+- Loss to follow-up
+- Withdrawal from study
+- No event by end of fixed study period
+
+Specifically these are examples of **right** censoring. Other common types of censoring include:
+
+- Left
+- Interval
+---
+
+### Censored survival data
+
+When the exact event time is unknown then some patients are censored, and survival analysis methods are required.
+
+
+![](survival_analysis_in_r_tutorial_files/figure-html/swimmer-1.png)&lt;!-- --&gt;
+
+---
+### We can incorporate censored data using survival analysis techniques
+
+Toy example of a Kaplan-Meier curve for this simple data (details to follow):
+.pull-left[
+![](survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+- Horizontal lines represent survival duration for the interval
+- An interval is terminated by an event
+- The height of vertical lines show the change in cumulative probability
+- Censored observations, indicated by tick marks, reduces the cumulative survival between intervals
+]
+---
+## Danger of ignoring censoring 
+
+.pull-left[
+[Case study: musicians and mortality](https://callingbullshit.org/case_studies/case_study_musician_mortality.html)
+
+Conclusion: Musical genre is associated with early death among musicians.
+
+Problem: this graph does not account for the right-censored nature of the data.
+]
+.pull-right[
+
+&lt;img src="musician_death_graph.jpg" width="1333" /&gt;
+
+]
+---
+## Components of survival data
+
+For subject `\(i\)`:
+
+1. Event time `\(T_i\)`
+2. Censoring time `\(C_i\)`
+3. Event indicator `\(\delta_i\)`: 
+
+    - 1 if event observed (i.e. `\(T_i \leq C_i\)`)
+    - 0 if censored (i.e. `\(T_i &gt; C_i\)`)
+    
+4. Observed time `\(Y_i = \min(T_i, C_i)\)`
+
+---
+class: center, middle, inverse
+# Data example
+---
+
+## Research question of interest
+
+Organ Transplantation is limited by the supply of cadaveric and living donors.
+
+Unfortunately, many people die while waiting on the list.
+
+What types of characteristics lead to an increase or decrease likelihood of dying on the waiting list?
+
+---
+## Data structure
+
+
+```r
+data("transplant")
+```
+
+- 815 of people on the waiting list 
+- Outcome: Death
+- Predictors: age, sex, Blood type, year added to list 
+
+
+```r
+transplant %&gt;% 
+    head
+```
+
+```
+##   age sex abo year futime    event
+## 1  47   m   B 1994   1197    death
+## 2  55   m   A 1991     28      ltx
+## 3  52   m   B 1996     85      ltx
+## 4  40   f   O 1995    231      ltx
+## 5  70   m   O 1996   1271 censored
+## 6  66   f   O 1996     58      ltx
+```
+---
+## Variables:
+
+- "futime": the observed time `\(Y_i = min(T_i, C_i)\)`
+- "event": the event factor variable can take on censored, death, liver transpant, or withdraw
+- "abo": blood type A, B, AB, or O
+- sex: Male or Female
+- age: age at addition to the waiting list
+
+---
+class: center, inverse, middle
+# Preparing data for analysis
+
+---
+## Event indicator
+
+Most functions used in survival analysis will also require a binary indicator of event that is:
+
+- 0 for no event
+- 1 for event
+
+Currently our data example contains a factor variable indicating whehter the patient has died or if they have received a liver transpant, been withdrawn, or are censored.
+
+
+```r
+transplant$delta&lt;-0
+transplant$delta[transplant$event=="death"]&lt;-1
+```
+
+---
+class: center, inverse, middle
+# Analyzing survival data
+
+---
+## Questions of interest
+
+Recall the questions of interest:
+
+1. What is the probability of surviving to a certain point in time?
+2. What is the average survival time?
+
+---
+## Creating survival objects
+
+The Kaplan-Meier method is the most common way to estimate survival times and probabilities. It is a non-parametric approach that results in a step function, where there is a step down each time an event occurs.
+
+- The `Surv` function from the `survival` package creates a survival object for use as the response in a model formula. 
+- There will be one entry for each subject that is the survival time, which is followed by a `+` if the subject was censored. 
+
+Let's look at the first 10 observations:
+
+
+```r
+survival::Surv(transplant$futime, transplant$delta)[1:10]
+```
+
+```
+##  [1] 1197    28+   85+  231+ 1271+   58+  392+   30+   12+  139+
+```
+
+---
+## Estimating survival curves with the Kaplan-Meier method
+
+- The `survival::survfit` function creates survival curves based on a formula. Let's generate the overall survival curve for the entire cohort, assign it to object `f1`, and look at the `names` of that object:
+
+
+```r
+f1 &lt;- survfit(Surv(transplant$futime, transplant$delta) ~ 1, data = transplant)
+names(f1)
+```
+
+```
+##  [1] "n"         "time"      "n.risk"    "n.event"   "n.censor"  "surv"     
+##  [7] "std.err"   "cumhaz"    "std.chaz"  "type"      "logse"     "conf.int" 
+## [13] "conf.type" "lower"     "upper"     "call"
+```
+
+Some key components of this `survfit` object that will be used to create survival curves include:
+
+- `time`, which contains the start and endpoints of each time interval
+- `surv`, which contains the survival probability corresponding to each `time`
+
+---
+## Kaplan-Meier plot - base R
+
+Now we plot the `survfit` object in base `R` to get the Kaplan-Meier plot:
+.pull-left[
+
+```r
+plot(f1, xlab = "Days", ylab = "Overall survival probability")
+```
+
+![](survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+]
+.pull-right[
+- The default plot in base `R` shows the step function (solid line) with associated confidence intervals (dotted lines). Note that the tick marks for censored patients are not shown by default, but could be added using `mark.time = TRUE`
+]
+---
+
+## Estimating `\(x\)`-year survival
+
+One quantity often of interest in a survival analysis is the probability of surviving a certain number `\((x)\)` of years.
+
+For example, to estimate the probability of surviving to 5 years, use `summary` with the `times` argument:
+
+
+```r
+summary(f1, times = 5*365)
+```
+
+```
+## Call: survfit(formula = Surv(transplant$futime, transplant$delta) ~ 
+##     1, data = transplant)
+## 
+##  time n.risk n.event survival std.err lower 95% CI upper 95% CI
+##  1825      2      66     0.49   0.206        0.215            1
+```
+
+We find that the 5-year probability of survival in this study is 49%. The associated lower and upper bounds of the 95% confidence interval are also displayed.
+
+---
+## `\(x\)`-year survival is often estimated incorrectly 
+
+What happens if you use a "naive" estimate? 
+
+66 of the 815 patients died by 5 years so:
+
+`$$\Big(1 - \frac{66}{815}\Big) \times 100 = 92\%$$`
+
+- You get an **incorrect** estimate of the 5-year probability of survival when you ignore the fact that 747 patients were censored before 5 years.
+
+- Recall the **correct** estimate of the 5-year probability of survival was 49%.
+
+---
+
+## Estimating median survival time
+
+Another quantity often of interest in a survival analysis is the average survival time, which we quantify using the median (survival times are not expected to be normally distributed so the mean is not an appropriate summary). 
+
+We can obtain this directly from our `survfit` object:
+
+
+```r
+survival::survfit(survival::Surv(futime, delta) ~ 1, data = transplant)
+```
+
+```
+## Call: survfit(formula = survival::Surv(futime, delta) ~ 1, data = transplant)
+## 
+##       n  events  median 0.95LCL 0.95UCL 
+##     815      66    1422    1422      NA
+```
+
+We see the median survival time is 3.9 years. The lower and upper bounds of the 95% confidence interval are also displayed.
+
+---
+
+## Median survival is often estimated incorrectly
+
+What happens if you use a "naive" estimate? 
+
+Summarize the median survival time among the 66 patients who died:
+
+
+```r
+transplant$futime[transplant$delta == 1] %&gt;% 
+    median
+```
+
+```
+## [1] 65.5
+```
+
+- You get an **incorrect** estimate of median survival time of 0.2 years when you ignore the fact that censored patients also contribute follow-up time.
+
+- Recall the **correct** estimate of median survival time is 3.9 years.
+---
+class: center, middle, inverse
+# Comparing survival times between groups
+
+---
+## Questions of interest with respect to between-group differences
+
+Is there a difference in survival probability between groups?
+
+From our example: does the probability of survival differ according to gender among liver transplant patients?
+
+---
+## Kaplan-Meier plot by group
+
+We can add a covariate to the right-hand side of the `survival::survfit` object to obtain a stratified Kaplan-Meier plot. 
+
+Let's also look at some other customization we can do with `survminer::ggsurvplot`.
+
+
+```r
+survminer::ggsurvplot(
+    fit = survival::survfit(survival::Surv(futime, delta) ~ abo, data = transplant), 
+    xlab = "Days",
+    ylab = "Overall survival probability",
+    legend.title = "Blood Type",
+    legend.labs = c("A", "B", "AB","O"),
+    break.x.by = 100, 
+    censor = FALSE,
+    risk.table = TRUE,
+    risk.table.y.text = FALSE)
+```
+
+---
+
+&lt;img src="survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-12-1.png" width="80%" /&gt;
+
+---
+
+- Blood type B patients have the lowest overall survival probability.
+- The risk table below the plot shows us the number of patients at risk at certain time points, which can give an idea of how much information is being used to calculate the estimates at each time
+- Male patients have the lowest overall survival probability.
+
+---
+
+## `\(x\)`-year survival probability by group 
+
+As before, we can get an estimate of, for example, 1-year survival by using `summary` with the `times` argument in our `survival::survfit` object:
+
+
+```r
+summary(survfit(Surv(futime, delta) ~ sex, data = transplant), times = 365)
+```
+
+```
+## Call: survfit(formula = Surv(futime, delta) ~ sex, data = transplant)
+## 
+##                 sex=m 
+##         time       n.risk      n.event     survival      std.err lower 95% CI 
+##     365.0000      82.0000      37.0000       0.8641       0.0244       0.8175 
+## upper 95% CI 
+##       0.9134 
+## 
+##                 sex=f 
+##         time       n.risk      n.event     survival      std.err lower 95% CI 
+##     365.0000      59.0000      22.0000       0.8763       0.0276       0.8238 
+## upper 95% CI 
+##       0.9322
+```
+
+---
+## Log-rank test for between-group significance test {.smaller}
+
+- We can conduct between-group significance tests using a log-rank test. 
+- The log-rank test equally weights observations over the entire follow-up time and is the most common way to compare survival times between groups.
+- There are versions that more heavily weight the early or late follow-up that could be more appropriate depending on the research question.
+
+We get the log-rank p-value using the `survival::survdiff` function:
+
+
+```r
+survival::survdiff(Surv(futime, delta) ~ sex, data = transplant)
+```
+
+```
+## Call:
+## survival::survdiff(formula = Surv(futime, delta) ~ sex, data = transplant)
+## 
+##         N Observed Expected (O-E)^2/E (O-E)^2/V
+## sex=m 447       42     36.4     0.861      1.93
+## sex=f 368       24     29.6     1.059      1.93
+## 
+##  Chisq= 1.9  on 1 degrees of freedom, p= 0.2
+```
+
+And we see that the p-value is .2, indicating no significant difference in overall survival according to gender.
+---
+class: center, middle, inverse
+# Regression
+---
+
+## The Cox regression model
+
+We may want to quantify an effect size for a single variable, or include more than one variable into a regression model to account for the effects of multiple variables.
+
+The Cox regression model is a semi-parametric model that can be used to fit univariable and multivariable regression models that have survival outcomes.
+
+Some key assumptions of the model:
+
+- non-informative censoring
+- proportional hazards
+---
+
+## Cox regression example using a single covariate
+
+We can fit regression models for survival data using the `survival::coxph` function, which takes a `survival::Surv` object on the left hand side and has standard syntax for regression formulas in `R` on the right hand side.
+
+
+```r
+survival::coxph(survival::Surv(futime, delta) ~ factor(abo), data = transplant)
+```
+
+We can see a tidy version of the output using the `tidy` function from the `broom` package:
+
+
+```r
+broom::tidy(survival::coxph(survival::Surv(futime, delta) ~ factor(abo), 
+                            data = transplant))
+```
+
+```
+## # A tibble: 3 x 5
+##   term          estimate std.error statistic p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 factor(abo)B    0.183      0.386    0.474    0.636
+## 2 factor(abo)AB   0.195      0.618    0.316    0.752
+## 3 factor(abo)O   -0.0110     0.284   -0.0388   0.969
+```
+
+---
+## Hazard ratios
+
+The quantity of interest from a Cox regression model is a **hazard ratio (HR)**.
+
+If you have a regression parameter `\(\beta\)` (from column `estimate` in our `survival::coxph`) then HR = `\(\exp(\beta)\)`.
+
+For example, from our example we obtain the regression parameter `\(\beta_1=0.195\)` for AB vs B blood type, so we have HR = `\(\exp(\beta_1)=1.21\)`. 
+
+A HR &lt; 1 indicates reduced hazard of death whereas a HR &gt; 1 indicates an increased hazard of death.
+
+So we would say that a person with AB blood type has 1.21 times increased hazard of death as compared to a person with A blood type.
+
+---
+## Summary
+
+- Time-to-event data is common
+- Survival analysis techniques are required to account for censored data
+- The `survival` package provides tools for survival analysis, including the `Surv` and `survfit` functions
+- The `survminer` package allows for customization of Kaplan-Meier plots based on `ggplot2`
+- Between-group comparisons can be made with the log-rank test using `survival::survdiff`
+- Multiavariable Cox regression analysis can be accomplished using `survival::coxph` 
+
+---
+
+## Empoyee Attrition Example
+
+
+```r
+# First let's import the data 
+q = read.csv('https://3jd8gl2iires146kaw2hgqy9-wpengine.netdna-ssl.com/wp-content/uploads/2018/01/turnover.csv', header = TRUE, sep = ",", na.strings = c("",NA))
+```
+
+Our case uses data of 1785 employees.
+
+---
+
+## Variables:
+
+$ exp - length of employment in the company
+
+$ event - event (1 - terminated, 0 - currently employed)
+
+$ branch - branch
+
+$ pipeline - source of recruitment
+
+Please note that the data is already prepared for survival analysis. Moreover, length of employment is counted in months up to two decimal places, according to the following formula: (date fire - date hire) / (365.25 / 12).
+
+---
+
+## Cox Model {.smaller}
+
+```r
+w = coxph(Surv(exp, event) ~ 1 , data = q)
+w1 = coxph(Surv(exp, event) ~ . , data = q)
+summary(w1)
+```
+
+```
+## Call:
+## coxph(formula = Surv(exp, event) ~ ., data = q)
+## 
+##   n= 1785, number of events= 1004 
+## 
+##                  coef exp(coef) se(coef)      z Pr(&gt;|z|)   
+## branchfirst  -0.08927   0.91460  0.16419 -0.544  0.58664   
+## branchfourth -0.52913   0.58912  0.17576 -3.010  0.00261 **
+## branchsecond -0.42416   0.65432  0.16378 -2.590  0.00960 **
+## branchthird  -0.46644   0.62723  0.21000 -2.221  0.02634 * 
+## pipelineea   -0.21381   0.80750  0.26715 -0.800  0.42351   
+## pipelinejs    0.50318   1.65398  0.20076  2.506  0.01220 * 
+## pipelineref   0.32156   1.37927  0.21409  1.502  0.13310   
+## pipelinesm    0.36136   1.43528  0.25807  1.400  0.16144   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+##              exp(coef) exp(-coef) lower .95 upper .95
+## branchfirst     0.9146     1.0934    0.6629    1.2618
+## branchfourth    0.5891     1.6975    0.4174    0.8314
+## branchsecond    0.6543     1.5283    0.4747    0.9020
+## branchthird     0.6272     1.5943    0.4156    0.9466
+## pipelineea      0.8075     1.2384    0.4784    1.3631
+## pipelinejs      1.6540     0.6046    1.1160    2.4514
+## pipelineref     1.3793     0.7250    0.9066    2.0984
+## pipelinesm      1.4353     0.6967    0.8655    2.3802
+## 
+## Concordance= 0.579  (se = 0.01 )
+## Likelihood ratio test= 67.28  on 8 df,   p=2e-11
+## Wald test            = 63.26  on 8 df,   p=1e-10
+## Score (logrank) test = 64.85  on 8 df,   p=5e-11
+```
+
+
+---
+##Accelerated failure-time models | survreg(formula, dist='weibull')
+
+An accelerated failure-time (AFT) model is a parametric model with covariates and failure times following the survival function of the form `\(S(x|Z) = S_0 (x exp[\theta Z])\)`, where `\(S_0\)` is a function for the baseline survival rate. The term `\(exp[\theta Z]\)` is called the acceleration factor. 
+
+The AFT model uses covariates to place individuals on different time scales { note the scaling by the covariates in `\(S(t|Z)\)` via `\(exp[\theta Z]\)`. The AFT model can be rewritten in a log-linear form, where the log of failure time (call this logX) is linearly related to the mean `\(\mu\)`, the acceleration factor, and an error term `\(\sigma W\)`: `$$log X = \theta'Z+\sigma W$$`
+
+---
+
+## Different AFT Models
+
+There are serveral AFT models depending on the assumption about the distribution of the error `\(W\)`.
+
+Distribution | df | Included in Survival
+-------------|----|---------------------
+Exponential | 1  | yes
+Weibull | 2 | yes
+lognormal | 2 | yes
+log logistic | 2 | yes
+generalized gamma | 3 | no
+
+---
+
+## Weibull
+
+The Weibull distribution has a survival function equal to `$$S(t)=exp(-(\lambda t)^\rho)$$`
+
+and a hazard function equal to `$$\Lambda(t)=\rho \lambda(\lambda t)^{\rho-1}$$`
+
+where `\(\lambda&gt;0\)` and `\(\rho&gt;0\)`. A special case of the Weibul functions is the exponential distribution when `\(\rho=1\)`.
+
+If `\(\rho &gt; 1\)`, then the risk increases over time. 
+
+If `\(\rho &lt; 1\)`, then the risk decreases over time.
+
+---
+
+## Weibul Model in R
+The _survial_ package allows us to estimate all of these models. We will use the same model with a small change to estimate a Weibul AFT model.
+
+```r
+w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
+w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
+stargazer::stargazer(w2,w3,type="text",style = "qje")
+```
+
+---
+## Weibul Model in R {.smaller}
+
+
+```
+## 
+## ======================================================
+##                                  exp                  
+##                      Weibull           exponential    
+##                        (1)                 (2)        
+## ------------------------------------------------------
+## branchfirst       0.142 (0.147)       0.119 (0.164)   
+## branchfourth    0.494*** (0.157)    0.524*** (0.176)  
+## branchsecond    0.433*** (0.146)    0.441*** (0.163)  
+## branchthird      0.434** (0.189)     0.469** (0.210)  
+## pipelineea        0.228 (0.239)       0.239 (0.267)   
+## pipelinejs      -0.529*** (0.180)   -0.537*** (0.200) 
+## pipelineref     -0.383** (0.192)     -0.372* (0.213)  
+## pipelinesm       -0.376 (0.232)      -0.386 (0.258)   
+## Constant        1.831*** (0.220)    1.860*** (0.245)  
+## N                     1,785               1,785       
+## Log Likelihood     -2,712.426          -2,721.241     
+## chi2 (df = 8)       74.713***           69.134***     
+## ======================================================
+## Notes:          ***Significant at the 1 percent level.
+##                  **Significant at the 5 percent level.
+##                  *Significant at the 10 percent level.
+```
+
+---
+## Do We need accelerated time?
+The exponential model assumes a constant effect of time. 
+
+We can perform a likelihood ratio test between the exponential and Weibul model to see if AFT is neccessary.
+
+
+```r
+library(lmtest)
+lrtest(w2,w3)
+```
+
+```
+## Likelihood ratio test
+## 
+## Model 1: Surv(exp, event) ~ branch + pipeline
+## Model 2: Surv(exp, event) ~ branch + pipeline
+##   #Df  LogLik Df Chisq Pr(&gt;Chisq)    
+## 1  10 -2712.4                        
+## 2   9 -2721.2 -1 17.63  2.683e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Although there is little difference in the parameter estimates, the likelihood ratio test suggest we should use the Weibul model over the exponential. 
+---
+## This is only the beginning
+
+* Machine learning methods are improving on survival models
+* We have only discussed X's that are constant over time, but what about time-varying covariates (or worse yet time-dependent covariates)
+* There are also issues of competing risks
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

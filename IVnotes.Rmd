@@ -205,9 +205,6 @@ Since $$\begin{align*} s_{ZY} &\overset{p}{\longrightarrow} Cov(Z_i, Y_i) \\ s_{
 therefore
 
 $$\hat{\beta}_1^{TSLS} = \frac{s_{ZY}}{s_{ZX}} \overset{p}{\longrightarrow} \frac{Cov(Z_i, Y_i)}{Cov(Z_i, X_i)} = \beta_1$$
----
-class: inverse, middle, center
-# Application to the Demand for Cigarettes
 
 ---
 ## Application to the Demand for Cigarettes (1)
@@ -404,10 +401,6 @@ iv.res.3 <- ivreg(log(packpc) ~ log(ravgprs) + log(perinc)
                   subset=(year == 1995))
 coeftest(iv.res.3, vcov.=vcovHAC(iv.res.3)) # For Robust Standard Errors
 ```
-
----
-class: middle, center, inverse
-# Instrument Validity
 
 ---
 ## Checking Instrument Validity
