@@ -4,6 +4,7 @@
     <title>Linear Regression</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
+    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -17,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Difference in Differences
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2020-07-10)
+### 2020-7-4 (updated: 2021-02-10)
 
 ---
 
@@ -47,47 +48,96 @@ Today, we will look at dif-in-dif.
 ---
 ## Framework
 
-Recall the potential outcome framework. When we estimate a treatment
-control contrast what we get is:
+Recall the potential outcome framework. When we estimate a treatment-control contrast what we get is:
 `$$E(Y|D=1)-E(Y|D=0)=\delta+E(Y_0|D=1)-E(Y_0|D=0)$$`
 Where `\(\delta\)` is the ATE.
 
-This equation says that the average of the treated group minus the average of the control group is the average treatment effect plus selection
-bias (AKA omitted variable bias in the regression framework).
+This equation says that the average of the treated group minus the average of the control group is the average treatment effect plus selection bias (AKA omitted variable bias in the regression framework).
 
 ---
 ## Parallel Trends
 
-We will now explore another way to get rid of the selection bias.
+We will now explore another way to get rid of the selection bias (i.e. `\(E(Y_0|D=1)-E(Y_0|D=0)\)`)
 
-Suppose we have data on the outcome variable for our treatment and control group from the previous period. Call this `\(Y_{pre}\)`.
+Suppose we have data on the outcome variable for our treatment and control group from a previous period. Call this `\(Y_{pre}\)`.
 
 Now suppose further that:
 `$$E(Y_0|D=1)-E(Y_{pre}|D=1)=E(Y_0|D=0)-E(Y_{pre}|D=0)$$`
-This assumption is known as the __parallel trends__ assumptions and is crucial for getting compelling estimates in the dif-in-dif framework.
+This equation says the _change in the treatment group_ is equal to the _change in the control group_ when neither group receives the __active__ treatment.
 
-What does this assumption mean?
+This assumption is known as the __parallel trends__ assumptions and is crucial for getting compelling estimates in the dif-in-dif framework.
 
 ---
 ## Parallel Trends
 
 It says that if the treatment group had never been treated, the average change in the outcome variable would have been identical to the average change in the outcome variable for the control group.
 
-How plausible this assumption is depends upon the given study you are
-examining.
+How plausible this assumption is depends upon the given study you are examining.
 
-For now, let's assume it is true, and see how this can help us kill the
-selection bias.
+For now, let's assume it is true, and see how this can help us kill the selection bias.
 
 ---
-## Difference in Difference
+# Our first Causal Model:DiD
 
-Suppose instead of just comparing the average treatment outcome to the average control outcome, we use the pre-period data to compare the average change in the treatment group to the average change in the control group.
+Difference in Differences (DiD): exploits natural experiments in observational data to obtain causal estimates.
 
-That is, we calculate:
-`$$E(Y|D=1)-E(Y_{pre}|D=1)-[E(Y|D=0)-E(Y_{pre}|D=0)]$$`
-This is a __difference in difference__ or dif-in-dif estimate.
+Need items
+- Random (or quasi random) assignment of treatment and control groups.
+- A pre-period and a post-period for both groups.
+- No sample selection bias.
+- Must have parallel trends.
 
+---
+## DAG
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="https://miro.medium.com/max/1750/1*KiRkxO-fUCfXSkJMR0bDig.png" alt="Causal Pathway Illustration: Z (confounder) is the cause of both X (independent variable) and Y (dependent variable) and thus, obscures the relationship between X and Y." width="75%" /&gt;
+&lt;p class="caption"&gt;Causal Pathway Illustration: Z (confounder) is the cause of both X (independent variable) and Y (dependent variable) and thus, obscures the relationship between X and Y.&lt;/p&gt;
+&lt;/div&gt;
+---
+## DiD
+
+The DiD estimator is a version of the Fixed Effects Model can be used with both 
+
+- repeated cross-sectional (easier to obtain)
+- and panel data. (harder to obtain)
+
+DiD is a combination of time-series difference (compares outcomes across pre-treatment and post-treatment periods) and cross-sectional difference (compares outcomes between treatment and control groups).
+
+---
+## Intuition
+There are two equivalent strategies to think about the two “differences”:
+&lt;img src="https://miro.medium.com/max/1750/1*YYT04dz8Mn80Bw3zyvTG_g.png" width="110%" style="display: block; margin: auto;" /&gt;
+
+---
+## Visually DID
+Visually, the DiD is the difference between these two changes:
+1. changes in outcomes from pre-treatment to post-treatment
+2. changes in outcomes between treatment and control groups
+&lt;img src="https://miro.medium.com/max/1750/1*yyVOO-oWeSPlgblipljulg.png" width="110%" style="display: block; margin: auto;" /&gt;
+---
+##Regression DiD
+`$$y_{it}=\beta_0+\beta_1 Treat_i+\beta_2 Post_t+\beta_3 Treat_i*Post_t+\gamma X_{it}+e_{it}$$`
+While it is possible to obtain the DiD estimator by calculating the means by hand, using a regression framework may be more advantageous as it:
+
+- outputs standard errors for hypothesis testing
+
+- can be easily extended to include multiple periods and groups
+
+- allows the addition of covariates
+---
+## Treatment Effect
+&lt;img src="https://miro.medium.com/max/1750/1*wJItSwzDDFe-YW4C9BZ1cw.png" width="110%" style="display: block; margin: auto;" /&gt;
+---
+## Interpreting the Coefficients
+- `\(\beta_0\)`: Average change in y from the first to the second time period that is common to both groups
+
+- `\(\beta_1\)`: Average difference in y between the two groups that is common in both time periods
+
+- `\(\beta_2\)`: Average differential change in y from the first to the second time period of the treatment group relative to the control group
+---
+## The coefficients visually
+
+&lt;img src="https://miro.medium.com/max/1750/1*etuwZRKQ-0cCfFO5jkMftw.png" width="110%" style="display: block; margin: auto;" /&gt;
 ---
 ## Difference in Differences: Animated
 
@@ -126,6 +176,308 @@ Violation of parallel trend assumption will lead to biased estimation of the cau
 ## Parralel Trend Assumption: Violated
 
 &lt;img src="violationparallel.png" width="80%" style="display: block; margin: auto;" /&gt;
+---
+## Generalized DiD
+
+We can generalize the DiD model for multiple time periods.
+- Very useful for policy adoption as they tend to happened at different times
+
+`$$y_{it}=\beta_0+\alpha_i+\delta_t+\beta_3 d_{it}+\gamma X_{it}+e_{it}$$`
+
+- `\(\alpha_i\)`: Individual fixed effects that change across individuals (state-specific characteristics, individual’s gender, etc.)
+
+- `\(\delta_t\)`: Time fixed effects that change across time (e.g. year dummies to allow intercept to vary across different years)
+
+- `\(d_{it}\)`: dummy variable which equals 1 if the unit of observation is in the post-treatment period (in contrast to Pt equals 1 in the second time period)
+---
+## Threats to Validity
+
+1. Parallel Trends Assumption is violated
+  - Try a placebo treatment
+  - Visually inspect pre-trends using an event study
+
+2. Difference in composition
+  - Covariates can mitigate this problem
+  - The people you are examining should not change too much within their group.
+  
+3. Extrapolation
+- Depending on the setting of interest, results may be unable to generalise to other populations or even a longer timeframe.
+---
+## Silly Example
+
+.left-column[
+Consider a chili cheese hotdog
+1. What is the cheese effect?
+2. What is the chili effect?
+3. What is the chili * cheese effect?
+]
+
+.right-column[
+&lt;img src="https://pbs.twimg.com/media/EHW3qolWwAAc0c0?format=jpg&amp;name=large" width="50%" style="display: block; margin: auto;" /&gt;
+]
+---
+## A simple example in R
+
+```r
+library(foreign)
+mydata = read.dta("http://dss.princeton.edu/training/Panel101.dta")
+mydata$y &lt;- mydata$y/1000000000
+# First, let's create a post time variable
+mydata$time = ifelse(mydata$year &gt;= 1994, 1, 0)
+# Second, let's create a treated group
+mydata$treated = ifelse(mydata$country == "E" |
+mydata$country == "F" |
+mydata$country == "G", 1, 0)
+# Third, the interaction term
+mydata$did = mydata$time * mydata$treated
+```
+---
+### 5 ways to do DiD
+I will show you a couple of different ways to run DiD in R.
+
+```r
+library(plm) #panel linear model
+library(lfe) #linear fixed effect model
+library(fixest)
+reg1&lt;-lm(y~time+treated+did, data=mydata)
+reg2&lt;-lm(y~time*treated, data=mydata)
+reg3&lt;-plm(y~did, data = mydata, index = c("country","year"), effect = "twoways", model = "within") 
+reg4 &lt;-felm(y~did | country + year, data = mydata)
+reg5 &lt;-feols(y~did | country + year, data = mydata)
+```
+---
+&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
+&lt;caption&gt;Statistical models&lt;/caption&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 3&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 4&lt;/th&gt;
+&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 5&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.36&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.36&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.74)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.74)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;time&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.29&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.29&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.95)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.95)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;treated&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.78&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.78&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.13)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.13)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;did&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.46)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.33)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.33)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.33)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;time:treated&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.46)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-top: 1px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.08&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.08&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.06&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.39&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.04&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.04&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.22&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt; (full model)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.39&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt; (proj model)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.06&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt; (full model)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.20&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt; (proj model)&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.22&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. groups: country&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;7&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. groups: year&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;10&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;within.r.squared&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.06&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Sigma&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.69&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;nobs&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AIC&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;351.85&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;BIC&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;390.08&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr style="border-bottom: 2px solid #000000;"&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Log Likelihood&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-158.93&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;
+&lt;tr&gt;
+&lt;td style="font-size: 0.8em;" colspan="6"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tfoot&gt;
+&lt;/table&gt;
+---
+## Event Study
+
+
+```r
+library(ggplot2)
+reg6 &lt;- feols(y~ i(treated,year,1994)|country + year, data = mydata)
+coefplot(reg6)
+```
+
+![](DIDnotes_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
 
 ---
 ## Dif-in-Dif in Practice
@@ -249,7 +601,7 @@ xlab="Year", ylab="Labor Force Participation Rate")+geom_vline(xintercept = 1994
 ---
 ## Create Plot
 
-&lt;img src="DIDnotes_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="DIDnotes_files/figure-html/unnamed-chunk-21-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 class: center, middle, inverse
