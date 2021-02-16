@@ -26,6 +26,13 @@ output:
 - Suppose the superintendent of an elementary school district wants to know the effect of class size on student performance
 - She decides that test scores are a good measure of performance
 
+```{r echo=FALSE}
+library(knitr)
+include_graphics("https://thecadreupei.com/wp-content/uploads/2019/11/exam-696x462.jpg")
+
+```
+
+
 ---
 ## The Effect of Class Size on Student Performance (2)
 
@@ -119,6 +126,33 @@ include_graphics("linear-regression.png")
 ```
 
 ---
+## Estimators
+
+You are already familiar with one estimator for a series, __the mean__.
+
+Suppose you have n observations of $y_i$. 
+$$y_1,y_2,y_3,...,y_n$$
+If I have you guess the next value what would it be? 
+
+Let's call this guess $\hat{y}$
+
+The difference between $y_i - \hat{y}=error= u_i$
+
+An estimator minimizes the size of the error.
+---
+### Estimator (2)
+
+One way to capture the size of the error is to use the variance of the error. 
+
+$$\frac{1}{n}\sum_i^n (u_i-\bar{u})^2 = \frac{1}{n}\sum_i^n u_i^2=\frac{1}{n}\sum_i^n (y_i-\hat{y})^2$$
+Let's assume that the mean of the errors is zero. How can we pick $\hat{y}$ to make this sum as small as possible (minimization problem)?
+---
+### Estimator (3)
+We can solve for the minimum using calculus.
+
+$$\frac{d}{d\hat{y}}\frac{1}{n}\sum_i^n (y_i-\hat{y})^2=\frac{-2}{n}\sum_i^n (y_i-\hat{y})=0 \\ \frac{1}{n}\sum_i^n (y_i-\hat{y})=0 \\ \frac{1}{n}\sum_i^n y_i-\hat{y}=\bar{y}-\hat{y}=0 \\ \bar{y} = \hat{y}$$ 
+For regression, we are essentially doing the same thing.
+---
 ## The Ordinary Least Squares Estimator (1)
 
 - The _ordinary least squares (OLS)_ estimator selects estimates for the model parameters that minimize the distance between the sample regression line (function) and the observed data.
@@ -126,6 +160,8 @@ include_graphics("linear-regression.png")
 - With OLS we are interested in minimizing 
 $$\min_{b_0,b_1} \sum_i [Y_i - (b_0 + b_1 X_i)]^2$$ 
 We want to find $b_0$ and $b_1$ such that the mistakes between the observed $Y_i$ and the predicted value $b_0 + b_1 X_i$ are minimized.
+
+__See the notes for the derivation__
 ---
 ## The Ordinary Least Squares Estimator (2)
 
@@ -238,7 +274,11 @@ $$E[u_i|X_i] = 0$$
 
 ---
 ## Assumption A.1 Plot
-![](ch4pic3.png)
+```{r echo=FALSE}
+include_graphics("https://slideplayer.com/slide/12910416/78/images/23/Least+squares+assumption+%231%3A+E%28u%7CX+%3D+x%29+%3D+0..jpg")
+```
+
+
 
 ---
 ## Randomized Controlled Experiment
@@ -275,7 +315,7 @@ $$0 < E[Y_i^4] < \infty$$
 
 ![](ch4pic4.png)
 ---
-## Sometimes the relationship is not Linear
+### Sometimes the relationship is not Linear
 
 ![](quartet.png)
 ---
@@ -355,8 +395,8 @@ Multiple Regression allows us to answer these questions.
   $$wages_{i}=\beta_0+\beta_1Education_{i}+\beta_2Experience_{i}+e_{i}$$
 
 
-* $\beta_2$ tells us the effect 1 additional year of schooling has on your wages, holding your level of Experience constant
-* $\beta_1$ tells us the effect 1 additional year of work experience has on your wages, holding your level of Education constant
+* $\beta_1$ tells us the effect 1 additional year of schooling has on your wages, holding your level of Experience constant
+* $\beta_2$ tells us the effect 1 additional year of work experience has on your wages, holding your level of Education constant
 * $\beta_0$ tells us your level of wages if you had no schooling and no work experience. (You can think of this as minimum wage)
     + Note, each variable is index by (i), this index represent a specific person in our data set.
     + The observed levels of education, experience, and wages changes with each person.  The index give us a method to keep track of these changes.
@@ -378,7 +418,7 @@ The relative increase in wages for an additional year of experience is given by 
 
 $$\frac{\partial wages_i}{\partial Experience}=\beta_2+2\beta_3 *Experience$$
 
-If $\beta_2 <0$, then wages are increasing at a decreasing rate (and may eventually decrease altogether)
+If $\beta_3 <0$, then wages are increasing at a decreasing rate (and may eventually decrease altogether)
 ---
 class: middle, center, inverse
 # Omitted Variable Bias
@@ -567,6 +607,13 @@ $$Var(u_i|X_{1i},\dots,X_{ki})$$
 is constant for all $i=1,\dots,n$. Otherwise, it is heteroskedastic.
 
 In most cases (read virtually always), you will have heteroskedastic errors.
+---
+### Visual of Homoskedasticity and Heteroskedasticity
+```{r echo=FALSE}
+include_graphics("https://www.albert.io/blog/wp-content/uploads/2016/11/heteroscedastic-relationships.png")
+
+```
+
 
 ---
 ## The OLS Estimator (1)
