@@ -65,7 +65,7 @@ To calculate probability, we need to use a pdf and cdf
 The blue line below is the pdf. We use the cdf to calculate probability that the z score is between $z_1$ and $z_2$ (the shaded region in yellow.)
 
 ```{r echo=FALSE, fig.align='center'}
-include_graphics("https://lh3.googleusercontent.com/proxy/DGf2tmD4rnqs9FBbukOEljWSwjYVHsbRxYo7q1nW2AjENH7OkI8pyzBBw8eR8egKuP1NZoRrJGUXsmL9TVfL2CoH8u3lDN_Wg0nOFQRltlUG1GpQVCH5brNCzh0w8ArvVDtu0RvGtNBV8FLpXme8Xw")
+include_graphics("http://stat88.org/textbook/images/notebooks/Chapter_08/02_Standard_Normal_Curve_10_0.png")
 
 ```
 
@@ -704,6 +704,7 @@ mydata <- data.frame(y,X,x2)
 mylogit1 <- glm(y ~ X, family = "binomial", data = mydata)
 mydata_group<-aggregate(mydata[, 1:2],list(mydata$x2), mean)
 # now y is represented as a share
+# Let's transform the shares using logs
 mydata_group$y2 <- log(mydata_group$y)-log(1-mydata_group$y)
 mylogit3 <- lm(y2 ~ X, mydata_group)
 ```
