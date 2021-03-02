@@ -201,25 +201,23 @@ include_graphics('rct1.png')
 ---
 ## Random Assignment
 
-Random assignment makes Di independent of potential outcomes,
+Random assignment makes $D_i$ independent of potential outcomes,
 hence: 
 - the selection effect is zeroed out and 
 - the treatment effect on the treated is equal to the ATE.
 
 ---
 ## Types of randomized experiments
-
-Randomized experiment is designed and implemented consciously by
-social scientists. It entails conscious use of a treatment and control group
-with random assignment.
-  * __Lab experiments__
-      - The effect of feedback on relative performance (Azmat and Iriberri, 2012). **Yes you work harder**
-  * __Field experiments__ (Lab-in-the-field or artefactual experiments)
-      - The effect of feedback on relative performance: (Bagues et al, work in progress) **Yes Students work harder**
-  * __Natural experiments__ - has a source of randomization that is as if randomly assigned, but this variation was not part of a conscious randomized treatment and control design
-      - Vietnam-era service effect on education and earnings (Flory, Leibbrandt and List 2010) **Women Shy away from competitive work settings**
+A randomized experiment is designed and implemented consciously by social scientists. It entails conscious use of a treatment and control group with random assignment.
+  - __Lab experiments__
+      - The effect of feedback on relative performance (Azmat and Iriberri, 2012). __Yes you work harder__
+  - __Field experiments__ (Lab-in-the-field)
+      - The effect of feedback on relative performance: (Bagues et al, work in progress) __Yes Students work harder__
+  - __Natural experiments__ 
+    - has a source of randomization that is as if randomly assigned, but not part of real experiment.
+    - Vietnam-era service effect on education and earnings (Flory, Leibbrandt and List 2010) __Women Shy away from competitive work settings__
       
----      
+---
 ## Who uses Experiments in Business?
 
 Tech Companies like Google, Facebook, and Amazon are positioned to use experiments.

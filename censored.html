@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Censored and Truncated Data
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-02-10)
+### 2020-7-4 (updated: 2021-02-12)
 
 ---
 
@@ -82,6 +82,23 @@ The probability density of Y will resemble that of a normal distribution.
 \end{matrix}\right.$$`
 
 Log Likelihood Function `$$LL(\beta,\sigma)=\sum_{c&lt;y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c&gt;y} 1-\Phi(\frac{c-X_i'beta}{\sigma})$$`
+
+---
+## The Expected Value of the Tobit model
+
+The unconditional expected value is of Y is
+`$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
+If we condition on Y&gt;0, then the expected value simplifies to 
+
+`$$E[Y_i|Y_i&gt;0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
+---
+## Marginal Effects of Tobit Model
+
+We can calculate the probability of Y&gt;0
+`$$Pr(Y&gt;0)=\Phi(x_i \beta/\sigma) \\ \frac{d Pr(Y&gt;0)}{dx} = \frac{\beta}{\sigma}*\phi(x_i \beta/\sigma)$$`
+Similarly, we can calculate the marginal effect of x on Y.
+`$$\frac{d E[Y]}{dx} = \beta*\Phi(x_i \beta/\sigma)$$`
+
 ---
 ## Tobit Model in R
 
@@ -148,7 +165,7 @@ The mean and variance are given by
 
 where `\(\lambda(x)=\frac{phi(x)}{1-Phi(x)}\)` = Inverse Mills Ratio and `\(\delta(x)=\lambda(x)(\lambda(x)-x),\,0&lt;\delta(x)&lt;1\)`
 
-Remarks: `\(E[X|X&gt;c] &gt; \mu\)` and `\(var(X|X&gt;c) &lt; \sigma^2\)`
+
 ---
 ## Truncated Normal Distribution
 
@@ -263,6 +280,18 @@ We use those estimates to construct `\(\lambda(z'\widehat{\gamma})\)`.
 Then we estimate the level equation as `$$Y=X\beta+\alpha\lambda(z'\widehat{\gamma})+u$$`
 
 If `\(\alpha=0\)`, then there is no sample selection problem.
+---
+## OLS versus Heckman
+
+Now is a good time to think about how Heckman corrects OLS.
+
+Let's restate the omitted variable bias (OVB) table, but using the correction factor as the OV. If x affects both the participation equation and the level equation, then we will have some sort of OVB.
+
+Signs      | Corr($x$,Mills Ratio)&gt;0 | Corr($x$,Mills Ratio)&lt;0
+---------  | ------------------- | ------------------
+`\(\alpha&gt;0\)`| Positive Bias       | Negative Bias
+`\(\alpha&lt;0\)`| Negative Bias       | Positive Bias
+
 ---
 ## Heckman Model in R
 

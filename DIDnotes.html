@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Difference in Differences
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-02-10)
+### 2020-7-4 (updated: 2021-03-02)
 
 ---
 
@@ -129,11 +129,12 @@ While it is possible to obtain the DiD estimator by calculating the means by han
 &lt;img src="https://miro.medium.com/max/1750/1*wJItSwzDDFe-YW4C9BZ1cw.png" width="110%" style="display: block; margin: auto;" /&gt;
 ---
 ## Interpreting the Coefficients
-- `\(\beta_0\)`: Average change in y from the first to the second time period that is common to both groups
+- `\(\beta_0\)`: Average value of y in the control group during the preperiod.
+- `\(\beta_1\)`: Average change in y from the first to the second time period that is common to both groups
 
-- `\(\beta_1\)`: Average difference in y between the two groups that is common in both time periods
+- `\(\beta_2\)`: Average difference in y between the two groups that is common in both time periods
 
-- `\(\beta_2\)`: Average differential change in y from the first to the second time period of the treatment group relative to the control group
+- `\(\beta_3\)`: Average differential change in y from the first to the second time period of the treatment group relative to the control group
 ---
 ## The coefficients visually
 

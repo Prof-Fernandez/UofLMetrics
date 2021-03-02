@@ -20,6 +20,13 @@ output:
 * For example, we might be interested in studying whether there is racial discrimination in the provision of loans
     * We are interested in comparing individuals who are identify with different races, but are otherwise identical
     * It is not sufficient to compare average loan denial rates
+```{r echo=FALSE, fig.align='center',out.width="50%", message=FALSE, warning=FALSE}
+library(knitr)
+library(AER)
+include_graphics("https://www.creighton.edu/fileadmin/user/PublicRelations/newsroom/images/Slider_333x300/Color-of-law_300.jpg")
+
+```
+
 
 ---
 ## Introduction (2)
@@ -30,7 +37,7 @@ We will consider two forms of regression to analyze such situations
 2.  __Nonlinear Regression Models__, that might be a better fit of such binary models
 
 ---
-## The Math of Latent Dependent Variables
+### The Math of Latent Dependent Variables
 
 In economics, we believe people choose to do things that makes them better off. That is, they __maximize utility__. 
 
@@ -38,28 +45,103 @@ Suppose you could go out to eat (option 1) or cook at home (option 2).
 
 Each option gives you different utility.
 - $u_1=X_1\beta+e_1$ is the utility you get from eating out
-- $u_2=X_2\beta+e_2$ is the utility you get from eating out
+- $u_2=X_2\beta+e_2$ is the utility you get from cooking at home
 
-Let $y*$ represent a person's net utility, $u_1-u_2$. We do not get to observe $y*$.
+Let $y*$ represent a person's net utility, $y*=u_1-u_2$. We do not get to observe $y*$.
 
 Instead, we observe $y=1$ if $y*>0$ and $y=0$ otherwise.
 - $y=1$ implies you went out to each.
 - $y=0$ implies you cooked at home.
 
 ---
+### The Math of Latent Dependent Variables
+
+We want to know the probability you go out to eat, $Prob(y=1)$
+
+To calculate probability, we need to use a pdf and cdf
+- pdf = probability density function (gives the shape of the distribution)
+- cdf = cumulative density function 
+
+The blue line below is the pdf. We use the cdf to calculate probability that the z score is between $z_1$ and $z_2$ (the shaded region in yellow.)
+
+```{r echo=FALSE, fig.align='center'}
+include_graphics("https://lh3.googleusercontent.com/proxy/DGf2tmD4rnqs9FBbukOEljWSwjYVHsbRxYo7q1nW2AjENH7OkI8pyzBBw8eR8egKuP1NZoRrJGUXsmL9TVfL2CoH8u3lDN_Wg0nOFQRltlUG1GpQVCH5brNCzh0w8ArvVDtu0RvGtNBV8FLpXme8Xw")
+
+```
+
+
+---
 ## The Math of Latent Dependent Variables
 
-$$y* = \beta X + \epsilon$$
-Now assume $F$ is the cumulative distribution of $\epsilon$
+$$y* = X \beta+ \epsilon$$
+Now assume $F$ is the cumulative density function of $\epsilon$
 $$\begin{align*} Prob(y=1) &= Prob(y*>0) \\
-&= Prob(\beta X + \epsilon>0) \\
-&= Prob(\epsilon>-\beta X) \\
-&= 1-Prob(\epsilon<-\beta X) \\
-&= 1-F(-\beta X) \end{align*}$$
+&= Prob(X \beta + \epsilon>0) \\
+&= Prob(\epsilon>-X \beta ) \\
+&= 1-Prob(\epsilon<-X \beta ) \\
+&= 1-F(-X \beta ) \end{align*}$$
 
 If F is symmetric about 0,
-$$\begin{align*} Prob(y=1) &= 1-F(\epsilon<-\beta X) \\
-&= F(\beta X) \end{align*}$$
+$$\begin{align*} Prob(y=1) &= 1-F(\epsilon<-X \beta ) \\
+&= F(X \beta ) \end{align*}$$
+---
+### The entire lecture in a nutshell
+
+- If we do not assume a distribution for the error terms and use __OLS__ to estimate Y
+  - $Prob(y=1)=F(X \beta)=X \beta$ the equation is linear
+- If we assume the errors are normally distributed, then we use __Probit__ to estimate Y
+  - $Prob(y=1)=F(X \beta)=\Phi(X \beta)$ the equation is nonlinear.
+- If we assume the errors are logistic, then we use __Logit__ to estimate Y
+  - $Prob(y=1)=F(X \beta)=\Lambda(X \beta)$ the equation is nonlinear.
+
+---
+### Let's try it
+One Rstudio
+```{r}
+# We will make some fake data
+XA <- rnorm(1000)*5+20
+XB <- rnorm(1000)*5+10
+eA <- rnorm(1000)*5
+eB <- rnorm(1000)*5
+B <- 0.7
+y_star <- (XA-XB)*B + eA - eB
+y <- ifelse(y_star>0,1,0)
+mean(y)
+```
+
+---
+### Let's try it
+.pull-left[
+```{r message=FALSE, warning=FALSE, results='asis', eval=FALSE}
+#Let's run a regression using both y_star and y
+X = XA - XB # we can only identify relative effects
+reg1 <-lm(y_star ~ X)
+reg2 <- lm(y ~ X)
+stargazer::stargazer(reg1,reg2, type = "html")
+```
+]
+.pull-right[
+<small>
+```{r message=FALSE, warning=FALSE, results='asis', echo=FALSE}
+#Let's run a regression using 
+#both y_star and y
+# we can only identify relative effects
+X = XA - XB 
+reg1 <-lm(y_star ~ X)
+reg2 <- lm(y ~ X)
+stargazer::stargazer(reg1,reg2,
+ type = "html")
+```
+</small>
+]
+---
+### Predict Y
+```{r fig.align='center', out.width="50%"}
+y_hat <- predict(reg2,as.data.frame(X))
+plot(X,y_hat)
+```
+
+The predicted mean of y is `r mean(y_hat)`, the max is `r max(y_hat)`, and the min is `r min(y_hat)`
 
 ---
 ## Examples of Binary Dependent Variables
@@ -92,14 +174,7 @@ Using a subset of the data on mortgages $n=127$
 - What does it mean to predict a binary variable with a continuous value?
 - Using a probability linear model, we interpret this as predicting that someone with such a P/I ratio would be denied a loan with a probability of 20%.
 
----
-## Interpreting the OLS Regression (2)
-
-- Recall that the predicted value of an OLS regression is $$E[Y|X_1, \dots, X_k] = \beta_0 + \beta_1 X_{1i} + \dots + \beta_k X_{ki}$$
-
-- Recall that for a binary random (Bernoulli) variable $Y$ $$\begin{align*} E[Y] &= Pr(Y=0)\times 0 + Pr(Y=1)\times 1 \\ &= Pr(Y=1) \end{align*}$$
-
-- In a regression context $$E[Y|X_1,\dots,X_k] = Pr(Y=1|X_1,\dots, X_k)$$
+- __The coefficients in the linear model tell us the marginal effect on the probability of getting denied a loan__
 
 ---
 ## The Linear Probability Model
@@ -118,7 +193,7 @@ $$Pr(Y = 1|X_1,\dots, X_k) = \beta_0 + \beta_1 X_{1} + \dots + \beta_k X_{k}$$
 ## R Squared in a LPM
 
 - A model with a continuous dependent variable one can imagine the possibility of getting $R^2 = 1$, when all the data lines up on the regression line.
-- This would be impossible if we had a binary dependent variable, unless the regressors are also all binary.
+- This would be __impossible__ if we had a binary dependent variable, unless the __explanatory variables (X's)__ are also all binary.
 - Therefore, $R^2$ from a LPM regression does not have a useful interpretation.
 
 ---
@@ -135,6 +210,8 @@ coeftest(fm1, vcov.=vcovHAC(fm1))
 
 ---
 ## Application to the Boston HMDA Data
+
+Note, once we control for an African American Family (afam), the likelihood of denial due to the PI ratio decreases. Further, we see a positive and significant effect on the __afam__ variable
 
 ```{r}
 fm2 <- lm(I(as.numeric(deny) - 1) ~ pirat + afam, data = HMDA)
@@ -172,6 +249,33 @@ where $\Phi$ is the CDF of the standard normal distribution.
 Probit uses a linear line to capture the Z-score, $Z = \beta_0 + \beta_1 X$
 
 The CDF is nonlinear (remember what a normal distribution looks like), but the Z score is linear.
+
+---
+### The normal CDF is non-linear
+
+If $$y = \beta_0 + \beta_1 X + e,$$ 
+
+then we know that if we increase X by one unit that the change in y will equal $\beta_1$,
+
+$\delta y / \delta X = \beta_1$
+
+But the same is not true for either probit or logit.
+
+__Why is this important?__
+
+If you are moving from z = 2.0 to z = 3.0, then the change in probability is big, but from z = 3.0 to 4.0 is a much smaller change in probability even though the change in z is the same!!
+
+---
+```{r echo=TRUE, fig.align='center', out.width='75%'}
+# create a list of z values from -3 to 3 increasing by .1
+z <- seq(-3,3, by = .1)
+# We want to calculate the change in probability for a .1 change in z
+z1 <- z[1:length(z)-1]
+z2 <- z[2:length(z)]
+y <- pnorm(z2)-pnorm(z1)
+plot(z1,y)
+```
+
 
 ---
 ## Graphic Representation of the problem.
@@ -340,7 +444,7 @@ Examples,
 - Occupational Choice
 - Type of cereal
 
-__We use Multinomial Logit or Probit__
+__We use Multinomial Logit or Probit__ (Future Class)
 
 ---
 ## Discrete Counts
@@ -353,58 +457,39 @@ Sometimes, we have discrete amounts of an item
 - Number of businesses
 
 These are examples of count variables
-__Models used are Poisson and Negative Binomial__
+__Models used are Poisson and Negative Binomial__ (Future class)
 
 ---
-## Limited Dependent Variables and Economic Theory
+## Limited Dependent Variables and Choice Theory
 
-The one key insight of limited dependent variables is how well it fits in with economic theory.
+The one key insight of limited dependent variables is how well it fits in with Choice Theory.
 
 Suppose you have two products, A and B. Which one will you buy first?
 
-Economic Theory says you buy the good that gives you the most utility. 
+Choice Theory says you buy the good that gives you the most utility. 
 
 If $U_A > U_B$ you buy A else you buy B.
 
+---
+## Limited Dependent Variables and Choice Theory
 We can define these utility functions as linear where $X_A$ contains the observed characteristics of good A and $X_B$ the observed characteristics of good B. 
 
 $U_A = X_A\beta+e_A$ is your utility for good A
 
 $U_B = X_B\beta+e_B$ is your utility for good B
 
-The error terms $e_A$ and $e_B$ represent the unobserved characteristics for the products that the econometrician cannot observed, but the consumer can. 
+The error terms $e_A$ and $e_B$ represent the unobserved characteristics for the products that the statistician cannot observed, but the consumer can. 
 
 ---
-### Limited Dependent Variables and Economic Theory
+### Limited Dependent Variables and Choice Theory
 
 The product error terms are random variables. Therefore, we cannot know definitely if $U_A > U_B$, but we can say what is the probability the consumer will choose product A over product B.
 
 We do this by first defining a latent variable, $y^*$. This latent variable is unobserved, but the choice Y is observed.
 
 If $y^* > 0$, then Y = 1 else Y = 0.
-
-We know that the consumer choose product A if $U_A > U_B$. 
-
-This is the same as saying $y^*=U_A - U_B > 0$
-
-So $y^* = (X_A-X_B)\beta+e_A-e_B$
-
-Similar to dummy variables, we cannot estimate the __absolute effect__ when comparing two products. We can only estimate the __relative effect.__
-
-Just as in the dummy variable case, we will need to set the utility of one of the goods to zero. 
-
 ---
-### Limited Dependent Variables and Economic Theory
-
-The product error terms are random variables. We cannot know definitely if $U_A > U_B$, but we can say what is the probability the consumer will choose product A over product B.
-
-We do this by first defining a latent variable, $y^*$. This latent variable is unobserved, but the choice Y is observed.
-
-If $y^* > 0$, then Y = 1 else Y = 0.
-
----
-### Product Choice
-
+### Limited Dependent Variables and Choice Theory
 We know that the consumer choose product A if $U_A > U_B$. 
 
 This is the same as saying $y^*=U_A - U_B > 0$
@@ -424,7 +509,13 @@ First, let Y = 1 if the consumer buys good A. Also, let $X = X_A-X_B$.
 
 $$Pr(Y=1)=Pr(y^*>0)=Pr(X\beta+e_A-e_B>0)$$
 
-Remember, X is just data that we observed. $\beta$ is the parameter we are interested in. But the difference in the error terms is a random variable.
+Remember, X is just data that we observed. 
+
+$\beta$ is the parameter we are interested in. 
+
+But the difference in the error terms is a random variable.
+---
+### LPM
 
 If we treat the difference of the error terms to have a mean zero and a constant variance, then we can run OLS on the equation. $$Y = X\beta+e_A-e_B$$
 
@@ -562,12 +653,27 @@ Odds is just the ratio of the two probabilities $\frac{Pr(Y=1)}{Pr(Y=0)}$.
 log odds is the natural log of this fraction.
 
 ---
-### Logit with aggregate data
+### Natural log rules
 
-log odds  $$log \frac{Pr(Y=1)}{Pr(Y=0)}= log(s_1)-log(s_0)=X\beta$$.
+In case it has been awhile since you have seen the natural log, here are some rules
+
+- $ln x*y = ln x + ln y$
+- $ln x/y = ln x - ln y$
+- $ln x^a = a*ln x$
+- $ln e = 1$
+- $ln 1 = 0$
+
+
+
+---
+### Logit with aggregate data
+$$log \space odds: ln \frac{Pr(Y=1)}{Pr(Y=0)}=ln \frac{s_1}{s_0}= ln(s_1)-ln(s_0)=X\beta$$.
 
 The log odds gives us a linear function that we can estimate using OLS.
 
+$$\begin{align} ln Pr(Y=1) &= ln F(X\beta)= ln \frac{exp(X \beta)}{1+exp(X \beta)} \\  &= ln\space exp(X\beta) - ln [1+exp(X \beta)] \\ &= X \beta - ln[1+exp(X \beta)] \end{align}$$
+$$\begin{align} ln Pr(Y=0) &= ln [1-F(X\beta)]= ln \frac{1}{1+exp(X \beta)} \\  &= ln\space 1 - ln [1+exp(X \beta)] \\ &=  - ln[1+exp(X \beta)] \end{align}$$
+Using these two equations we find $$ln Pr(Y=1)-ln Pr(Y=0)=X\beta$$
 ---
 ### An Example
 
@@ -580,3 +686,31 @@ $$log(s_i)-log(s_0) = \beta_0 + \beta_1*price_i+\gamma*X_i+\epsilon_{ij}$$
 We can estimate a demand function using market level data instead of individual level data. 
 
 We would still need to find an instrumental variable for price.
+---
+### Let's Try it
+```{r}
+# Let's create individual level data for a logit
+X <- rnorm(100000)*5+10
+e1 <- rnorm(100000)*10
+x1<-1:1000
+w<-c(rep(1,100))
+x2<-kronecker(x1,w)
+
+B <- 0.7
+y_star <- X*B + e1
+y <- ifelse(y_star>0,1,0)
+mean(y)
+mydata <- data.frame(y,X,x2)
+mylogit1 <- glm(y ~ X, family = "binomial", data = mydata)
+mydata_group<-aggregate(mydata[, 1:2],list(mydata$x2), mean)
+# now y is represented as a share
+mydata_group$y2 <- log(mydata_group$y)-log(1-mydata_group$y)
+mylogit3 <- lm(y2 ~ X, mydata_group)
+```
+
+---
+#### Results
+
+```{r echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
+stargazer::stargazer(mylogit1,mylogit3,type="html")
+```

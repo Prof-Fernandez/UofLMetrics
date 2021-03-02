@@ -127,11 +127,12 @@ include_graphics("https://miro.medium.com/max/1750/1*wJItSwzDDFe-YW4C9BZ1cw.png"
 ```
 ---
 ## Interpreting the Coefficients
-- $\beta_0$: Average change in y from the first to the second time period that is common to both groups
+- $\beta_0$: Average value of y in the control group during the preperiod.
+- $\beta_1$: Average change in y from the first to the second time period that is common to both groups
 
-- $\beta_1$: Average difference in y between the two groups that is common in both time periods
+- $\beta_2$: Average difference in y between the two groups that is common in both time periods
 
-- $\beta_2$: Average differential change in y from the first to the second time period of the treatment group relative to the control group
+- $\beta_3$: Average differential change in y from the first to the second time period of the treatment group relative to the control group
 ---
 ## The coefficients visually
 

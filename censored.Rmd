@@ -73,6 +73,23 @@ $$f(y)=\left\{\begin{matrix}
 \end{matrix}\right.$$
 
 Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c<y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c>y} 1-\Phi(\frac{c-X_i'beta}{\sigma})$$
+
+---
+## The Expected Value of the Tobit model
+
+The unconditional expected value is of Y is
+$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
+If we condition on Y>0, then the expected value simplifies to 
+
+$$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
+---
+## Marginal Effects of Tobit Model
+
+We can calculate the probability of Y>0
+$$Pr(Y>0)=\Phi(x_i \beta/\sigma) \\ \frac{d Pr(Y>0)}{dx} = \frac{\beta}{\sigma}*\phi(x_i \beta/\sigma)$$
+Similarly, we can calculate the marginal effect of x on Y.
+$$\frac{d E[Y]}{dx} = \beta*\Phi(x_i \beta/\sigma)$$
+
 ---
 ## Tobit Model in R
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
@@ -137,7 +154,7 @@ $$\begin{align*}E[X|X>c] &= \mu+\sigma \lambda(\frac{c-\mu}{\sigma}) \\ var(X|X>
 
 where $\lambda(x)=\frac{phi(x)}{1-Phi(x)}$ = Inverse Mills Ratio and $\delta(x)=\lambda(x)(\lambda(x)-x),\,0<\delta(x)<1$
 
-Remarks: $E[X|X>c] > \mu$ and $var(X|X>c) < \sigma^2$
+
 ---
 ## Truncated Normal Distribution
 
@@ -252,6 +269,18 @@ We use those estimates to construct $\lambda(z'\widehat{\gamma})$.
 Then we estimate the level equation as $$Y=X\beta+\alpha\lambda(z'\widehat{\gamma})+u$$
 
 If $\alpha=0$, then there is no sample selection problem.
+---
+## OLS versus Heckman
+
+Now is a good time to think about how Heckman corrects OLS.
+
+Let's restate the omitted variable bias (OVB) table, but using the correction factor as the OV. If x affects both the participation equation and the level equation, then we will have some sort of OVB.
+
+Signs      | Corr($x$,Mills Ratio)>0 | Corr($x$,Mills Ratio)<0
+---------  | ------------------- | ------------------
+$\alpha>0$| Positive Bias       | Negative Bias
+$\alpha<0$| Negative Bias       | Positive Bias
+
 ---
 ## Heckman Model in R
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
