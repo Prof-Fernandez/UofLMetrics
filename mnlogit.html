@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 ## Multinomial Logit
 ### Jose Fernandez
 ### University of Louisville
-### updated: 2021-03-08
+### updated: 2021-03-09
 
 ---
 
@@ -162,6 +162,126 @@ stargazer(multi1, type="html", coef=list(multi1.rrr), p.auto=FALSE)
 Keeping all other variables constant, if your science score increases one unit, you are 0.97 times more likely to stay in the low ses category as compared to the middle ses category (the risk or odds is 3% lower). The coefficient, however, is not significant.
 
 Keeping all other variables constant, if your science score increases one unit, you are 1.02 times more likely to stay in the high ses category as compared to the middle ses category (the risk or odds is 2% higher). The coefficient, however, is not significant.
+
+---
+## Let's now try a mixed Multinomial Logit model
+
+Here we have data on different insurance plans and customer choices.
+Notice, our data is `long` meaning that we the same customer entered in for each of the K choices. 
+
+```r
+library(haven)
+ins&lt;-read_dta("http://www.stata-press.com/data/r15/inschoice.dta") 
+head(ins)
+```
+
+```
+## # A tibble: 6 x 6
+##      id premium deductible income      insurance choice
+##   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl+lbl&gt;  &lt;dbl&gt;
+## 1     1   2.87        1.70   5.74 1 [Health]          1
+## 2     1   3.13        2.14   5.74 2 [HCorp]           0
+## 3     1   2.03        2.26   5.74 3 [SickInc]         0
+## 4     1   1.65        2.94   5.74 4 [MGroup]          0
+## 5     1   0.870       3.56   5.74 5 [MoonHealth]      0
+## 6     2   3.52        1.24   2.89 1 [Health]          0
+```
+
+```r
+library(mlogit)
+```
+
+```
+## Loading required package: dfidx
+```
+
+```
+## 
+## Attaching package: 'dfidx'
+```
+
+```
+## The following object is masked from 'package:stats':
+## 
+##     filter
+```
+
+```r
+ins&lt;-mlogit.data(ins,choice = "choice", shape = "long", alt.var = "insurance",id.var = "id")
+```
+
+---
+## Use the mlogit package
+The `mlogit` package has the following form
+
+## a pure "conditional" model
+mlogit(dependent var ~ product characteristics, data)
+
+## a pure "multinomial model"
+mlogit(dependent ~ 0 | individual characteristics, data)
+
+## a "mixed" model
+mlogit(dependent ~ product characteristics | individual characteristics, data)
+
+---
+### MLOGIT in R
+
+
+```r
+library(mlogit)
+# conditional logit
+m1&lt;-mlogit(choice ~ premium + deductible, data = ins)
+# multinomial logit
+m2 &lt;- mlogit(choice ~ 0 | income, data = ins)
+# mixed multinomial logit
+m3 &lt;- mlogit(choice ~ premium + deductible | income, data = ins)
+stargazer(m1,m2,m3, type = "html")
+```
+
+---
+### MLOGIT in R
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3"&gt;choice&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;(Intercept):2&lt;/td&gt;&lt;td&gt;-0.607&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.620&lt;/td&gt;&lt;td&gt;-0.021&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.269)&lt;/td&gt;&lt;td&gt;(0.714)&lt;/td&gt;&lt;td&gt;(0.814)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;(Intercept):3&lt;/td&gt;&lt;td&gt;-1.426&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.052&lt;/td&gt;&lt;td&gt;0.406&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.404)&lt;/td&gt;&lt;td&gt;(0.725)&lt;/td&gt;&lt;td&gt;(0.865)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;(Intercept):4&lt;/td&gt;&lt;td&gt;-2.535&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.123&lt;/td&gt;&lt;td&gt;-0.973&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.546)&lt;/td&gt;&lt;td&gt;(0.745)&lt;/td&gt;&lt;td&gt;(0.983)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;(Intercept):5&lt;/td&gt;&lt;td&gt;-3.521&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.028&lt;/td&gt;&lt;td&gt;-1.278&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.721)&lt;/td&gt;&lt;td&gt;(0.806)&lt;/td&gt;&lt;td&gt;(1.136)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;premium&lt;/td&gt;&lt;td&gt;-2.454&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-2.537&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.214)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.221)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;deductible&lt;/td&gt;&lt;td&gt;-0.989&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.974&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.294)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.296)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;income:2&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.076&lt;/td&gt;&lt;td&gt;-0.123&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.133)&lt;/td&gt;&lt;td&gt;(0.151)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;income:3&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.194&lt;/td&gt;&lt;td&gt;-0.383&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.138)&lt;/td&gt;&lt;td&gt;(0.159)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;income:4&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.242&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-0.339&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.144)&lt;/td&gt;&lt;td&gt;(0.168)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;income:5&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.297&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-0.494&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;(0.159)&lt;/td&gt;&lt;td&gt;(0.190)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;250&lt;/td&gt;&lt;td&gt;250&lt;/td&gt;&lt;td&gt;250&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.253&lt;/td&gt;&lt;td&gt;0.007&lt;/td&gt;&lt;td&gt;0.267&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-296.540&lt;/td&gt;&lt;td&gt;-394.220&lt;/td&gt;&lt;td&gt;-290.932&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;LR Test&lt;/td&gt;&lt;td&gt;200.778&lt;sup&gt;***&lt;/sup&gt; (df = 6)&lt;/td&gt;&lt;td&gt;5.416 (df = 8)&lt;/td&gt;&lt;td&gt;211.993&lt;sup&gt;***&lt;/sup&gt; (df = 10)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

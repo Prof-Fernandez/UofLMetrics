@@ -83,3 +83,57 @@ stargazer(multi1, type="html", coef=list(multi1.rrr), p.auto=FALSE)
 Keeping all other variables constant, if your science score increases one unit, you are 0.97 times more likely to stay in the low ses category as compared to the middle ses category (the risk or odds is 3% lower). The coefficient, however, is not significant.
 
 Keeping all other variables constant, if your science score increases one unit, you are 1.02 times more likely to stay in the high ses category as compared to the middle ses category (the risk or odds is 2% higher). The coefficient, however, is not significant.
+
+---
+## Let's now try a mixed Multinomial Logit model
+
+Here we have data on different insurance plans and customer choices.
+Notice, our data is `long` meaning that we the same customer entered in for each of the K choices. 
+```{r}
+library(haven)
+ins<-read_dta("http://www.stata-press.com/data/r15/inschoice.dta") 
+head(ins)
+library(mlogit)
+ins<-mlogit.data(ins,choice = "choice", shape = "long", alt.var = "insurance",id.var = "id")
+```
+
+---
+## Use the mlogit package
+The `mlogit` package has the following form
+
+## a pure "conditional" model
+mlogit(dependent var ~ product characteristics, data)
+
+## a pure "multinomial model"
+mlogit(dependent ~ 0 | individual characteristics, data)
+
+## a "mixed" model
+mlogit(dependent ~ product characteristics | individual characteristics, data)
+
+---
+### MLOGIT in R
+
+```{r eval=FALSE}
+library(mlogit)
+# conditional logit
+m1<-mlogit(choice ~ premium + deductible, data = ins)
+# multinomial logit
+m2 <- mlogit(choice ~ 0 | income, data = ins)
+# mixed multinomial logit
+m3 <- mlogit(choice ~ premium + deductible | income, data = ins)
+stargazer(m1,m2,m3, type = "html")
+```
+
+---
+### MLOGIT in R
+
+```{r eval=TRUE, echo=FALSE, results='asis'}
+library(mlogit)
+# conditional logit
+m1<-mlogit(choice ~ premium + deductible, data = ins)
+# multinomial logit
+m2 <- mlogit(choice ~ 0 | income, data = ins)
+# mixed multinomial logit
+m3 <- mlogit(choice ~ premium + deductible | income, data = ins)
+stargazer(m1,m2,m3, type = "html")
+```
