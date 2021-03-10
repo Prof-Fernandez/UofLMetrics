@@ -92,6 +92,8 @@ where $F_{ij}=F(\alpha_j-\beta_e  educ -\beta_k  kids)$ and $Z_{ij}$ is an indic
 
 We choose the values of $\alpha$ and $\beta$ that maximize the value of the log likelihood function.
 
+__However, in the case of models such as ordered probit and ordered logit failure to account for heteroskedasticity can lead to biased parameter estimates in addition to misspecified standard errors__
+
 ---
 ## Ordered Logit in R
 
@@ -166,6 +168,29 @@ xlab("Grade Point Average")+ylab("Prob. of Likely going to grad school")+labs(co
 
 ---
 class: inverse, center, middle
+# Ordered Probit and Logit in R
+---
+## Marginal Effects
+
+Re-run the example from the notes, but this time using the `oglmx` package
+
+```{r message=FALSE, warning=FALSE}
+library(erer)
+m_probit <- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE, method = "probit")
+m_logit <- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE, method = "logistic")
+m1_probit<-ocME(m_probit,rev.dum = TRUE)
+m1_logit<-ocME(m_logit,rev.dum = TRUE)
+```
+
+---
+## Marginal Effects
+```{r eval=TRUE, echo=FALSE}
+m1_probit
+m1_logit
+```
+
+---
+class: inverse, center, middle
 # Poisson and Negative Binomial Model
 ---
 ## Count Models
@@ -174,7 +199,7 @@ Count data are integer counts of the outcome variable that can include the numbe
 
 These data present problems for typical linear regression methods because the outcome variable is non-negative, but the regression error is bounded by $-\infty$ and $\infty$.
 
-We cannont simply take a the natural log of the outcome variable because zero's are present.
+We cannot simply take a the natural log of the outcome variable because zero's are present.
 
 Also, the integer values are more discrete in nature.
 
@@ -232,7 +257,7 @@ Step 3. Determine which case you are in
   * If $\alpha<0$, then we have _underdispersion_ (rare)
 
 ---
-## Poisson and Negative Binomial in
+## Poisson and Negative Binomial in R
 ```{r fig.align='center', message=FALSE, warning=FALSE}
 library(MASS); library(AER) #MASS contains the negative binomial model
 data("NMES1988") 
@@ -274,13 +299,45 @@ texreg::htmlreg(list(fm_pois,fm_pois,fm_qpois,fm_nbin),custom.model.names = c("P
 ```
 
 ---
+### Fixed Effects Poisson
+
+```{r eval=FALSE}
+library(pglm)
+library(readstata13)
+library(lmtest)
+library(MASS)
+ships<-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
+ships$lnservice=log(ships$service)
+res <- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
+res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
+```
+
+---
+### Fixed Effects Poisson
+
+```{r echo=FALSE ,warning=FALSE,message=FALSE}
+library(pglm)
+library(readstata13)
+library(lmtest)
+library(MASS)
+ships<-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
+ships$lnservice=log(ships$service)
+res <- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
+res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
+coeftest(res)
+standard_se<-ginv(-res1$hessian)
+coeftest(res1,standard_se)
+```
+
+
+---
 ## Excessive Zeros
 
 A problem that plagues both the Poisson and Negative Binomial Models is when there are excessive zeros in the data.
 
-There a two appoaches to address these zeros
+There a two approaches to address these zeros
 
-1. Hurdle Model or Two Part Model
+1. Hurdle Model (aka Two Part Model)
 
 2. Zero Inflated Model
 

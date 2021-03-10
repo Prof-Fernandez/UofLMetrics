@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Count Models
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-02-10)
+### 2020-7-4 (updated: 2021-03-10)
 
 ---
 
@@ -100,6 +100,8 @@ We could alternatively introduce a constant `\(\beta_0\)` and assume that `\(\al
 where `\(F_{ij}=F(\alpha_j-\beta_e  educ -\beta_k  kids)\)` and `\(Z_{ij}\)` is an indicator that equals 1 if person i select option j and zero otherwise.
 
 We choose the values of `\(\alpha\)` and `\(\beta\)` that maximize the value of the log likelihood function.
+
+__However, in the case of models such as ordered probit and ordered logit failure to account for heteroskedasticity can lead to biased parameter estimates in addition to misspecified standard errors__
 
 ---
 ## Ordered Logit in R
@@ -214,6 +216,40 @@ p2=1-p2
 
 ---
 class: inverse, center, middle
+# Ordered Probit and Logit in R
+---
+## Marginal Effects
+
+Re-run the example from the notes, but this time using the `oglmx` package
+
+
+```r
+library(erer)
+m_probit &lt;- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE, method = "probit")
+m_logit &lt;- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE, method = "logistic")
+m1_probit&lt;-ocME(m_probit,rev.dum = TRUE)
+m1_logit&lt;-ocME(m_logit,rev.dum = TRUE)
+```
+
+---
+## Marginal Effects
+
+```
+##        effect.unlikely effect.somewhat likely effect.very likely
+## pared           -0.234                  0.108              0.127
+## public          -0.004                  0.002              0.002
+## gpa             -0.142                  0.083              0.059
+```
+
+```
+##        effect.unlikely effect.somewhat likely effect.very likely
+## pared           -0.255                  0.137              0.117
+## public           0.015                 -0.010             -0.005
+## gpa             -0.152                  0.101              0.051
+```
+
+---
+class: inverse, center, middle
 # Poisson and Negative Binomial Model
 ---
 ## Count Models
@@ -222,7 +258,7 @@ Count data are integer counts of the outcome variable that can include the numbe
 
 These data present problems for typical linear regression methods because the outcome variable is non-negative, but the regression error is bounded by `\(-\infty\)` and `\(\infty\)`.
 
-We cannont simply take a the natural log of the outcome variable because zero's are present.
+We cannot simply take a the natural log of the outcome variable because zero's are present.
 
 Also, the integer values are more discrete in nature.
 
@@ -280,7 +316,7 @@ Step 3. Determine which case you are in
   * If `\(\alpha&lt;0\)`, then we have _underdispersion_ (rare)
 
 ---
-## Poisson and Negative Binomial in
+## Poisson and Negative Binomial in R
 
 ```r
 library(MASS); library(AER) #MASS contains the negative binomial model
@@ -288,7 +324,7 @@ data("NMES1988")
 plot(table(NMES1988$visits),xlab="Physician Office Visits", ylab="Counts")
 ```
 
-&lt;img src="Count-Models_files/figure-html/unnamed-chunk-6-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="Count-Models_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Issues with the data
@@ -413,13 +449,62 @@ texreg::htmlreg(list(fm_pois,fm_pois,fm_qpois,fm_nbin),custom.model.names = c("P
 &lt;/table&gt;
 
 ---
+### Fixed Effects Poisson
+
+
+```r
+library(pglm)
+library(readstata13)
+library(lmtest)
+library(MASS)
+ships&lt;-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
+ships$lnservice=log(ships$service)
+res &lt;- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
+res1 &lt;- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
+```
+
+---
+### Fixed Effects Poisson
+
+
+```
+## 
+## z test of coefficients:
+## 
+##             Estimate Std. Error  z value  Pr(&gt;|z|)    
+## (Intercept) -5.22294    0.48261 -10.8224 &lt; 2.2e-16 ***
+## op_75_79     0.35465    0.11685   3.0351  0.002404 ** 
+## co_65_69     0.67352    0.15029   4.4814 7.417e-06 ***
+## co_70_74     0.79669    0.17019   4.6811 2.853e-06 ***
+## co_75_79     0.39785    0.23375   1.7020  0.088746 .  
+## lnservice    0.83107    0.04602  18.0591 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```
+## 
+## z test of coefficients:
+## 
+##           Estimate Std. Error z value  Pr(&gt;|z|)    
+## op_75_79   0.37026    0.11815  3.1339  0.001725 ** 
+## co_65_69   0.66254    0.15364  4.3124 1.615e-05 ***
+## co_70_74   0.75974    0.17766  4.2763 1.900e-05 ***
+## co_75_79   0.36974    0.24584  1.5040  0.132589    
+## lnservice  0.90271    0.10180  8.8672 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+---
 ## Excessive Zeros
 
 A problem that plagues both the Poisson and Negative Binomial Models is when there are excessive zeros in the data.
 
-There a two appoaches to address these zeros
+There a two approaches to address these zeros
 
-1. Hurdle Model or Two Part Model
+1. Hurdle Model (aka Two Part Model)
 
 2. Zero Inflated Model
 
