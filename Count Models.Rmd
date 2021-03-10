@@ -183,10 +183,19 @@ m1_logit<-ocME(m_logit,rev.dum = TRUE)
 ```
 
 ---
+## Ordered Probit and Logit
+<tiny>
+```{r warning=FALSE, message=FALSE, results='asis', echo=FALSE}
+library(stargazer)
+library(knitr)
+stargazer(m_probit,m_logit,type = "html")
+```
+</tiny>
+---
 ## Marginal Effects
 ```{r eval=TRUE, echo=FALSE}
-m1_probit
-m1_logit
+m1_probit[[2]]$ME.all %>% kable()
+m1_logit[[2]]$ME.all %>% kable()
 ```
 
 ---
@@ -223,7 +232,8 @@ where the $E[y|X]=Var[y|X]=\lambda$
 
 For our purposes, we assume $\lambda=exp(X\beta)$
 
-Interpretation of $\beta$ is the percentage change in $\lambda$ for a one unit increase in $X$.
+Interpretation of $\beta$ is the percentage change in $\lambda$ for a one unit increase in $X$. 
+$$ E[ln y|X]= X \beta$$ 
 
 ---
 ## Properties of the Poisson Distribution
@@ -315,7 +325,7 @@ res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = p
 ---
 ### Fixed Effects Poisson
 
-```{r echo=FALSE ,warning=FALSE,message=FALSE}
+```{r echo=FALSE ,warning=FALSE,message=FALSE, results='asis'}
 library(pglm)
 library(readstata13)
 library(lmtest)
@@ -324,9 +334,9 @@ ships<-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
 ships$lnservice=log(ships$service)
 res <- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
 res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
-coeftest(res)
+coeftest(res) %>% as.table %>% kable()
 standard_se<-ginv(-res1$hessian)
-coeftest(res1,standard_se)
+coeftest(res1,standard_se) %>% as.table %>% kable()
 ```
 
 
