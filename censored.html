@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Censored and Truncated Data
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-02-12)
+### 2020-7-4 (updated: 2021-03-16)
 
 ---
 
@@ -71,7 +71,7 @@ c &amp; y^*&gt;c
 
 We are interested in estimating the equation `$$Y=X\beta+u$$`
 
-If we are willing to assum `\(u \rightarrow N(0,\sigma^2)\)`, then we can use the Tobit Model
+If we are willing to assume `\(u \rightarrow N(0,\sigma^2)\)`, then we can use the Tobit Model
 ---
 ## Tobit Density and Likelihood Function
 
@@ -81,16 +81,30 @@ The probability density of Y will resemble that of a normal distribution.
 1-\Phi(\frac{c-X_i'beta}{\sigma}) &amp; y^*&gt;c
 \end{matrix}\right.$$`
 
-Log Likelihood Function `$$LL(\beta,\sigma)=\sum_{c&lt;y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c&gt;y} 1-\Phi(\frac{c-X_i'beta}{\sigma})$$`
+Log Likelihood Function `$$LL(\beta,\sigma)=\sum_{c&gt;y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c&lt;y} 1-\Phi(\frac{c-X_i'beta}{\sigma})$$`
+---
+## Bottom Coding
+
+The equation is very similar for the bottom coding situation.
+__Bottom coding__ means we are censored from below.
+`$$Y=\left\{\begin{matrix}
+y^* &amp; y^*&gt;c \\ 
+c &amp; y^*&lt;c
+\end{matrix}\right.$$`
+The likelihood function changes to capture this difference in bottom coding
+Log Likelihood Function `$$LL(\beta,\sigma)=\sum_{c&lt;y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c&gt;y} \Phi(\frac{c-X_i'beta}{\sigma})$$`
 
 ---
 ## The Expected Value of the Tobit model
+Let's assume your y variable is bottom coded at zero. This means we only observe Y if Y&gt;0.
 
 The unconditional expected value is of Y is
 `$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
 If we condition on Y&gt;0, then the expected value simplifies to 
 
 `$$E[Y_i|Y_i&gt;0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
+The `\(\lambda\)` term is the Inverse Mills Ratio.
+
 ---
 ## Marginal Effects of Tobit Model
 
@@ -126,6 +140,26 @@ stargazer(fm.ols,fm.tobit,fm.tobit2,type="html")
 &lt;tr&gt;&lt;td style="text-align:left"&gt;rating&lt;/td&gt;&lt;td&gt;-0.712&lt;sup&gt;a&lt;/sup&gt; (0.118)&lt;/td&gt;&lt;td&gt;-2.285&lt;sup&gt;a&lt;/sup&gt; (0.408)&lt;/td&gt;&lt;td&gt;-2.207&lt;sup&gt;a&lt;/sup&gt; (0.450)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;5.608&lt;sup&gt;a&lt;/sup&gt; (0.797)&lt;/td&gt;&lt;td&gt;8.174&lt;sup&gt;a&lt;/sup&gt; (2.741)&lt;/td&gt;&lt;td&gt;7.901&lt;sup&gt;a&lt;/sup&gt; (2.804)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+---
+## Marginal effects with Tobit
+Let's use the `censReg` package to estimate the tobit model and get marginal effects.
+
+```r
+library(censReg)
+estResult &lt;- censReg( affairs ~ age + yearsmarried + religiousness + occupation + rating, data = Affairs )
+margEff(estResult) %&gt;% kable()
+```
+
+
+
+|              |           x|
+|:-------------|-----------:|
+|age           | -0.04192089|
+|yearsmarried  |  0.12953651|
+|religiousness | -0.39417189|
+|occupation    |  0.07621840|
+|rating        | -0.53413656|
+
 ---
 class: center, inverse, middle
 # Truncated Regression
@@ -238,7 +272,7 @@ ggplot(data_1, aes(x=Y, fill=groups)) +
 ```
 ---
 ## Truncated Regression: Histogram
-![](censored_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+![](censored_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 ---
 class: center, middle, inverse
 # Heckman Model
@@ -300,6 +334,7 @@ library(sampleSelection)
 data( Mroz87 )
 Mroz87$kids  &lt;- ( Mroz87$kids5 + Mroz87$kids618 &gt; 0 )
 # Two-step estimation
+# heckit(first stage equation, second stage equation, data, method c("2step","ml"))
 heck.m1 &lt;- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
    wage ~ exper + I( exper^2 ) + educ + city, Mroz87, method = "2step" ) 
 # MLE Estimator
@@ -316,17 +351,51 @@ stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, 
 &lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3"&gt;wage&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;OLS&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Heckman&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;selection&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;exper&lt;/td&gt;&lt;td&gt;0.188&lt;sup&gt;a&lt;/sup&gt; (0.039)&lt;/td&gt;&lt;td&gt;0.021 (0.062)&lt;/td&gt;&lt;td&gt;0.028 (0.062)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;I(exper2)&lt;/td&gt;&lt;td&gt;-0.003&lt;sup&gt;a&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;td&gt;0.0001 (0.002)&lt;/td&gt;&lt;td&gt;-0.0001 (0.002)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;educ&lt;/td&gt;&lt;td&gt;0.415&lt;sup&gt;a&lt;/sup&gt; (0.049)&lt;/td&gt;&lt;td&gt;0.417&lt;sup&gt;a&lt;/sup&gt; (0.100)&lt;/td&gt;&lt;td&gt;0.457&lt;sup&gt;a&lt;/sup&gt; (0.073)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;city&lt;/td&gt;&lt;td&gt;0.073 (0.229)&lt;/td&gt;&lt;td&gt;0.444 (0.316)&lt;/td&gt;&lt;td&gt;0.447 (0.316)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-4.183&lt;sup&gt;a&lt;/sup&gt; (0.614)&lt;/td&gt;&lt;td&gt;-0.971 (2.059)&lt;/td&gt;&lt;td&gt;-1.963 (1.198)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;753&lt;/td&gt;&lt;td&gt;753&lt;/td&gt;&lt;td&gt;753&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;exper&lt;/td&gt;&lt;td&gt;0.032 (0.062)&lt;/td&gt;&lt;td&gt;0.021 (0.062)&lt;/td&gt;&lt;td&gt;0.028 (0.062)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;I(exper2)&lt;/td&gt;&lt;td&gt;-0.0003 (0.002)&lt;/td&gt;&lt;td&gt;0.0001 (0.002)&lt;/td&gt;&lt;td&gt;-0.0001 (0.002)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;educ&lt;/td&gt;&lt;td&gt;0.481&lt;sup&gt;a&lt;/sup&gt; (0.067)&lt;/td&gt;&lt;td&gt;0.417&lt;sup&gt;a&lt;/sup&gt; (0.100)&lt;/td&gt;&lt;td&gt;0.457&lt;sup&gt;a&lt;/sup&gt; (0.073)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;city&lt;/td&gt;&lt;td&gt;0.449 (0.318)&lt;/td&gt;&lt;td&gt;0.444 (0.316)&lt;/td&gt;&lt;td&gt;0.447 (0.316)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-2.561&lt;sup&gt;a&lt;/sup&gt; (0.929)&lt;/td&gt;&lt;td&gt;-0.971 (2.059)&lt;/td&gt;&lt;td&gt;-1.963 (1.198)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;428&lt;/td&gt;&lt;td&gt;753&lt;/td&gt;&lt;td&gt;753&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;rho&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.343&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Inverse Mills Ratio&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.098 (1.266)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+---
+### The two step method 
+We can do the two step method by brute force as well.
+
+
+```r
+first.stage&lt;-glm(lfp ~ age + I( age^2 ) + faminc + kids + educ , data=Mroz87, family=binomial(link = "probit"))
+Mroz87$z1 &lt;- predict.glm(first.stage)
+Mroz87$millsratio &lt;- dnorm(Mroz87$z1)/(pnorm(Mroz87$z1))
+second.stage &lt;- lm(wage ~ exper + I( exper^2 ) + educ + city+millsratio, Mroz87)
+```
+---
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;wage&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;OLS&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Heckman&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;selection&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;exper&lt;/td&gt;&lt;td&gt;0.021 (0.063)&lt;/td&gt;&lt;td&gt;0.021 (0.062)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;I(exper2)&lt;/td&gt;&lt;td&gt;0.0001 (0.002)&lt;/td&gt;&lt;td&gt;0.0001 (0.002)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;educ&lt;/td&gt;&lt;td&gt;0.417&lt;sup&gt;***&lt;/sup&gt; (0.099)&lt;/td&gt;&lt;td&gt;0.417&lt;sup&gt;***&lt;/sup&gt; (0.100)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;city&lt;/td&gt;&lt;td&gt;0.444 (0.318)&lt;/td&gt;&lt;td&gt;0.444 (0.316)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;millsratio&lt;/td&gt;&lt;td&gt;-1.098 (1.253)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-0.971 (2.039)&lt;/td&gt;&lt;td&gt;-0.971 (2.059)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;428&lt;/td&gt;&lt;td&gt;753&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.126&lt;/td&gt;&lt;td&gt;0.126&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.116&lt;/td&gt;&lt;td&gt;0.116&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;rho&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.343&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Inverse Mills Ratio&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.098 (1.266)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;3.112 (df = 422)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;12.208&lt;sup&gt;***&lt;/sup&gt; (df = 5; 422)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 ---
 ## Summary

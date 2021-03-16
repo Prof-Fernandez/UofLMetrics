@@ -62,7 +62,7 @@ c & y^*>c
 
 We are interested in estimating the equation $$Y=X\beta+u$$
 
-If we are willing to assum $u \rightarrow N(0,\sigma^2)$, then we can use the Tobit Model
+If we are willing to assume $u \rightarrow N(0,\sigma^2)$, then we can use the Tobit Model
 ---
 ## Tobit Density and Likelihood Function
 
@@ -72,16 +72,30 @@ $$f(y)=\left\{\begin{matrix}
 1-\Phi(\frac{c-X_i'beta}{\sigma}) & y^*>c
 \end{matrix}\right.$$
 
-Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c<y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c>y} 1-\Phi(\frac{c-X_i'beta}{\sigma})$$
+Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c>y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c<y} 1-\Phi(\frac{c-X_i'beta}{\sigma})$$
+---
+## Bottom Coding
+
+The equation is very similar for the bottom coding situation.
+__Bottom coding__ means we are censored from below.
+$$Y=\left\{\begin{matrix}
+y^* & y^*>c \\ 
+c & y^*<c
+\end{matrix}\right.$$
+The likelihood function changes to capture this difference in bottom coding
+Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c<y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c>y} \Phi(\frac{c-X_i'beta}{\sigma})$$
 
 ---
 ## The Expected Value of the Tobit model
+Let's assume your y variable is bottom coded at zero. This means we only observe Y if Y>0.
 
 The unconditional expected value is of Y is
 $$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
 If we condition on Y>0, then the expected value simplifies to 
 
 $$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
+The $\lambda$ term is the Inverse Mills Ratio.
+
 ---
 ## Marginal Effects of Tobit Model
 
@@ -107,14 +121,25 @@ stargazer(fm.ols,fm.tobit,fm.tobit2,type="html")
 ---
 ## Tobit Model in R 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+library(knitr)
 library(AER)
 library(stargazer)
+library(tidyverse)
 data("Affairs")
 fm.ols <- lm(affairs ~ age + yearsmarried + religiousness + occupation + rating,  data = Affairs)
 fm.tobit <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating,  data = Affairs)
 fm.tobit2 <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating,  right = 4, data = Affairs)
 stargazer(fm.ols,fm.tobit,fm.tobit2,type="html",omit.table.layout = "sn", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), style = "qje")
 ```
+---
+## Marginal effects with Tobit
+Let's use the `censReg` package to estimate the tobit model and get marginal effects.
+```{r results='asis', warning=FALSE, message=FALSE}
+library(censReg)
+estResult <- censReg( affairs ~ age + yearsmarried + religiousness + occupation + rating, data = Affairs )
+margEff(estResult) %>% kable()
+```
+
 ---
 class: center, inverse, middle
 # Truncated Regression
@@ -288,6 +313,7 @@ library(sampleSelection)
 data( Mroz87 )
 Mroz87$kids  <- ( Mroz87$kids5 + Mroz87$kids618 > 0 )
 # Two-step estimation
+# heckit(first stage equation, second stage equation, data, method c("2step","ml"))
 heck.m1 <- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
    wage ~ exper + I( exper^2 ) + educ + city, Mroz87, method = "2step" ) 
 # MLE Estimator
@@ -303,6 +329,7 @@ stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 library(sampleSelection)
 data( Mroz87 )
+Mroz87$wage[Mroz87$wage==0]<-NA
 Mroz87$kids  <- ( Mroz87$kids5 + Mroz87$kids618 > 0 )
 # Two-step estimation
 heck.m1 <- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
@@ -313,6 +340,20 @@ heck.m2 <- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
 # OLS Estimator
 ols.m1 <- lm(wage ~ exper + I( exper^2 ) + educ + city, Mroz87)
 stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", omit.stat = c("rsq","f","adj.rsq","ser"), model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), style = "qje")
+```
+---
+### The two step method 
+We can do the two step method by brute force as well.
+
+```{r}
+first.stage<-glm(lfp ~ age + I( age^2 ) + faminc + kids + educ , data=Mroz87, family=binomial(link = "probit"))
+Mroz87$z1 <- predict.glm(first.stage)
+Mroz87$millsratio <- dnorm(Mroz87$z1)/(pnorm(Mroz87$z1))
+second.stage <- lm(wage ~ exper + I( exper^2 ) + educ + city+millsratio, Mroz87)
+```
+---
+```{r echo=FALSE, results='asis'}
+stargazer(second.stage,heck.m1,type="html", single.row = TRUE)
 ```
 ---
 ## Summary
