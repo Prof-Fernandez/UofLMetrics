@@ -90,10 +90,10 @@ Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c<y} \frac{1}{\sigma}\phi(\frac
 Let's assume your y variable is bottom coded at zero. This means we only observe Y if Y>0.
 
 The unconditional expected value is of Y is
-$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
+$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$
 If we condition on Y>0, then the expected value simplifies to 
 
-$$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
+$$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$
 The $\lambda$ term is the Inverse Mills Ratio.
 
 ---

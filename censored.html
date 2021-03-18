@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Censored and Truncated Data
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-03-16)
+### 2020-7-4 (updated: 2021-03-18)
 
 ---
 
@@ -99,10 +99,10 @@ Log Likelihood Function `$$LL(\beta,\sigma)=\sum_{c&lt;y} \frac{1}{\sigma}\phi(\
 Let's assume your y variable is bottom coded at zero. This means we only observe Y if Y&gt;0.
 
 The unconditional expected value is of Y is
-`$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
+`$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$`
 If we condition on Y&gt;0, then the expected value simplifies to 
 
-`$$E[Y_i|Y_i&gt;0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
+`$$E[Y_i|Y_i&gt;0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$`
 The `\(\lambda\)` term is the Inverse Mills Ratio.
 
 ---
