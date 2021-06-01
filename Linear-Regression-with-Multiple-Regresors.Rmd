@@ -26,7 +26,7 @@ output:
 - Suppose the superintendent of an elementary school district wants to know the effect of class size on student performance
 - She decides that test scores are a good measure of performance
 
-```{r echo=FALSE}
+```{r echo=FALSE, warning=FALSE, message=FALSE}
 library(knitr)
 include_graphics("https://thecadreupei.com/wp-content/uploads/2019/11/exam-696x462.jpg")
 
@@ -110,7 +110,7 @@ To estimate the model parameters of the class size/student performance model we 
 ---
 ## Correlation and Scatterplot (2)
 
-```{r out.width="50%",fig.align='center'}
+```{r out.width="50%",fig.align='center', warning=FALSE,message=FALSE}
 suppressPackageStartupMessages(library(AER,quietly=TRUE,warn.conflicts=FALSE))
 library(ggplot2,quietly=TRUE,warn.conflicts=FALSE)
 data("CASchools")
@@ -257,11 +257,9 @@ regress.results=lm(formula = testscr ~ str, data=CASchools)
 ```
 ---
 ## Regression in R 
-<small>
 ```{r message=FALSE, warning=FALSE,results='asis'}
-stargazer(regress.results, type = "html", dep.var.labels.include = FALSE, column.labels = "Test Score", covariate.labels = "Student-Teacher Ratio", fontsize = "small", style = "qje", single.row = TRUE)
+stargazer(regress.results, type = "html", font.size="tiny", no.space =TRUE, star.char = c("c","b","a"), notes = c("c","b","a"), dep.var.labels.include = FALSE, column.labels = "Test Score", covariate.labels = "Student-Teacher Ratio", style = "apsr", omit.table.layout = "n", single.row = TRUE)
 ```
-</small>
 ---
 ## The Least Squares Assumptions
 
@@ -283,7 +281,7 @@ include_graphics("https://slideplayer.com/slide/12910416/78/images/23/Least+squa
 ---
 ## Randomized Controlled Experiment
 
-- In a randomized controlled experiment, subjects are placed in treatment group $(X_i = 1)$ or the control group ($X_i = 0$) randomly, not influenced by their characteristics. 
+- In a randomized controlled experiment, subjects are placed in treatment group $(X_i = 1)$ or the control group $(X_i = 0)$ randomly, not influenced by their characteristics. 
   
   + Hence, $E[u_i|X_i] = 0$.
 
@@ -331,17 +329,83 @@ class: inverse, middle, center
 ## Review of Sampling Distribution of the Sample Mean of Y
 
 When we have a large sample, we can approximate the distribution of the random variable $\bar{Y}$ by a normal distribution with mean $\mu_Y$.
+
+---
+### Example: Uniform distribution
+
+```{r echo=FALSE}
+#=================================================
+# Simulation of central limit theorem
+#=================================================
+layout(matrix(c(1,2,3,4),2,2,byrow=TRUE))
+#---------------------------------------------------------------------------
+# One uniform random variable simulated 10000 times
+#---------------------------------------------------------------------------
+size=1 # No. of random variables in sum.
+repeats=10000 # No. of values to simulate for
+ # histogram.
+v=runif(size*repeats) # Vector of uniform random
+ # variables.
+w=matrix(v,size, repeats) # Enter v into a matrix
+ # sizeXrepeats).
+y=colSums(w) # Sum the columns.
+hist(y,freq=FALSE,ann=FALSE) # Histogram.
+title("size 1")
+
+#------------------------------------------------------------------------------
+#Sum of 2 uniform random variables simulated 10000 times
+#------------------------------------------------------------------------------
+size=2 # No. of random variables in sum.
+repeats=10000 # No. of values to simulate for
+ # histogram.
+v=runif(size*repeats) # Vector of uniform random
+ # variables.
+w=matrix(v,size, repeats) # Enter v into a matrix
+ # sizeXrepeats).
+y=colSums(w) # Sum the columns.
+hist(y,freq=FALSE,ann=FALSE) # Histogram.
+title("size 2")
+
+#------------------------------------------------------------------------------
+#Sum of 4 uniform random variables simulated 10000 times
+#------------------------------------------------------------------------------
+size=4 # No. of random variables in sum.
+repeats=10000 # No. of values to simulate for
+ # histogram.
+v=runif(size*repeats) # Vector of uniform random
+ # variables.
+w=matrix(v,size, repeats) # Enter v into a matrix 
+ # sizeXrepeats).
+y=colSums(w) # Sum the columns.
+hist(y,freq=FALSE,ann=FALSE) # Histogram.
+title("size 4")
+
+#-------------------------------------------------------------------------------
+#Sum of 20 uniform random variables simulated 10000 times
+#------------------------------------------------------------------------------
+size=20 # No. of random variables in sum.
+repeats=10000 # No. of values to simulate for
+ # histogram.
+v=runif(size*repeats) # Vector of uniform random
+ # variables.
+w=matrix(v,size, repeats) # Enter v into a matrix
+ # sizeXrepeats).
+y=colSums(w) # Sum the columns.
+hist(y,freq=FALSE,ann=FALSE) # Histogram.
+title("size 20") 
+```
+
 ---
 ## The Sampling Distribution of the Model Coefficient Estimators (1)
 
 - Both estimates are unbiased: $E[\hat{\beta}_0] = \beta_0$ and $E[\hat{\beta}_1] = \beta_1$.
 - Using the same reasoning as we did with $\bar{Y}$, we can use the CLT to argue that $\hat{\beta}_0$ and $\hat{\beta}_1$ are both approximately normal
-- The large sample variance of $\hat{\beta}_1$ is $$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$
+- The large sample variance of $\hat{\beta}_1$ is $$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{\sigma^2_u}{[Var(X_i)]^2}$$
 - Since $\sigma_{\hat{\beta}_1}^2$ decreases to zero the large the sample, $\hat{\beta}_1$ is said to be consistent
 ---
 ## The Sampling Distribution of the Model Coefficient Estimators (2)
 
-Another implication of the variance of $\hat{\beta}_1$ $$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$
+Another implication of the variance of $\hat{\beta}_1$ $$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{\sigma^2_u}{[Var(X_i)]^2}$$
 
 is the larger $Var(X_i)$ the smaller is $\sigma_{\hat{\beta}_1}^2$ and hence tighter is our prediction of $\beta_1$.
 ---
@@ -354,7 +418,7 @@ include_graphics('ch4pic5.png')
 
 Yet another implication of the variance of $\hat{\beta}_1$
 
-$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$
+$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{\sigma^2_u}{[Var(X_i)]^2}$$
 
 is that the smaller the variance $u_i$ the smaller is $\sigma_{\hat{\beta}_1}^2$ and hence tighter is our prediction of $\beta_1$.
 ---
@@ -506,6 +570,9 @@ From here we see clearly the two conditions need for an Omitted Variable Bias
 ---
 ## Summary of the Direction of Bias
 
+- __Positive Bias__: Our estimate of $\beta$ is too big.
+- __Negative Bias__: Our estimate of $\beta$ is too small.
+
 Signs      | $Corr(x_1,x_2)>0$ | $Corr(x_1,x_2)<0$
 ---------  | ------------------- | ------------------
 $\beta_2>0$| Positive Bias       | Negative Bias
@@ -524,6 +591,185 @@ The OLS estimator has the limit  $$\hat{\beta}_1 \overset{p}{\longrightarrow} \b
 * The direction of bias depends on the sign of $\rho_{Xu}$.
 
 ---
+## Simulation Example 1
+Suppose the true model is $$y_i = \beta_0+\beta_1 X1_i + \beta_2 X2_i + u_i$$
+and $X2 = \delta_0+\delta_1 X1+e$. However, we estimate the model $$y_i = \beta_0+\beta_1 X1_i + \epsilon_i$$ 
+```{r echo=TRUE, eval=FALSE}
+# Parameters set by the user
+s <- 10000 #Number of simulated samples
+n <- 1000  #Sample size
+sigma <- 1
+
+# Main equation
+beta1 <- -0.5 #True constant
+beta2 = 2 #True slope coefficient
+beta3 = 1 #True slope coefficient
+
+# Auxiliary equation
+delta1 <- 0.5 #Constant
+delta2 <- 0.5 #Slope
+```
+---
+## Simulation
+```{r echo=FALSE, eval=TRUE}
+# Parameters set by the user
+s <- 10000 #Number of simulated samples
+n <- 1000  #Sample size
+sigma <- 1
+
+# Main equation
+beta1 <- -0.5 #True constant
+beta2 = 2 #True slope coefficient
+beta3 = 1 #True slope coefficient
+
+# Auxiliary equation
+delta1 <- 0.5 #Constant
+delta2 <- 0.5 #Slope
+
+b_vec <- rep(0,s) #Initializing the vector of estimated coefficients
+Y_vec <- rep(0,s) #Initializing the vector of average prediction
+for (i in 1:s) {  
+  #Small sample
+  u   <- rnorm(n, 0 ,sigma) #Error term in the main equation
+  eps <- rnorm(n, 0, sigma) #Error term in the auxiliary equation
+  X2  <- rnorm(n, 0, sigma) #Included Regressor
+  X3  <- delta1 + delta2*X2 + eps #Omitted regressor
+  Y   <- beta1 + beta2*X2 + beta3*X3 + u #Dependent variable
+  model_miss <- lm(Y ~ X2)
+  
+  b_vec[i] <- model_miss$coefficients[2] #OLS estimates of misspecified model
+  Y_vec[i] <- mean(predict(model_miss)) #Mean predicted values
+}
+# Histogram of estimates
+hist(b_vec, breaks=20, col='gold3', 
+     freq = FALSE,
+     xlim=c(0, 3),
+     main=paste('OLS coefficient: ',s,' samples of ',n, ' observations'),
+     xlab = 'Coefficient values')
+abline(v=beta2, col="darkgreen",lwd=4) #Vertical line at true parameter value
+lines(density(b_vec),col="red",lwd=2)
+```
+
+---
+## Simulation Example 2
+ 
+```{r echo=TRUE, eval=FALSE}
+# Parameters set by the user
+s <- 10000 #Number of simulated samples
+n <- 1000  #Sample size
+sigma <- 1
+
+# Main equation
+beta1 <- -0.5 #True constant
+beta2 = 2 #True slope coefficient
+beta3 = 1 #True slope coefficient
+
+# Auxiliary equation
+delta1 <- 0.5 #Constant
+delta2 <- -0.5 #Slope
+```
+---
+## Simulation
+```{r echo=FALSE, eval=TRUE}
+# Parameters set by the user
+s <- 10000 #Number of simulated samples
+n <- 1000  #Sample size
+sigma <- 1
+
+# Main equation
+beta1 <- -0.5 #True constant
+beta2 = 2 #True slope coefficient
+beta3 = 1 #True slope coefficient
+
+# Auxiliary equation
+delta1 <- 0.5 #Constant
+delta2 <- -0.5 #Slope
+
+b_vec <- rep(0,s) #Initializing the vector of estimated coefficients
+Y_vec <- rep(0,s) #Initializing the vector of average prediction
+for (i in 1:s) {  
+  #Small sample
+  u   <- rnorm(n, 0 ,sigma) #Error term in the main equation
+  eps <- rnorm(n, 0, sigma) #Error term in the auxiliary equation
+  X2  <- rnorm(n, 0, sigma) #Included Regressor
+  X3  <- delta1 + delta2*X2 + eps #Omitted regressor
+  Y   <- beta1 + beta2*X2 + beta3*X3 + u #Dependent variable
+  model_miss <- lm(Y ~ X2)
+  
+  b_vec[i] <- model_miss$coefficients[2] #OLS estimates of misspecified model
+  Y_vec[i] <- mean(predict(model_miss)) #Mean predicted values
+}
+# Histogram of estimates
+hist(b_vec, breaks=20, col='gold3', 
+     freq = FALSE,
+     xlim=c(0, 3),
+     main=paste('OLS coefficient: ',s,' samples of ',n, ' observations'),
+     xlab = 'Coefficient values')
+abline(v=beta2, col="darkgreen",lwd=4) #Vertical line at true parameter value
+lines(density(b_vec),col="red",lwd=2)
+```
+
+---
+## Simulation Example 3
+ 
+```{r echo=TRUE, eval=FALSE}
+# Parameters set by the user
+s <- 10000 #Number of simulated samples
+n <- 1000  #Sample size
+sigma <- 1
+
+# Main equation
+beta1 <- -0.5 #True constant
+beta2 = 2 #True slope coefficient
+beta3 = 0 #True slope coefficient
+
+# Auxiliary equation
+delta1 <- 0.5 #Constant
+delta2 <- -0.5 #Slope
+```
+---
+## Simulation
+```{r echo=FALSE, eval=TRUE}
+# Parameters set by the user
+s <- 10000 #Number of simulated samples
+n <- 1000  #Sample size
+sigma <- 1
+
+# Main equation
+beta1 <- -0.5 #True constant
+beta2 = 2 #True slope coefficient
+beta3 = 0 #True slope coefficient
+
+# Auxiliary equation
+delta1 <- 0.5 #Constant
+delta2 <- -0.5 #Slope
+
+b_vec <- rep(0,s) #Initializing the vector of estimated coefficients
+Y_vec <- rep(0,s) #Initializing the vector of average prediction
+for (i in 1:s) {  
+  #Small sample
+  u   <- rnorm(n, 0 ,sigma) #Error term in the main equation
+  eps <- rnorm(n, 0, sigma) #Error term in the auxiliary equation
+  X2  <- rnorm(n, 0, sigma) #Included Regressor
+  X3  <- delta1 + delta2*X2 + eps #Omitted regressor
+  Y   <- beta1 + beta2*X2 + beta3*X3 + u #Dependent variable
+  model_miss <- lm(Y ~ X2)
+  
+  b_vec[i] <- model_miss$coefficients[2] #OLS estimates of misspecified model
+  Y_vec[i] <- mean(predict(model_miss)) #Mean predicted values
+}
+# Histogram of estimates
+hist(b_vec, breaks=20, col='gold3', 
+     freq = FALSE,
+     xlim=c(0, 3),
+     main=paste('OLS coefficient: ',s,' samples of ',n, ' observations'),
+     xlab = 'Coefficient values')
+abline(v=beta2, col="darkgreen",lwd=4) #Vertical line at true parameter value
+lines(density(b_vec),col="red",lwd=2)
+```
+
+---
+
 ## Addressing OVB by Dividing the Data into Groups
 
 The Multiple Regressor Model: Regressing On More Than One Variable
@@ -680,7 +926,7 @@ where $PctEL_i$ is the percentage of English learners in school district $i$.
 
 ```{r}
 regress.results <- lm(score ~ stratio + english, data = CASchools)
-het.se <- vcovHC(regress.results)
+het.se <- vcovHC(regress.results) #Robust SE's
 coeftest(regress.results, vcov.=het.se)
 ```
 
@@ -692,6 +938,7 @@ In the single regressor case our estimates were $$\widehat{TestScore} = 698.9 - 
 Notice the lower effect of STR in the second regression.
 
 The second regression captures the effect of STR holding the percentage of English learners constant. We can conclude that the first regression does suffer from OVB.
+
 This multiple regression approach is superior to the tabular approach shown before; we can give a clear estimate of the effect of STR and it is possible to easily add more regressors if the need arises.
 
 ---
@@ -786,9 +1033,11 @@ Fraction of English learners
 
 "Not very small" classes:
 
-Let $NVS_i = 1 \) if \( STR_i \geq 12$
+Let $NVS_i = 1$ if $STR_i \geq 12$
 
-None of the data available has $STR_i \le 12 \) therefore \( NVS_i$ is always equal to $1$.
+None of the data available has $STR_i \le 12$ 
+
+therefore $NVS_i$ is always equal to $1$.
 
 ---
 ## Example 2: The Dummy Variable Trap
@@ -802,7 +1051,10 @@ Suppose we want to categorize school districts as rural, suburban, and urban
 ---
 ## Imperfect Multicollinearity (1)
 
-> Imperfect multicollinearity means that two or more regressors are highly correlated. It differs from perfect     multicollinearity it that they don't have to be exact linear functions of each other.
+Imperfect multicollinearity means that two or more regressors are highly correlated. 
+
+
+It differs from perfect multicollinearity it that they don't have to be exact linear functions of each other.
 
 ---
 ## Imperfect Multicollinearity (2)
@@ -864,15 +1116,24 @@ West	     | 1 if from the West, 0 otherwise      |
 
 ---
 ## Load the data 
-
-
-```{r}
+.pull-left[
+```{r results='asis',warning=FALSE,message=FALSE, eval=FALSE, echo=TRUE}
 library("AER")
 library("lattice")
+library("gtsummary")
 data("CPSSW8")
-summary(CPSSW8)
+tbl_summary(CPSSW8, by = gender)
 ```
-
+]
+.pull-right[
+```{r results='asis',warning=FALSE,message=FALSE, eval=TRUE, echo=FALSE}
+library("AER")
+library("lattice")
+library("gtsummary")
+data("CPSSW8")
+tbl_summary(CPSSW8, by = gender)
+```
+]
 ---
 ```{r echo=FALSE}
 histogram(~CPSSW8$earnings | CPSSW8$gender)
@@ -890,7 +1151,7 @@ A simple linear regression of Avg. Hourly Earnings on Gender will give us a quic
 <small>
 ```{r results='asis', echo=FALSE}
 m1 = lm(earnings ~ factor(gender), data=CPSSW8)
-stargazer(m1,type="html",style="qje", covariate.labels = "Female")
+stargazer(m1,type="html", covariate.labels = "Female", style = "apsr", omit.table.layout = "n", star.char = c("c","b","a"), notes = c("c","b","a"))
 ```
 </small>
 ]
@@ -903,7 +1164,7 @@ $$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age + \beta_3 education$$
 <small>
 ```{r results='asis', echo=FALSE}
 m2 = lm(earnings ~ factor(gender)+age+education, data=CPSSW8)
-stargazer(m1,m2,type="html",omit.stat = c("f","ser"), single.row = TRUE, style ="qje", covariate.labels = c("Female","Age","Education"))
+stargazer(m1,m2,type="html",omit.stat = c("f","ser"), single.row = TRUE, style = "apsr", star.char = c("c","b","a"), notes = c("c","b","a"),omit.table.layout = "n", covariate.labels = c("Female","Age","Education"))
 ```
 </small>
 ---
@@ -916,7 +1177,7 @@ $$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age + \beta_3 age^2 +\beta_4 ed
 ```{r results='hide', eval=FALSE}
 CPSSW8$age2=CPSSW8$age*CPSSW8$age
 m3 = lm(earnings ~ factor(gender)+age+age2+education, data=CPSSW8)
-stargazer(m1,m2,m3,type="html",omit.stat = c("f","ser"), covariate.labels = c("Female","Age","Age Sq","Education"))
+stargazer(m1,m2,m3,type="html",omit.stat = c("f","ser"), covariate.labels = c("Female","Age","Age Sq","Education"), style = "apsr", omit.table.layout = "n", star.char = c("c","b","a"))
 ```
 
 ---
@@ -925,7 +1186,7 @@ stargazer(m1,m2,m3,type="html",omit.stat = c("f","ser"), covariate.labels = c("F
 ```{r results='asis', echo=FALSE}
 CPSSW8$age2=CPSSW8$age*CPSSW8$age
 m3 = lm(earnings ~ factor(gender)+age+age2+education, data=CPSSW8)
-stargazer(m1,m2,m3,type="html",omit.stat = c("f","ser"), style = "qje", single.row = TRUE,covariate.labels = c("Female","Age","Age Sq","Education"))
+stargazer(m1,m2,m3,type="html",omit.stat = c("f","ser"), style = "apsr", omit.table.layout = "n", star.char = c("c","b","a"), single.row = TRUE, covariate.labels = c("Female","Age","Age Sq","Education"))
 ```
 </small>
 ---
@@ -943,7 +1204,7 @@ We see from the regression results that there are not much difference with respe
 <small>
 ```{r results='asis',echo=FALSE}
 m4 = lm(earnings ~ age+age2+education+education*factor(gender), data=CPSSW8)
-stargazer(m1,m2,m3,m4,type="html",omit.stat = c("f","ser"), single.row = TRUE, covariate.labels = c("Female","Female*Educ","Age","Age Sq","Education"),style = "qje" )
+stargazer(m1,m2,m3,m4,type="html",omit.stat = c("f","ser"), single.row = TRUE, covariate.labels = c("Female","Female*Educ","Age","Age Sq","Education"), style = "apsr", omit.table.layout = "n", star.char = c("c","b","a") )
 ```
 </small>
 ---
@@ -960,7 +1221,7 @@ These categorical variables will capture any time invariant differences between 
 <small>
 ```{r results='asis', echo=FALSE}
 m5 = lm(earnings ~ age+age2+education+education*factor(gender)+factor(region), data=CPSSW8)
-stargazer(m1,m2,m3,m4,m5,type="html",covariate.labels = c("Female", "MidWest","South","West","Education*Female","Age","Age Squared","Education"),omit.stat = c("f","ser"), style = "qje", single.row=TRUE)
+stargazer(m4,m5,type="html",covariate.labels = c("Age","Age Squared","Education","Female", "MidWest","South","West","Education*Female"),omit.stat = c("f","ser"), style = "apsr", omit.table.layout = "n", star.char = c("c","b","a"), single.row=TRUE)
 ```
 </small>
 ---
@@ -975,14 +1236,14 @@ However, there are some variables we use often that are always positive
 * income
 * wages 
 
-One method used to insure that we have a positive depedent variable is to transform the dependent variable by taking the natural log. 
+One method used to insure that we have a positive dependent variable is to transform the dependent variable by taking the natural log. 
 
 ---
 ## Log Transformation
 <small>
 ```{r results='asis', echo=FALSE}
 m6 = lm(log(earnings) ~ age+age2+education+education*factor(gender)+factor(region), data=CPSSW8)
-stargazer(m1,m2,m3,m4,m5,m6,type="html", covariate.labels = c("Female", "MidWest","South","West","Education*Female","Age","Age Squared","Education"),omit.stat = c("f","ser"), style = "qje", single.row=TRUE)
+stargazer(m4,m5,m6,type="html", covariate.labels = c("Age","Age Squared","Education","Female", "MidWest","South","West","Education*Female"),omit.stat = c("f","ser"), style = "apsr",omit.table.layout = "n", star.char = c("c","b","a"), single.row=TRUE)
 ```
 </small>
 ---
@@ -1221,7 +1482,7 @@ reg1<-lm(Price ~ Quantity, data = data1)
 reg2 <-lm(difprice ~ difquantity, data = data1)
 reg3 <- lm(Price ~ Quantity + factor(Location), data = data1)
 reg4 <- wi <- plm(Price ~ Quantity, data = data1, model = "within", effect = "individual", index = c("Location","Year"))
-stargazer(reg1,reg2,reg3,reg4, type = "html")
+stargazer(reg1,reg2,reg3,reg4, type = "html", style = "apsr", omit.table.layout = "n")
 ```
 ---
 
@@ -1310,6 +1571,7 @@ regress.results.fe.only <- plm(mrall ~ beertax,
                                effect='individual', 
                                model='within')
 robust.se <- vcovHC(regress.results.fe.only, method="arellano", type="HC2")
+coeftest(regress.results.fe.only)
 coeftest(regress.results.fe.only, vcov = robust.se)
 
 ```

@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose Fernandez" />
-    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
   </head>
@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 ## Multinomial Logit
 ### Jose Fernandez
 ### University of Louisville
-### updated: 2021-03-09
+### updated: 2021-06-01
 
 ---
 
@@ -171,6 +171,13 @@ Notice, our data is `long` meaning that we the same customer entered in for each
 
 ```r
 library(haven)
+```
+
+```
+## Warning: package 'haven' was built under R version 4.0.5
+```
+
+```r
 ins&lt;-read_dta("http://www.stata-press.com/data/r15/inschoice.dta") 
 head(ins)
 ```

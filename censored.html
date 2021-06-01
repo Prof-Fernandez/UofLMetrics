@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Censored and Truncated Data
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-03-18)
+### 2020-7-4 (updated: 2021-06-01)
 
 ---
 
@@ -139,6 +139,13 @@ stargazer(fm.ols,fm.tobit,fm.tobit2,type="html")
 &lt;tr&gt;&lt;td style="text-align:left"&gt;occupation&lt;/td&gt;&lt;td&gt;0.106 (0.071)&lt;/td&gt;&lt;td&gt;0.326 (0.254)&lt;/td&gt;&lt;td&gt;0.324 (0.254)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;rating&lt;/td&gt;&lt;td&gt;-0.712&lt;sup&gt;a&lt;/sup&gt; (0.118)&lt;/td&gt;&lt;td&gt;-2.285&lt;sup&gt;a&lt;/sup&gt; (0.408)&lt;/td&gt;&lt;td&gt;-2.207&lt;sup&gt;a&lt;/sup&gt; (0.450)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;5.608&lt;sup&gt;a&lt;/sup&gt; (0.797)&lt;/td&gt;&lt;td&gt;8.174&lt;sup&gt;a&lt;/sup&gt; (2.741)&lt;/td&gt;&lt;td&gt;7.901&lt;sup&gt;a&lt;/sup&gt; (2.804)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;601&lt;/td&gt;&lt;td&gt;601&lt;/td&gt;&lt;td&gt;601&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.131&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.124&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-705.576&lt;/td&gt;&lt;td&gt;-500.043&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;3.087 (df = 595)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;18.004&lt;sup&gt;a&lt;/sup&gt; (df = 5; 595)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Wald Test (df = 5)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;67.707&lt;sup&gt;a&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;42.559&lt;sup&gt;a&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 ---
 ## Marginal effects with Tobit
@@ -257,7 +264,8 @@ fm_trunc &lt;- truncreg(yt ~ x, data = d, point = 1, direction = "left")
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;OLS&lt;/td&gt;&lt;td&gt;OLS&lt;/td&gt;&lt;td&gt;Trunc. Reg.&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;x&lt;/td&gt;&lt;td&gt;0.983&lt;sup&gt;a&lt;/sup&gt; (0.020)&lt;/td&gt;&lt;td&gt;0.462&lt;sup&gt;a&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;0.982&lt;sup&gt;a&lt;/sup&gt; (0.046)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;2.022&lt;sup&gt;a&lt;/sup&gt; (0.040)&lt;/td&gt;&lt;td&gt;4.645&lt;sup&gt;a&lt;/sup&gt; (0.037)&lt;/td&gt;&lt;td&gt;1.964&lt;sup&gt;a&lt;/sup&gt; (0.177)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;10,000&lt;/td&gt;&lt;td&gt;5,973&lt;/td&gt;&lt;td&gt;5,973&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 ---
 ## Truncated Regression: Histogram
 
@@ -321,7 +329,7 @@ Now is a good time to think about how Heckman corrects OLS.
 
 Let's restate the omitted variable bias (OVB) table, but using the correction factor as the OV. If x affects both the participation equation and the level equation, then we will have some sort of OVB.
 
-Signs      | Corr($x$,Mills Ratio)&gt;0 | Corr($x$,Mills Ratio)&lt;0
+Signs      | `\(Corr(x,\text{Mills Ratio})&gt;0\)` | `\(Corr(x,\text{Mills Ratio})&lt;0\)` 
 ---------  | ------------------- | ------------------
 `\(\alpha&gt;0\)`| Positive Bias       | Negative Bias
 `\(\alpha&lt;0\)`| Negative Bias       | Positive Bias
@@ -342,7 +350,7 @@ heck.m2 &lt;- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
    wage ~ exper + I( exper^2 ) + educ + city, Mroz87, method = "ml" ) 
 # OLS Estimator
 ols.m1 &lt;- lm(wage ~ exper + I( exper^2 ) + educ + city, Mroz87)
-stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "sn")
+stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "n")
 ```
 
 ---

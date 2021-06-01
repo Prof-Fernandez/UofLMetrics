@@ -129,7 +129,7 @@ data("Affairs")
 fm.ols <- lm(affairs ~ age + yearsmarried + religiousness + occupation + rating,  data = Affairs)
 fm.tobit <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating,  data = Affairs)
 fm.tobit2 <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating,  right = 4, data = Affairs)
-stargazer(fm.ols,fm.tobit,fm.tobit2,type="html",omit.table.layout = "sn", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), style = "qje")
+stargazer(fm.ols,fm.tobit,fm.tobit2,type="html",omit.table.layout = "n", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), style = "qje")
 ```
 ---
 ## Marginal effects with Tobit
@@ -229,7 +229,7 @@ fm_trunc <- truncreg(yt ~ x, data = d, point = 1, direction = "left")
 ---
 ## OLS vs Truncreg
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-stargazer::stargazer(fm_full,fm_ols,fm_ols,type="html",dep.var.labels = c("Full Data","Truncated"),column.labels = c("OLS","OLS","Trunc. Reg."),coef=list(NULL,NULL,fm_trunc$coefficients[1:2]),se = list(NULL,NULL,sqrt(diag(fm_trunc$vcov[1:2,1:2]))),omit.stat = c("rsq","adj.rsq","F","ser"), model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "sn")
+stargazer::stargazer(fm_full,fm_ols,fm_ols,type="html",dep.var.labels = c("Full Data","Truncated"),column.labels = c("OLS","OLS","Trunc. Reg."),coef=list(NULL,NULL,fm_trunc$coefficients[1:2]),se = list(NULL,NULL,sqrt(diag(fm_trunc$vcov[1:2,1:2]))),omit.stat = c("rsq","adj.rsq","F","ser"), model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "n")
 ```
 ---
 ## Truncated Regression: Histogram
@@ -301,7 +301,7 @@ Now is a good time to think about how Heckman corrects OLS.
 
 Let's restate the omitted variable bias (OVB) table, but using the correction factor as the OV. If x affects both the participation equation and the level equation, then we will have some sort of OVB.
 
-Signs      | Corr($x$,Mills Ratio)>0 | Corr($x$,Mills Ratio)<0
+Signs      | $Corr(x,\text{Mills Ratio})>0$ | $Corr(x,\text{Mills Ratio})<0$ 
 ---------  | ------------------- | ------------------
 $\alpha>0$| Positive Bias       | Negative Bias
 $\alpha<0$| Negative Bias       | Positive Bias
@@ -321,7 +321,7 @@ heck.m2 <- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
    wage ~ exper + I( exper^2 ) + educ + city, Mroz87, method = "ml" ) 
 # OLS Estimator
 ols.m1 <- lm(wage ~ exper + I( exper^2 ) + educ + city, Mroz87)
-stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "sn")
+stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "n")
 ```
 
 ---

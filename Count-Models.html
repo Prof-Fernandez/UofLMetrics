@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Count Models
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-03-10)
+### 2020-7-4 (updated: 2021-06-01)
 
 ---
 
@@ -91,6 +91,9 @@ y = 1 if `\(\alpha_1 &lt; \beta_e educ +\beta_k kids +\epsilon\)` &lt; `\(\alpha
 y = 2 if `\(\alpha_2 &lt; \beta_e  educ +\beta_k kids +\epsilon\)`
 
 We could alternatively introduce a constant `\(\beta_0\)` and assume that `\(\alpha_1\)` = 0.
+---
+## Analytical Example
+![](https://methods.sagepub.com/images/virtual/oprobit-in-cces-2012/10.4135_9781473961890-fig2.jpg)
 
 ---
 ## Log Likelihood Function
@@ -302,6 +305,8 @@ Count data capture the number of occurrences over a fixed time intervals such as
 The Poisson density function is `$$Pr(Y=y)=\frac{e^{-\lambda}\lambda^y}{y!}$$`
 
 where the `\(E[y|X]=Var[y|X]=\lambda\)`
+
+__This is a very restrictive assumption that the mean and variance are equal. More about this issue is covered in future slides.__
 
 For our purposes, we assume `\(\lambda=exp(X\beta)\)`
 
@@ -555,7 +560,7 @@ Zeros are produce for two reasons.
 
 2. There are a set of zeros that are caused by the count process.
 
-Example: You may drink alchohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
+Example: You may drink alcohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
 
 ---
 ## Zero Inflated Model

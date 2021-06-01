@@ -82,6 +82,9 @@ y = 1 if $\alpha_1 < \beta_e educ +\beta_k kids +\epsilon$ < $\alpha_2$
 y = 2 if $\alpha_2 < \beta_e  educ +\beta_k kids +\epsilon$
 
 We could alternatively introduce a constant $\beta_0$ and assume that $\alpha_1$ = 0.
+---
+## Analytical Example
+![](https://methods.sagepub.com/images/virtual/oprobit-in-cces-2012/10.4135_9781473961890-fig2.jpg)
 
 ---
 ## Log Likelihood Function
@@ -229,6 +232,8 @@ Count data capture the number of occurrences over a fixed time intervals such as
 The Poisson density function is $$Pr(Y=y)=\frac{e^{-\lambda}\lambda^y}{y!}$$
 
 where the $E[y|X]=Var[y|X]=\lambda$
+
+__This is a very restrictive assumption that the mean and variance are equal. More about this issue is covered in future slides.__
 
 For our purposes, we assume $\lambda=exp(X\beta)$
 
@@ -384,7 +389,7 @@ Zeros are produce for two reasons.
 
 2. There are a set of zeros that are caused by the count process.
 
-Example: You may drink alchohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
+Example: You may drink alcohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
 
 ---
 ## Zero Inflated Model
