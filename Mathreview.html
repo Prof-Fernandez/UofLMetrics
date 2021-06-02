@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Limited Dependent Variables</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Jose M. Fernandez" />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="extra.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Limited Dependent Variables
+## Mathematics Revew
+### Jose M. Fernandez
+### University of Louisville
+### 2020-7-4 (updated: 2021-06-02)
+
+---
+
+## Math Review
+
+- Summations
+- Expected Value
+- Central Limit Theorem
+- Z score &amp; T-statistics
+- Derivatives
+- Linear Algebra
+
+---
+## Summations
+
+In this class we will use a lot of math notation. One that will be used a great deal is the summations.
+`$$\sum^n_{i=1} x_i=x_1+x_2+x_3+...x_n$$`
+This is a basic summation. It states there are _n_ observations of x and we would like to sum all of those observations together.
+
+What if x is a constant (think equal to one number)?
+`$$\sum^n_{i=1} 2=2+2+2+...2=2n$$`
+---
+## Multiply a summation
+
+Something common that happens is that we multiply x by a constant `\(a\)`.
+`$$a\sum^n_{i=1} x_i=ax_1+ax_2+ax_3+...ax_n$$`
+
+A place you will see this a lot is with the mean. In this case, the mean essentially sums up all of the values and multiplies it by 1/n. **WHY?**
+`$$\frac{1}{n}\sum^n_{i=1} x_i=\frac{x_1}{n}+\frac{x_2}{n}+\frac{x_3}{n}+...\frac{x_n}{n}$$`
+---
+## Weighted Average
+We can also multiply our `\(x_i\)`'s with other items that vary.
+
+Two examples:
+- a weighted average is `$$\sum^n_{i=1}Pr(x_i) x_i=Pr(x_1)x_1+Pr(x_2)x_2+Pr(x_3)x_3+...Pr(x_n)x_n$$` where `\(Pr(x_i)\)` is the probability that `\(x_i\)` will be observed.
+  +   The probabilities must sum to 1, `\(\sum_{i=1}^n Pr(x_i)=1\)`
+  +   The previous mean we discuss is a special case of the weighted average where all of the `\(Pr(x_i)=\frac{1}{n}\)`.
+- a covariance has two variables using the same index. `$$\frac{1}{n}\sum^n_{i=1}(y_i-\mu_y)(x_i-\mu_x)$$`
+
+---
+## The Expected Value operator, E[]
+
+The expected value is typically the mean of a random variable. 
+
+Formally, the expected value of `\(x\)` depends on its distribution. If x has a discrete distribution, then we would use the weighted average on the previous slide. 
+
+If x is a continuous random variable with a probability density of function of `\(f(x)\)` is given by `$$E[x]=\int^b_{a}x f(x)dx$$`
+
+In our class, you can primarily assume that x is normally distributed where the mean of x is given by `\(\mu\)` and the variance is given by `\(\sigma^2\)`. 
+
+The standard normal is a special case where `\(\mu=0\)` and `\(\sigma^2=1\)`.
+---
+## Application of the E[x] Operator
+
+Let's look at the function for the mean. How do we know this function actually gives us the mean?
+
+`$$\bar{x}=\frac{1}{n}\sum x_i  \rightarrow E[\bar{x}]=E[\frac{1}{n}\sum x_i ]$$`
+- Rule 1: The expected value of a constant is just the constant `\(E[a]=a.\)` Why? Well `\(a\)` is not random. It keeps it's value.
+- Rule 2: `\(E[ax]=aE[x]\)`
+- Rule 3: if `\(x\)` and `\(y\)` are random, then `\(E[x+y]=E[x]+E[y]\)`
+- Rule 4: `\(E[x^2]\neq (E[x])^2\)` `\(\leftarrow\)` important for variance.
+
+`\(E[\bar{x}]=E[\frac{1}{n}\sum x_i ]=\frac{1}{n}E[\sum x_i ]\)` by Rule 2.
+
+`\(E[\bar{x}]=\frac{1}{n}E[\sum x_i ]=\frac{1}{n}\sum E[x_i ]=\frac{1}{n}\sum \mu\)` by Rule 3.
+
+You can think of `\(\mu\)` as a constant, `\(E[\bar{x}]=\frac{1}{n}\sum \mu=\frac{1}{n}n \mu=\mu\)`
+---
+## Variance operator, Var[x]
+
+We can define the variance function, `\(Var[x]=E[x^2]-(E[x])^2\)`. Recall Rule 4?
+
+Sticking with the normality assumption `\(Var[x]=\sigma^2\)`.
+
+- Rule 5: If `\(a\)` is a constant, then `\(Var[ax]=a^2Var[x]=a^2\sigma^2\)`.
+- Rule 6: If x and y are random variables, then `\(Var[x+y]=Var[x]+Var[y]+2COV[x,y]\)`
+- Rule 7: If x and y are random variables, then `\(Var[x-y]=Var[x]+Var[y]-2COV[x,y]\)` because `\(Var[y]=Var[-y]\)`. 
+- Rule 8: If x and y are independent, `\(COV[x,y]=0\)`
+---
+## Variance of the sample mean
+
+Let's try to find `\(Var[\bar{x}]\)`
+
+`$$Var[\bar{x}]=Var[\frac{1}{n}\sum x_i] = \frac{1}{n^2}\sum Var[x_i]= \frac{1}{n^2}\sum \sigma^2=\frac{\sigma^2}{n}$$`
+Notice, the sample mean is unbiased in that `\(E[\bar{x}]=\mu\)` and as the sample size increases `\(Var[\bar{x}]\rightarrow 0\)`.
+
+---
+## Central Limit Theorem
+
+The Central Limit Theorem (CLT) says that the sample means from almost any distribution will be approximately normally distributed. Here we show an exponential distribution with a mean of 5.
+
+![](Mathreview_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+---
+## CLT
+
+![](Mathreview_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+## CLT and Z-scores
+
+- The CLT allows us to treat sample means like normally distributed random variables. 
+- A z-score is a way of transforming **any** normally distributed random variable into a standard normal random variable. `$$Z=\frac{\text{observed x - mean of x}}{\text{std of x}}$$` 
+- we subtract the mean so that the x is centered at zero. We divided by the standard deviation to force the new standard deviation to be 1.
+- The z-score measures how far x is from zero using standard deviation as the size of the measurement (i.e. z = 2.3 means x is 2.3 standard deviations above zero)
+- For the sample mean, we get `$$Z=\frac{\bar{x}-\mu}{\sigma / \sqrt{n} }$$` 
+---
+## Z-scores and T-statistics
+
+- We can use a Z-score only when we assume the random variable is normally distributed or the sample size is very large.
+- In most cases, you will not use the z-score. Instead, you will use the t-statistics `$$t=\frac{\bar{x}-\mu}{s / \sqrt{n} }$$` where s is the sample standard deviation. 
+- You might be saying, "these don't look that different."
+- The student T distribution has fatter tails. The fatter tails indicate more uncertainty. More uncertainty means wider confidence intervals.
+---
+## Z-scores and T-statistics
+&lt;img src="https://www.jmp.com/en_us/statistics-knowledge-portal/t-test/t-distribution/_jcr_content/par/styledcontainer_2069_1940499363/par/image.img.png/1594940812252.png" width="75%" style="display: block; margin: auto;" /&gt;
+---
+## T-statistics and Confidence intervals
+
+&lt;img src="https://i.ytimg.com/vi/MUD390jtgQs/maxresdefault.jpg" width="95%" style="display: block; margin: auto;" /&gt;
+- The term `\(\alpha\)` is our level of significance holding the value (typically) of .10, .05, or .01.
+- If our observed mean lands inside of one of the blue shaded areas we reject the null hypothesis. 
+---
+## Basic Calculus
+
+- This section is not meant to teach you calculus!!
+- However, there are some basic concepts and formulas you will need.
+- But first some algebra.
+
+`$$y=mx+b$$`
+This is the standard formula for a line. 
+- `\(x\)` is the independent variable
+- `\(y\)` is the dependent variable.
+- `\(m\)` is the slope and tells us how y changes when x changes.
+- `\(b\)` is the y-intercept `$$y=\beta_0+\beta_1x$$`
+
+A simple linear regression takes essentially the same form
+- `\(\beta_0\)` is the y intercept
+- `\(\beta_1\)` is the slope
+---
+## Let's make it harder
+`$$y=\beta_0+\beta_1x_1+\beta_2x_2$$`
+Now we interpret the slopes differently
+- `\(\beta_1\)` is the `\(\Delta y\)` when `\(\Delta x_1\)` holding `\(x_2\)` constant.
+- `\(\beta_2\)` is the `\(\Delta y\)` when `\(\Delta x_2\)` holding `\(x_1\)` constant.
+- notice we are assuming the other values are being held constant.
+
+What about a non-linear function like `$$y=\beta_0+\beta_1x_1+\beta_2x_1^2$$` Now it is not so clear what the slope is of the line.
+
+---
+## Non-Linear functions
+
+`$$y=\beta_0+\beta_1x_1+\beta_2x_1^2$$` You have seen this function before in your algebra class. It looked like this instead. `$$y=ax^2+bx+c$$` and you learn the rule that if `\(a&gt;0\)` this had a U shape to it else it `\(\cap\)`.
+
+You then learned a rule that the peak or trough of these U occurred when `$$x=-\frac{b}{2a}$$`
+
+This rule comes from calculus.
+---
+## Basic derrivative
+
+The derivative tells us the slope. It tells us how a change in x causes a change in y.
+
+These are the formulas for your basic derivatives. Let `\(a\)` be a constant and `\(n\)` be the value of an exponent. The simplest case is when `$$y=a \rightarrow \frac{dy}{dx}=0$$` The reason is that `\(a\)` is a constant and does not change with x; therefore y does not change.
+
+A more common derivative is one with an exponent. `$$y=ax^n \rightarrow \frac{dy}{dx} = anx^{n-1}$$`
+A special case here is when `\(n=1\)`, then we are given just a linear line and `\(a\)` is the slope.
+---
+## Let's put this together
+`$$y=\beta_0+\beta_1x_1+\beta_2x_1^2$$`
+We can find the _marginal effect_ of x on y by taking a derivative. `$$\frac{dy}{dx_1}=\beta_1+2\beta_2x_1$$`
+The derivative of `\(\beta_0\)` is zero because it is a constant. The derivative of `\(\beta_1x_1\)` is `\(\beta_1\)` since it is the linear portion. The derivative of `\(\beta_2x^2_1\)` is `\(2\beta_2x_1\)` using our derivative formula.
+
+The maximum or minimum of a parabola occurs when the slope is equals to zero (i.e. dy/dx = 0).$$\frac{dy}{dx_1}=\beta_1+2\beta_2x_1=0; \text{ solve for }x_1$$  
+
+`$$x_1 = -\frac{\beta_1}{2\beta_2}$$`
+
+---
+## Linear Algebra
+Matix multiplication
+`$$\begin{bmatrix}
+a &amp; b \\
+c &amp; d
+\end{bmatrix} \begin{bmatrix}
+e \\
+f
+\end{bmatrix}=\begin{bmatrix}
+ae+bf \\
+ce+df
+\end{bmatrix}$$`
+Matrix Inversion
+- The matrix must be of full rank
+- The matrix must be square
+`$$\begin{bmatrix}
+a &amp; b \\
+c &amp; d
+\end{bmatrix}^{-1}=\frac{1}{ad-cb}\begin{bmatrix}
+d &amp; -b \\
+-c &amp; a
+\end{bmatrix} \\ X^{-1}X=XX^{-1}=I \text{;  I is the identity Matrix}$$`
+---
+## Multiple Regression in matrix form
+Matrix notation is very useful to write regression equations.
+`$$Y=\begin{bmatrix}
+y_1\\ 
+y_2\\ 
+...\\ 
+y_n
+\end{bmatrix}, X=\begin{bmatrix}
+1 &amp; x_{11} &amp; x_{21} &amp; \cdots &amp; x_{k1} \\ 
+1 &amp; x_{12} &amp; x_{22} &amp; \cdots &amp; x_{k2}\\ 
+\vdots  &amp;  &amp;  &amp; \\ 
+1 &amp; x_{1n} &amp; x_{2n} &amp; \cdots &amp; x_{kn}
+\end{bmatrix}, \beta =\begin{bmatrix}
+\beta_0\\ 
+\beta_1\\ 
+\vdots \\ 
+\beta_k
+\end{bmatrix}, u=\begin{bmatrix}
+u_1\\ 
+u_2\\ 
+...\\ 
+u_n
+\end{bmatrix} \\ \\Y=X\beta+u$$`
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
