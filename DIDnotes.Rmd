@@ -192,7 +192,7 @@ include_graphics("violationparallel.png")
 ## Generalized DiD
 
 We can generalize the DiD model for multiple time periods.
-- Very useful for policy adoption as they tend to happened at different times
+- Useful for policy adoption, which tends to happened at different times
 
 $$y_{it}=\beta_0+\alpha_i+\delta_t+\beta_3 d_{it}+\gamma X_{it}+e_{it}$$
 
@@ -201,6 +201,8 @@ $$y_{it}=\beta_0+\alpha_i+\delta_t+\beta_3 d_{it}+\gamma X_{it}+e_{it}$$
 - $\delta_t$: Time fixed effects that change across time (e.g. year dummies to allow intercept to vary across different years)
 
 - $d_{it}$: dummy variable which equals 1 if the unit of observation is in the post-treatment period (in contrast to Pt equals 1 in the second time period)
+
+- WARNING: TWFE only equal DiD if the treatment effect is homogenous and constant across units. See [link]("https://andrewcbaker.netlify.app/did#1")
 ---
 ## Threats to Validity
 
@@ -274,7 +276,7 @@ texreg::htmlreg(list(reg1,reg2,reg3,reg4,reg5),override.se = list(NULL,NULL,NULL
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(ggplot2)
-reg6 <- feols(y~ i(treated,year,1994)|country + year, data = mydata)
+reg6 <- feols(y~ i(year,treated,1994)|country + year, data = mydata)
 coefplot(reg6)
 ```
 

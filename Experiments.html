@@ -4,7 +4,7 @@
     <title>Causal Inference</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Experiments
 ### Jose Fernandez
 ### University of Louisville
-### 2020/6/29 (updated: 2021-02-10)
+### 2020/6/29 (updated: 2021-07-06)
 
 ---
 
@@ -102,6 +102,11 @@ Potentially confusing examples:
 
 ## Examples
 
+
+```
+## Warning: package 'kableExtra' was built under R version 4.0.4
+```
+
 &lt;img src="sociology.png" width="2773" style="display: block; margin: auto;" /&gt;&lt;img src="kymarriage.png" width="2773" style="display: block; margin: auto;" /&gt;
 
 ---
@@ -148,7 +153,7 @@ And potential outcomes (counterfactuals): `\(Y_{0i}\)`, `\(Y_{1i}\)`
 
 `\(Y_{0i}\)` = A measure of person `\(i\)`'s health given they _do not have_ insurance `\((D_i=0)\)`.
 
-The individual treatment effect is `\(Y_{1i} , Y_{0i}\)`
+The individual treatment effect is `\(Y_{1i} - Y_{0i}\)`
 
 Unfortunately, for `\(i\)`, we only observe `\(Y_{1i}\)` if `\(D_i\)` = 1 and `\(Y_{0i}\)` if `\(D_i\)` = 0
 
@@ -429,7 +434,7 @@ Studied effects on health spending and health outcomes
  &lt;/thead&gt;
 &lt;tbody&gt;
   &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; ftf &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; face-to-face &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; 2.78 (0.178) &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; 0.481 (0.24) &lt;/td&gt;
    &lt;td style="text-align:left;"&gt; 0.193 (0.247) &lt;/td&gt;

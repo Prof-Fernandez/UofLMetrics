@@ -4,7 +4,7 @@
     <title>Linear Regression</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Difference in Differences
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-03-02)
+### 2020-7-4 (updated: 2021-07-06)
 
 ---
 
@@ -89,6 +89,11 @@ Need items
 
 ---
 ## DAG
+
+```
+## Warning: package 'knitr' was built under R version 4.0.5
+```
+
 &lt;div class="figure" style="text-align: center"&gt;
 &lt;img src="https://miro.medium.com/max/1750/1*KiRkxO-fUCfXSkJMR0bDig.png" alt="Causal Pathway Illustration: Z (confounder) is the cause of both X (independent variable) and Y (dependent variable) and thus, obscures the relationship between X and Y." width="75%" /&gt;
 &lt;p class="caption"&gt;Causal Pathway Illustration: Z (confounder) is the cause of both X (independent variable) and Y (dependent variable) and thus, obscures the relationship between X and Y.&lt;/p&gt;
@@ -181,7 +186,7 @@ Violation of parallel trend assumption will lead to biased estimation of the cau
 ## Generalized DiD
 
 We can generalize the DiD model for multiple time periods.
-- Very useful for policy adoption as they tend to happened at different times
+- Useful for policy adoption, which tends to happened at different times
 
 `$$y_{it}=\beta_0+\alpha_i+\delta_t+\beta_3 d_{it}+\gamma X_{it}+e_{it}$$`
 
@@ -190,6 +195,8 @@ We can generalize the DiD model for multiple time periods.
 - `\(\delta_t\)`: Time fixed effects that change across time (e.g. year dummies to allow intercept to vary across different years)
 
 - `\(d_{it}\)`: dummy variable which equals 1 if the unit of observation is in the post-treatment period (in contrast to Pt equals 1 in the second time period)
+
+- WARNING: TWFE only equal DiD if the treatment effect is homogenous and constant across units. See [link]("https://andrewcbaker.netlify.app/did#1")
 ---
 ## Threats to Validity
 
@@ -473,7 +480,7 @@ reg5 &lt;-feols(y~did | country + year, data = mydata)
 
 ```r
 library(ggplot2)
-reg6 &lt;- feols(y~ i(treated,year,1994)|country + year, data = mydata)
+reg6 &lt;- feols(y~ i(year,treated,1994)|country + year, data = mydata)
 coefplot(reg6)
 ```
 

@@ -149,7 +149,7 @@ $Y_{1i}$ = A measure of person $i$'s health given they _have_ insurance $(D_i=1)
 
 $Y_{0i}$ = A measure of person $i$'s health given they _do not have_ insurance $(D_i=0)$.
 
-The individual treatment effect is $Y_{1i} , Y_{0i}$
+The individual treatment effect is $Y_{1i} - Y_{0i}$
 
 Unfortunately, for $i$, we only observe $Y_{1i}$ if $D_i$ = 1 and $Y_{0i}$ if $D_i$ = 0
 
@@ -387,7 +387,7 @@ table2<-person_diffs %>%
   mutate(estimate = str_c(fmt_num(estimate), " (", fmt_num(std.error), ")")) %>%
   select(-std.error) %>%
   spread(term, estimate) 
-table2$response <- c("ftf","Inpatient","Outpatient","Total Cost","Admissions")
+table2$response <- c("face-to-face","Inpatient","Outpatient","Total Cost","Admissions")
   knitr::kable(table2,digits = 3, caption="Patient Health Spending by Plan")
 ```
 
