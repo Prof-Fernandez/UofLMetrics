@@ -4,7 +4,7 @@
     <title>Survival Analysis</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.12/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## An Introduction
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-02-10)
+### 2020-7-4 (updated: 2022-03-14)
 
 ---
 
@@ -43,12 +43,11 @@ Examples from cancer:
 
 Time-to-event data is common in many fields including, but not limited to:
 
-- Time from HIV infection to development of AIDS
-- Time to heart attack
-- Time to onset of substance abuse
-- Time to initiation of sexual activity
-- Time to machine malfunction
-- Time to employee resignation/termination
+- Crime: Time from release to criminal recidivism
+- Marketing: Customer retention
+- Engineering: Time to machine malfunction
+- Finance: Time to loan default
+- Management: Time to employee resignation/termination
 ---
 
 ## Aliases for survival analysis
@@ -74,7 +73,7 @@ class: inverse, center, middle
 
 ## What is censoring?
 
-In survival analysis it is common for the exact event time to be unknown, or unobserved, which is called censoring. A subject may be censored due to:
+In survival analysis, it is common for the exact event time to be unknown, or unobserved, which is called censoring. A subject may be censored due to:
 
 - Loss to follow-up
 - Withdrawal from study
@@ -82,8 +81,8 @@ In survival analysis it is common for the exact event time to be unknown, or uno
 
 Specifically these are examples of **right** censoring. Other common types of censoring include:
 
-- Left
-- Interval
+- Left (you do not observed the beginning)
+- Interval (individual is loss during the study)
 ---
 
 ### Censored survival data
@@ -274,7 +273,7 @@ plot(f1, xlab = "Days", ylab = "Overall survival probability")
 ]
 ---
 
-## Estimating `\(x\)`-year survival
+## Estimating survival time
 
 One quantity often of interest in a survival analysis is the probability of surviving a certain number `\((x)\)` of years.
 
@@ -296,7 +295,7 @@ summary(f1, times = 5*365)
 We find that the 5-year probability of survival in this study is 49%. The associated lower and upper bounds of the 95% confidence interval are also displayed.
 
 ---
-## `\(x\)`-year survival is often estimated incorrectly 
+## Survival time is often estimated incorrectly 
 
 What happens if you use a "naive" estimate? 
 
@@ -327,6 +326,12 @@ survival::survfit(survival::Surv(futime, delta) ~ 1, data = transplant)
 ##       n  events  median 0.95LCL 0.95UCL 
 ##     815      66    1422    1422      NA
 ```
+
+
+```r
+round(summary(f1)$table["median"]/365, 1)
+```
+
 
 We see the median survival time is 3.9 years. The lower and upper bounds of the 95% confidence interval are also displayed.
 
@@ -385,7 +390,7 @@ survminer::ggsurvplot(
 
 ---
 
-&lt;img src="survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-12-1.png" width="80%" /&gt;
+&lt;img src="survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-13-1.png" width="80%" /&gt;
 
 ---
 
@@ -421,7 +426,7 @@ summary(survfit(Surv(futime, delta) ~ sex, data = transplant), times = 365)
 ```
 
 ---
-## Log-rank test for between-group significance test {.smaller}
+## Log-rank test for between-group significance test
 
 - We can conduct between-group significance tests using a log-rank test. 
 - The log-rank test equally weights observations over the entire follow-up time and is the most common way to compare survival times between groups.
@@ -528,63 +533,47 @@ Our case uses data of 1785 employees.
 
 ## Variables:
 
-$ exp - length of employment in the company
+`\(exp\)` - length of employment in the company
 
-$ event - event (1 - terminated, 0 - currently employed)
+`\(event\)` - event (1 - terminated, 0 - currently employed)
 
-$ branch - branch
+`\(branch\)` - branch
 
-$ pipeline - source of recruitment
+`\(pipeline\)` - source of recruitment
 
 Please note that the data is already prepared for survival analysis. Moreover, length of employment is counted in months up to two decimal places, according to the following formula: (date fire - date hire) / (365.25 / 12).
 
 ---
 
-## Cox Model {.smaller}
+## Cox Model
+&lt;tiny&gt;
 
-```r
-w = coxph(Surv(exp, event) ~ 1 , data = q)
-w1 = coxph(Surv(exp, event) ~ . , data = q)
-summary(w1)
-```
-
-```
-## Call:
-## coxph(formula = Surv(exp, event) ~ ., data = q)
-## 
-##   n= 1785, number of events= 1004 
-## 
-##                  coef exp(coef) se(coef)      z Pr(&gt;|z|)   
-## branchfirst  -0.08927   0.91460  0.16419 -0.544  0.58664   
-## branchfourth -0.52913   0.58912  0.17576 -3.010  0.00261 **
-## branchsecond -0.42416   0.65432  0.16378 -2.590  0.00960 **
-## branchthird  -0.46644   0.62723  0.21000 -2.221  0.02634 * 
-## pipelineea   -0.21381   0.80750  0.26715 -0.800  0.42351   
-## pipelinejs    0.50318   1.65398  0.20076  2.506  0.01220 * 
-## pipelineref   0.32156   1.37927  0.21409  1.502  0.13310   
-## pipelinesm    0.36136   1.43528  0.25807  1.400  0.16144   
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-##              exp(coef) exp(-coef) lower .95 upper .95
-## branchfirst     0.9146     1.0934    0.6629    1.2618
-## branchfourth    0.5891     1.6975    0.4174    0.8314
-## branchsecond    0.6543     1.5283    0.4747    0.9020
-## branchthird     0.6272     1.5943    0.4156    0.9466
-## pipelineea      0.8075     1.2384    0.4784    1.3631
-## pipelinejs      1.6540     0.6046    1.1160    2.4514
-## pipelineref     1.3793     0.7250    0.9066    2.0984
-## pipelinesm      1.4353     0.6967    0.8655    2.3802
-## 
-## Concordance= 0.579  (se = 0.01 )
-## Likelihood ratio test= 67.28  on 8 df,   p=2e-11
-## Wald test            = 63.26  on 8 df,   p=1e-10
-## Score (logrank) test = 64.85  on 8 df,   p=5e-11
-```
-
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;exp&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfirst&lt;/td&gt;&lt;td&gt;-0.089 (0.164)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfourth&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;c&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;branchsecond&lt;/td&gt;&lt;td&gt;-0.424&lt;sup&gt;c&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;branchthird&lt;/td&gt;&lt;td&gt;-0.466&lt;sup&gt;b&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineea&lt;/td&gt;&lt;td&gt;-0.214 (0.267)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinejs&lt;/td&gt;&lt;td&gt;0.503&lt;sup&gt;b&lt;/sup&gt; (0.201)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineref&lt;/td&gt;&lt;td&gt;0.322 (0.214)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinesm&lt;/td&gt;&lt;td&gt;0.361 (0.258)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.037&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Max. Possible R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.000&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-6,767.031&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Wald Test&lt;/td&gt;&lt;td&gt;63.260&lt;sup&gt;c&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;LR Test&lt;/td&gt;&lt;td&gt;67.275&lt;sup&gt;c&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Score (Logrank) Test&lt;/td&gt;&lt;td&gt;64.850&lt;sup&gt;c&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/tiny&gt;
 
 ---
-##Accelerated failure-time models | survreg(formula, dist='weibull')
+##Accelerated failure-time models
+
+###survreg(formula, dist='weibull')
 
 An accelerated failure-time (AFT) model is a parametric model with covariates and failure times following the survival function of the form `\(S(x|Z) = S_0 (x exp[\theta Z])\)`, where `\(S_0\)` is a function for the baseline survival rate. The term `\(exp[\theta Z]\)` is called the acceleration factor. 
 
@@ -626,40 +615,35 @@ The _survial_ package allows us to estimate all of these models. We will use the
 ```r
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="text",style = "qje")
+stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE, star.char = c("a","b","c"))
 ```
 
 ---
-## Weibul Model in R {.smaller}
+## Weibul Model in R
+&lt;small&gt;
 
-
-```
-## 
-## ======================================================
-##                                  exp                  
-##                      Weibull           exponential    
-##                        (1)                 (2)        
-## ------------------------------------------------------
-## branchfirst       0.142 (0.147)       0.119 (0.164)   
-## branchfourth    0.494*** (0.157)    0.524*** (0.176)  
-## branchsecond    0.433*** (0.146)    0.441*** (0.163)  
-## branchthird      0.434** (0.189)     0.469** (0.210)  
-## pipelineea        0.228 (0.239)       0.239 (0.267)   
-## pipelinejs      -0.529*** (0.180)   -0.537*** (0.200) 
-## pipelineref     -0.383** (0.192)     -0.372* (0.213)  
-## pipelinesm       -0.376 (0.232)      -0.386 (0.258)   
-## Constant        1.831*** (0.220)    1.860*** (0.245)  
-## N                     1,785               1,785       
-## Log Likelihood     -2,712.426          -2,721.241     
-## chi2 (df = 8)       74.713***           69.134***     
-## ======================================================
-## Notes:          ***Significant at the 1 percent level.
-##                  **Significant at the 5 percent level.
-##                  *Significant at the 10 percent level.
-```
-
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;exp&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Weibull&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;exponential&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfirst&lt;/td&gt;&lt;td&gt;0.142 (0.147)&lt;/td&gt;&lt;td&gt;0.119 (0.164)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfourth&lt;/td&gt;&lt;td&gt;0.494&lt;sup&gt;***&lt;/sup&gt; (0.157)&lt;/td&gt;&lt;td&gt;0.524&lt;sup&gt;***&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;branchsecond&lt;/td&gt;&lt;td&gt;0.433&lt;sup&gt;***&lt;/sup&gt; (0.146)&lt;/td&gt;&lt;td&gt;0.441&lt;sup&gt;***&lt;/sup&gt; (0.163)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;branchthird&lt;/td&gt;&lt;td&gt;0.434&lt;sup&gt;**&lt;/sup&gt; (0.189)&lt;/td&gt;&lt;td&gt;0.469&lt;sup&gt;**&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineea&lt;/td&gt;&lt;td&gt;0.228 (0.239)&lt;/td&gt;&lt;td&gt;0.239 (0.267)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinejs&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;***&lt;/sup&gt; (0.180)&lt;/td&gt;&lt;td&gt;-0.537&lt;sup&gt;***&lt;/sup&gt; (0.200)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineref&lt;/td&gt;&lt;td&gt;-0.383&lt;sup&gt;**&lt;/sup&gt; (0.192)&lt;/td&gt;&lt;td&gt;-0.372&lt;sup&gt;*&lt;/sup&gt; (0.213)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinesm&lt;/td&gt;&lt;td&gt;-0.376 (0.232)&lt;/td&gt;&lt;td&gt;-0.386 (0.258)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;1.831&lt;sup&gt;***&lt;/sup&gt; (0.220)&lt;/td&gt;&lt;td&gt;1.860&lt;sup&gt;***&lt;/sup&gt; (0.245)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-2,712.426&lt;/td&gt;&lt;td&gt;-2,721.241&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;chi&lt;sup&gt;2&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;td&gt;74.713&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;69.134&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/small&gt;
 ---
-## Do We need accelerated time?
+## Do we need accelerated time?
 The exponential model assumes a constant effect of time. 
 
 We can perform a likelihood ratio test between the exponential and Weibul model to see if AFT is neccessary.

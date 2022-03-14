@@ -40,12 +40,11 @@ Examples from cancer:
 
 Time-to-event data is common in many fields including, but not limited to:
 
-- Time from HIV infection to development of AIDS
-- Time to heart attack
-- Time to onset of substance abuse
-- Time to initiation of sexual activity
-- Time to machine malfunction
-- Time to employee resignation/termination
+- Crime: Time from release to criminal recidivism
+- Marketing: Customer retention
+- Engineering: Time to machine malfunction
+- Finance: Time to loan default
+- Management: Time to employee resignation/termination
 ---
 
 ## Aliases for survival analysis
@@ -71,7 +70,7 @@ class: inverse, center, middle
 
 ## What is censoring?
 
-In survival analysis it is common for the exact event time to be unknown, or unobserved, which is called censoring. A subject may be censored due to:
+In survival analysis, it is common for the exact event time to be unknown, or unobserved, which is called censoring. A subject may be censored due to:
 
 - Loss to follow-up
 - Withdrawal from study
@@ -79,8 +78,8 @@ In survival analysis it is common for the exact event time to be unknown, or uno
 
 Specifically these are examples of **right** censoring. Other common types of censoring include:
 
-- Left
-- Interval
+- Left (you do not observed the beginning)
+- Interval (individual is loss during the study)
 ---
 
 ### Censored survival data
@@ -271,7 +270,7 @@ plot(f1, xlab = "Days", ylab = "Overall survival probability")
 ]
 ---
 
-## Estimating $x$-year survival
+## Estimating survival time
 
 One quantity often of interest in a survival analysis is the probability of surviving a certain number $(x)$ of years.
 
@@ -284,7 +283,7 @@ summary(f1, times = 5*365)
 We find that the 5-year probability of survival in this study is `r round(summary(f1, times = 5*356)$surv * 100)`%. The associated lower and upper bounds of the 95% confidence interval are also displayed.
 
 ---
-## $x$-year survival is often estimated incorrectly 
+## Survival time is often estimated incorrectly 
 
 What happens if you use a "naive" estimate? 
 
@@ -307,6 +306,11 @@ We can obtain this directly from our `survfit` object:
 ```{r}
 survival::survfit(survival::Surv(futime, delta) ~ 1, data = transplant)
 ```
+
+```{r eval=FALSE}
+round(summary(f1)$table["median"]/365, 1)
+```
+
 
 We see the median survival time is `r round(summary(f1)$table["median"]/365, 1)` years. The lower and upper bounds of the 95% confidence interval are also displayed.
 
@@ -472,28 +476,31 @@ Our case uses data of 1785 employees.
 
 ## Variables:
 
-$ exp - length of employment in the company
+$exp$ - length of employment in the company
 
-$ event - event (1 - terminated, 0 - currently employed)
+$event$ - event (1 - terminated, 0 - currently employed)
 
-$ branch - branch
+$branch$ - branch
 
-$ pipeline - source of recruitment
+$pipeline$ - source of recruitment
 
 Please note that the data is already prepared for survival analysis. Moreover, length of employment is counted in months up to two decimal places, according to the following formula: (date fire - date hire) / (365.25 / 12).
 
 ---
 
-## Cox Model {.smaller}
-```{r}
+## Cox Model
+<tiny>
+```{r results='asis', echo=FALSE}
 w = coxph(Surv(exp, event) ~ 1 , data = q)
 w1 = coxph(Surv(exp, event) ~ . , data = q)
-summary(w1)
+stargazer::stargazer(w1, type = "html", single.row = TRUE, star.char = c("a","b","c"), font.size = "tiny")
 ```
-
+</tiny>
 
 ---
-##Accelerated failure-time models | survreg(formula, dist='weibull')
+##Accelerated failure-time models
+
+###survreg(formula, dist='weibull')
 
 An accelerated failure-time (AFT) model is a parametric model with covariates and failure times following the survival function of the form $S(x|Z) = S_0 (x exp[\theta Z])$, where $S_0$ is a function for the baseline survival rate. The term $exp[\theta Z]$ is called the acceleration factor. 
 
@@ -534,20 +541,20 @@ The _survial_ package allows us to estimate all of these models. We will use the
 ```{r message=FALSE, warning=FALSE, eval=FALSE}
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="text",style = "qje")
+stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE, star.char = c("a","b","c"))
 ```
 
 ---
-## Weibul Model in R {.smaller}
-
-```{r message=FALSE, warning=FALSE, echo=FALSE}
+## Weibul Model in R
+<small>
+```{r message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE)
+stargazer::stargazer(w2,w3,type="html",style = "qje",single.row = TRUE)
 ```
-
+</small>
 ---
-## Do We need accelerated time?
+## Do we need accelerated time?
 The exponential model assumes a constant effect of time. 
 
 We can perform a likelihood ratio test between the exponential and Weibul model to see if AFT is neccessary.
