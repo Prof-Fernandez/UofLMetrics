@@ -82,9 +82,6 @@ y = 1 if $\alpha_1 < \beta_e educ +\beta_k kids +\epsilon$ < $\alpha_2$
 y = 2 if $\alpha_2 < \beta_e  educ +\beta_k kids +\epsilon$
 
 We could alternatively introduce a constant $\beta_0$ and assume that $\alpha_1$ = 0.
----
-## Analytical Example
-![](https://methods.sagepub.com/images/virtual/oprobit-in-cces-2012/10.4135_9781473961890-fig2.jpg)
 
 ---
 ## Log Likelihood Function
@@ -186,19 +183,10 @@ m1_logit<-ocME(m_logit,rev.dum = TRUE)
 ```
 
 ---
-## Ordered Probit and Logit
-<tiny>
-```{r warning=FALSE, message=FALSE, results='asis', echo=FALSE}
-library(stargazer)
-library(knitr)
-stargazer(m_probit,m_logit,type = "html")
-```
-</tiny>
----
 ## Marginal Effects
 ```{r eval=TRUE, echo=FALSE}
-m1_probit[[2]]$ME.all %>% kable()
-m1_logit[[2]]$ME.all %>% kable()
+m1_probit
+m1_logit
 ```
 
 ---
@@ -233,12 +221,9 @@ The Poisson density function is $$Pr(Y=y)=\frac{e^{-\lambda}\lambda^y}{y!}$$
 
 where the $E[y|X]=Var[y|X]=\lambda$
 
-__This is a very restrictive assumption that the mean and variance are equal. More about this issue is covered in future slides.__
-
 For our purposes, we assume $\lambda=exp(X\beta)$
 
-Interpretation of $\beta$ is the percentage change in $\lambda$ for a one unit increase in $X$. 
-$$ E[ln y|X]= X \beta$$ 
+Interpretation of $\beta$ is the percentage change in $\lambda$ for a one unit increase in $X$.
 
 ---
 ## Properties of the Poisson Distribution
@@ -330,7 +315,7 @@ res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = p
 ---
 ### Fixed Effects Poisson
 
-```{r echo=FALSE ,warning=FALSE,message=FALSE, results='asis'}
+```{r echo=FALSE ,warning=FALSE,message=FALSE}
 library(pglm)
 library(readstata13)
 library(lmtest)
@@ -339,9 +324,9 @@ ships<-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
 ships$lnservice=log(ships$service)
 res <- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
 res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
-coeftest(res) %>% as.table %>% kable()
+coeftest(res)
 standard_se<-ginv(-res1$hessian)
-coeftest(res1,standard_se) %>% as.table %>% kable()
+coeftest(res1,standard_se)
 ```
 
 
@@ -389,7 +374,7 @@ Zeros are produce for two reasons.
 
 2. There are a set of zeros that are caused by the count process.
 
-Example: You may drink alcohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
+Example: You may drink alchohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
 
 ---
 ## Zero Inflated Model

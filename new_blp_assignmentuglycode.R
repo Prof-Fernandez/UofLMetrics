@@ -1,0 +1,10 @@
+aggregate(share ~ cdid, df = productData_cereal, sum)
+aggregate(share ~ cdid, productData_cereal, sum)
+share_outside<-aggregate(share ~ cdid, productData_cereal, sum)
+share_outside$share_outside<-1-share_outside$share
+productData_cereal<-merge(productData_cereal,share_outside, by="cdid")
+productData_cereal$delta<-ln(productData_cereal$share.x)-ln(productData_cereal$share_outside)
+productData_cereal$delta<-log(productData_cereal$share.x)-log(productData_cereal$share_outside)
+summary(lm(delta~price+sugar+mushy,productData_cereal))
+summary(lm(delta~price+sugar+mushy+product_id,productData_cereal))
+summary(lm(delta~price+sugar+mushy+cdid,productData_cereal))

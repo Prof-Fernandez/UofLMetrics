@@ -4,21 +4,33 @@
     <title>Linear Regression</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="extra.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Linear Regression
+]
+.subtitle[
 ## Difference in Differences
+]
+.author[
 ### Jose M. Fernandez
+]
+.institute[
 ### University of Louisville
-### 2020-7-4 (updated: 2021-07-06)
+]
+.date[
+### 2020-7-4 (updated: 2022-06-17)
+]
 
 ---
 
@@ -89,11 +101,6 @@ Need items
 
 ---
 ## DAG
-
-```
-## Warning: package 'knitr' was built under R version 4.0.5
-```
-
 &lt;div class="figure" style="text-align: center"&gt;
 &lt;img src="https://miro.medium.com/max/1750/1*KiRkxO-fUCfXSkJMR0bDig.png" alt="Causal Pathway Illustration: Z (confounder) is the cause of both X (independent variable) and Y (dependent variable) and thus, obscures the relationship between X and Y." width="75%" /&gt;
 &lt;p class="caption"&gt;Causal Pathway Illustration: Z (confounder) is the cause of both X (independent variable) and Y (dependent variable) and thus, obscures the relationship between X and Y.&lt;/p&gt;
@@ -121,7 +128,7 @@ Visually, the DiD is the difference between these two changes:
 &lt;img src="https://miro.medium.com/max/1750/1*yyVOO-oWeSPlgblipljulg.png" width="110%" style="display: block; margin: auto;" /&gt;
 ---
 ##Regression DiD
-`$$y_{it}=\beta_0+\beta_1 Treat_i+\beta_2 Post_t+\beta_3 Treat_i*Post_t+\gamma X_{it}+e_{it}$$`
+`$$y_{it}=\beta_0+\beta_1 Post_i+\beta_2 Treat_t+\beta_3 Treat_i*Post_t+\gamma X_{it}+e_{it}$$`
 While it is possible to obtain the DiD estimator by calculating the means by hand, using a regression framework may be more advantageous as it:
 
 - outputs standard errors for hypothesis testing
@@ -186,7 +193,7 @@ Violation of parallel trend assumption will lead to biased estimation of the cau
 ## Generalized DiD
 
 We can generalize the DiD model for multiple time periods.
-- Useful for policy adoption, which tends to happened at different times
+- Very useful for policy adoption as they tend to happened at different times
 
 `$$y_{it}=\beta_0+\alpha_i+\delta_t+\beta_3 d_{it}+\gamma X_{it}+e_{it}$$`
 
@@ -195,8 +202,6 @@ We can generalize the DiD model for multiple time periods.
 - `\(\delta_t\)`: Time fixed effects that change across time (e.g. year dummies to allow intercept to vary across different years)
 
 - `\(d_{it}\)`: dummy variable which equals 1 if the unit of observation is in the post-treatment period (in contrast to Pt equals 1 in the second time period)
-
-- WARNING: TWFE only equal DiD if the treatment effect is homogenous and constant across units. See [link]("https://andrewcbaker.netlify.app/did#1")
 ---
 ## Threats to Validity
 
@@ -240,7 +245,7 @@ mydata$country == "G", 1, 0)
 mydata$did = mydata$time * mydata$treated
 ```
 ---
-### 5 ways to do DiD
+### 4 ways to do DiD
 I will show you a couple of different ways to run DiD in R.
 
 ```r
@@ -254,225 +259,179 @@ reg4 &lt;-felm(y~did | country + year, data = mydata)
 reg5 &lt;-feols(y~did | country + year, data = mydata)
 ```
 ---
-&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
-&lt;caption&gt;Statistical models&lt;/caption&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 3&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 4&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 5&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 2 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 3 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 4 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 5 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
 &lt;tbody&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.36&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.36&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.74)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.74)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;time&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.29&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.29&lt;sup&gt;*&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.95)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.95)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;treated&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.78&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.78&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.13)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.13)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;did&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.46)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.33)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.33)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.33)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;time:treated&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.52&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.46)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.08&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.08&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.06&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.39&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.04&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.04&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.22&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.20&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt; (full model)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.39&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt; (proj model)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.06&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt; (full model)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.20&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt; (proj model)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.22&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. groups: country&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;7&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. groups: year&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;10&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;within.r.squared&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.06&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Sigma&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.69&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;nobs&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;70&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AIC&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;351.85&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;BIC&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;390.08&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-bottom: 2px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Log Likelihood&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-158.93&lt;/td&gt;
-&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.358 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.358 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.738) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.738) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; time &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.289 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.289 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.953) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.953) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; treated &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.776 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.776 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.128) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.128) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; did &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −2.520 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −2.520 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −2.520 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −2.520 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.456) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.328) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.328) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (1.086) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; time × treated &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −2.520 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1px"&gt; (1.456) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1px"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 70 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 70 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 70 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 70 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 70 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.083 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.083 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.064 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.387 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 Adj. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.041 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.041 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.219 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.202 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 356.1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 356.1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 321.9 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 353.9 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 367.4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 367.4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 322.1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 394.3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; F &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.984 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.984 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RMSE &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.87 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.87 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.34 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.34 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.34 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Std.Errors &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; by: country &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FE: country &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; X &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FE: year &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; X &lt;/td&gt;
+  &lt;/tr&gt;
 &lt;/tbody&gt;
-&lt;tfoot&gt;
-&lt;tr&gt;
-&lt;td style="font-size: 0.8em;" colspan="6"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tfoot&gt;
 &lt;/table&gt;
 ---
 ## Event Study
@@ -688,6 +647,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

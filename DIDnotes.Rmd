@@ -112,7 +112,7 @@ include_graphics("https://miro.medium.com/max/1750/1*yyVOO-oWeSPlgblipljulg.png"
 ```
 ---
 ##Regression DiD
-$$y_{it}=\beta_0+\beta_1 Treat_i+\beta_2 Post_t+\beta_3 Treat_i*Post_t+\gamma X_{it}+e_{it}$$
+$$y_{it}=\beta_0+\beta_1 Post_i+\beta_2 Treat_t+\beta_3 Treat_i*Post_t+\gamma X_{it}+e_{it}$$
 While it is possible to obtain the DiD estimator by calculating the means by hand, using a regression framework may be more advantageous as it:
 
 - outputs standard errors for hypothesis testing
@@ -192,7 +192,7 @@ include_graphics("violationparallel.png")
 ## Generalized DiD
 
 We can generalize the DiD model for multiple time periods.
-- Useful for policy adoption, which tends to happened at different times
+- Very useful for policy adoption as they tend to happened at different times
 
 $$y_{it}=\beta_0+\alpha_i+\delta_t+\beta_3 d_{it}+\gamma X_{it}+e_{it}$$
 
@@ -201,8 +201,6 @@ $$y_{it}=\beta_0+\alpha_i+\delta_t+\beta_3 d_{it}+\gamma X_{it}+e_{it}$$
 - $\delta_t$: Time fixed effects that change across time (e.g. year dummies to allow intercept to vary across different years)
 
 - $d_{it}$: dummy variable which equals 1 if the unit of observation is in the post-treatment period (in contrast to Pt equals 1 in the second time period)
-
-- WARNING: TWFE only equal DiD if the treatment effect is homogenous and constant across units. See [link]("https://andrewcbaker.netlify.app/did#1")
 ---
 ## Threats to Validity
 
@@ -247,7 +245,7 @@ mydata$country == "G", 1, 0)
 mydata$did = mydata$time * mydata$treated
 ```
 ---
-### 5 ways to do DiD
+### 4 ways to do DiD
 I will show you a couple of different ways to run DiD in R.
 ```{r echo=TRUE, eval=FALSE}
 library(plm) #panel linear model
@@ -269,7 +267,7 @@ reg2<-lm(y~time*treated, data=mydata)
 reg3<-plm(y~did, data = mydata, index = c("country","year"), effect = "twoways", model = "within")
 reg4 <-felm(y~did | country + year, data = mydata)
 reg5 <-feols(y~did | country + year, data = mydata)
-texreg::htmlreg(list(reg1,reg2,reg3,reg4,reg5),override.se = list(NULL,NULL,NULL,NULL,se(reg5,se = "standard")))
+modelsummary::modelsummary(list(reg1,reg2,reg3,reg4,reg5))
 ```
 ---
 ## Event Study

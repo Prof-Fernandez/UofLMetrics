@@ -4,7 +4,7 @@
     <title>Survival Analysis</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.12/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -14,11 +14,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Survival Analysis
+]
+.subtitle[
 ## An Introduction
+]
+.author[
 ### Jose M. Fernandez
+]
+.institute[
 ### University of Louisville
-### 2020-7-4 (updated: 2022-03-14)
+]
+.date[
+### 2020-7-4 (updated: 2022-06-17)
+]
 
 ---
 
@@ -323,8 +333,8 @@ survival::survfit(survival::Surv(futime, delta) ~ 1, data = transplant)
 ```
 ## Call: survfit(formula = survival::Surv(futime, delta) ~ 1, data = transplant)
 ## 
-##       n  events  median 0.95LCL 0.95UCL 
-##     815      66    1422    1422      NA
+##        n events median 0.95LCL 0.95UCL
+## [1,] 815     66   1422    1422      NA
 ```
 
 
@@ -486,7 +496,7 @@ broom::tidy(survival::coxph(survival::Surv(futime, delta) ~ factor(abo),
 ```
 
 ```
-## # A tibble: 3 x 5
+## # A tibble: 3 × 5
 ##   term          estimate std.error statistic p.value
 ##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
 ## 1 factor(abo)B    0.183      0.386    0.474    0.636
@@ -673,6 +683,12 @@ Although there is little difference in the parameter estimates, the likelihood r
 * Machine learning methods are improving on survival models
 * We have only discussed X's that are constant over time, but what about time-varying covariates (or worse yet time-dependent covariates)
 * There are also issues of competing risks
+
+[Read More Here](https://rpubs.com/omironenko/survival_churn)
+
+---
+## This is only the beginning
+![](survivalgif1.png)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -720,6 +736,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

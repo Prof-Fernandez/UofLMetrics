@@ -66,9 +66,9 @@ To calculate probability, we need to use a pdf and cdf
 - pdf = probability density function (gives the shape of the distribution)
 - cdf = cumulative density function 
 
-The blue line below is the pdf. We use the cdf to calculate probability that the z score is between `\(z_1\)` and `\(z_2\)` (the shaded region.)
+The blue line below is the pdf. We use the cdf to calculate probability that the z score is between `\(z_1\)` and `\(z_2\)` (the shaded region in yellow.)
 
-&lt;img src="https://d26tpo4cm8sb6k.cloudfront.net/img/z-score.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="https://stat88.org/textbook/images/notebooks/Chapter_08/02_Standard_Normal_Curve_10_0.png" style="display: block; margin: auto;" /&gt;
 
 
 ---
@@ -112,7 +112,7 @@ mean(y)
 ```
 
 ```
-## [1] 0.778
+## [1] 0.788
 ```
 
 ---
@@ -134,17 +134,17 @@ stargazer::stargazer(reg1,reg2, type = "html")
 &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;y_star&lt;/td&gt;&lt;td&gt;y&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;X&lt;/td&gt;&lt;td&gt;0.713&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.023&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.031)&lt;/td&gt;&lt;td&gt;(0.002)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;X&lt;/td&gt;&lt;td&gt;0.665&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.023&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.030)&lt;/td&gt;&lt;td&gt;(0.002)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-0.764&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.553&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.371)&lt;/td&gt;&lt;td&gt;(0.020)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;0.245&lt;/td&gt;&lt;td&gt;0.567&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.364)&lt;/td&gt;&lt;td&gt;(0.020)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;1,000&lt;/td&gt;&lt;td&gt;1,000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.350&lt;/td&gt;&lt;td&gt;0.159&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.350&lt;/td&gt;&lt;td&gt;0.159&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error (df = 998)&lt;/td&gt;&lt;td&gt;6.962&lt;/td&gt;&lt;td&gt;0.381&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic (df = 1; 998)&lt;/td&gt;&lt;td&gt;538.152&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;189.255&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.326&lt;/td&gt;&lt;td&gt;0.156&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.325&lt;/td&gt;&lt;td&gt;0.155&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error (df = 998)&lt;/td&gt;&lt;td&gt;6.793&lt;/td&gt;&lt;td&gt;0.376&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic (df = 1; 998)&lt;/td&gt;&lt;td&gt;482.617&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;184.167&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/small&gt;
@@ -159,7 +159,7 @@ plot(X,y_hat)
 
 &lt;img src="limitedDep2_files/figure-html/unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 
-The predicted mean of y is 0.778, the max is 1.3892119, and the min is 0.2844994
+The predicted mean of y is 0.788, the max is 1.3215412, and the min is 0.2581041
 
 ---
 ## Examples of Binary Dependent Variables
@@ -940,7 +940,7 @@ mean(y)
 ```
 
 ```
-## [1] 0.74513
+## [1] 0.74659
 ```
 
 ```r
@@ -962,19 +962,19 @@ mylogit3 &lt;- lm(y2 ~ X, mydata_group)
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;y&lt;/td&gt;&lt;td&gt;y2&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;logistic&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;OLS&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;X&lt;/td&gt;&lt;td&gt;0.119&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.086&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.002)&lt;/td&gt;&lt;td&gt;(0.014)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;X&lt;/td&gt;&lt;td&gt;0.121&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.120&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.002)&lt;/td&gt;&lt;td&gt;(0.015)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-0.034&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.228&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.016)&lt;/td&gt;&lt;td&gt;(0.140)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-0.045&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-0.109&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.016)&lt;/td&gt;&lt;td&gt;(0.147)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;100,000&lt;/td&gt;&lt;td&gt;1,000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.036&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.035&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-53,750.380&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;107,504.800&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.225 (df = 998)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;37.733&lt;sup&gt;***&lt;/sup&gt; (df = 1; 998)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.063&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.062&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-53,433.320&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;106,870.600&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.230 (df = 998)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;66.946&lt;sup&gt;***&lt;/sup&gt; (df = 1; 998)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
     </textarea>

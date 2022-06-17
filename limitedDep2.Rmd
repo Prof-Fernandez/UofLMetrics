@@ -62,10 +62,10 @@ To calculate probability, we need to use a pdf and cdf
 - pdf = probability density function (gives the shape of the distribution)
 - cdf = cumulative density function 
 
-The blue line below is the pdf. We use the cdf to calculate probability that the z score is between $z_1$ and $z_2$ (the shaded region.)
+The blue line below is the pdf. We use the cdf to calculate probability that the z score is between $z_1$ and $z_2$ (the shaded region in yellow.)
 
 ```{r echo=FALSE, fig.align='center'}
-include_graphics("https://d26tpo4cm8sb6k.cloudfront.net/img/z-score.png")
+include_graphics("http://stat88.org/textbook/images/notebooks/Chapter_08/02_Standard_Normal_Curve_10_0.png")
 
 ```
 

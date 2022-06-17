@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.7/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -18,7 +18,7 @@ class: center, middle, inverse, title-slide
 ## Count Models
 ### Jose M. Fernandez
 ### University of Louisville
-### 2020-7-4 (updated: 2021-06-01)
+### 2020-7-4 (updated: 2021-03-10)
 
 ---
 
@@ -91,9 +91,6 @@ y = 1 if `\(\alpha_1 &lt; \beta_e educ +\beta_k kids +\epsilon\)` &lt; `\(\alpha
 y = 2 if `\(\alpha_2 &lt; \beta_e  educ +\beta_k kids +\epsilon\)`
 
 We could alternatively introduce a constant `\(\beta_0\)` and assume that `\(\alpha_1\)` = 0.
----
-## Analytical Example
-![](https://methods.sagepub.com/images/virtual/oprobit-in-cces-2012/10.4135_9781473961890-fig2.jpg)
 
 ---
 ## Log Likelihood Function
@@ -235,44 +232,21 @@ m1_logit&lt;-ocME(m_logit,rev.dum = TRUE)
 ```
 
 ---
-## Ordered Probit and Logit
-&lt;tiny&gt;
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;apply&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;ordered&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;ordered&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;probit&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;logistic&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;pared&lt;/td&gt;&lt;td&gt;0.598&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.048&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.158)&lt;/td&gt;&lt;td&gt;(0.266)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;public&lt;/td&gt;&lt;td&gt;0.010&lt;/td&gt;&lt;td&gt;-0.059&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.173)&lt;/td&gt;&lt;td&gt;(0.298)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;gpa&lt;/td&gt;&lt;td&gt;0.358&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.616&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.157)&lt;/td&gt;&lt;td&gt;(0.261)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;400&lt;/td&gt;&lt;td&gt;400&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/tiny&gt;
----
 ## Marginal Effects
 
-|       | effect.unlikely| effect.somewhat likely| effect.very likely|
-|:------|---------------:|----------------------:|------------------:|
-|pared  |          -0.234|                  0.108|              0.127|
-|public |          -0.004|                  0.002|              0.002|
-|gpa    |          -0.142|                  0.083|              0.059|
+```
+##        effect.unlikely effect.somewhat likely effect.very likely
+## pared           -0.234                  0.108              0.127
+## public          -0.004                  0.002              0.002
+## gpa             -0.142                  0.083              0.059
+```
 
-
-
-|       | effect.unlikely| effect.somewhat likely| effect.very likely|
-|:------|---------------:|----------------------:|------------------:|
-|pared  |          -0.255|                  0.137|              0.117|
-|public |           0.015|                 -0.010|             -0.005|
-|gpa    |          -0.152|                  0.101|              0.051|
+```
+##        effect.unlikely effect.somewhat likely effect.very likely
+## pared           -0.255                  0.137              0.117
+## public           0.015                 -0.010             -0.005
+## gpa             -0.152                  0.101              0.051
+```
 
 ---
 class: inverse, center, middle
@@ -306,12 +280,9 @@ The Poisson density function is `$$Pr(Y=y)=\frac{e^{-\lambda}\lambda^y}{y!}$$`
 
 where the `\(E[y|X]=Var[y|X]=\lambda\)`
 
-__This is a very restrictive assumption that the mean and variance are equal. More about this issue is covered in future slides.__
-
 For our purposes, we assume `\(\lambda=exp(X\beta)\)`
 
-Interpretation of `\(\beta\)` is the percentage change in `\(\lambda\)` for a one unit increase in `\(X\)`. 
-$$ E[ln y|X]= X \beta$$ 
+Interpretation of `\(\beta\)` is the percentage change in `\(\lambda\)` for a one unit increase in `\(X\)`.
 
 ---
 ## Properties of the Poisson Distribution
@@ -353,7 +324,7 @@ data("NMES1988")
 plot(table(NMES1988$visits),xlab="Physician Office Visits", ylab="Counts")
 ```
 
-&lt;img src="Count-Models_files/figure-html/unnamed-chunk-9-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="Count-Models_files/figure-html/unnamed-chunk-8-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Issues with the data
@@ -496,24 +467,34 @@ res1 &lt;- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family 
 ### Fixed Effects Poisson
 
 
-|            |   Estimate| Std. Error|    z value| Pr(&gt;&amp;#124;z&amp;#124;)|
-|:-----------|----------:|----------:|----------:|------------------:|
-|(Intercept) | -5.2229434|  0.4826048| -10.822402|          0.0000000|
-|op_75_79    |  0.3546482|  0.1168471|   3.035147|          0.0024042|
-|co_65_69    |  0.6735224|  0.1502944|   4.481355|          0.0000074|
-|co_70_74    |  0.7966861|  0.1701905|   4.681144|          0.0000029|
-|co_75_79    |  0.3978499|  0.2337477|   1.702048|          0.0887463|
-|lnservice   |  0.8310732|  0.0460195|  18.059143|          0.0000000|
+```
+## 
+## z test of coefficients:
+## 
+##             Estimate Std. Error  z value  Pr(&gt;|z|)    
+## (Intercept) -5.22294    0.48261 -10.8224 &lt; 2.2e-16 ***
+## op_75_79     0.35465    0.11685   3.0351  0.002404 ** 
+## co_65_69     0.67352    0.15029   4.4814 7.417e-06 ***
+## co_70_74     0.79669    0.17019   4.6811 2.853e-06 ***
+## co_75_79     0.39785    0.23375   1.7020  0.088746 .  
+## lnservice    0.83107    0.04602  18.0591 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
-
-
-|          |  Estimate| Std. Error|  z value| Pr(&gt;&amp;#124;z&amp;#124;)|
-|:---------|---------:|----------:|--------:|------------------:|
-|op_75_79  | 0.3702568|  0.1181453| 3.133911|          0.0017249|
-|co_65_69  | 0.6625407|  0.1536357| 4.312413|          0.0000161|
-|co_70_74  | 0.7597380|  0.1776628| 4.276291|          0.0000190|
-|co_75_79  | 0.3697410|  0.2458430| 1.503972|          0.1325885|
-|lnservice | 0.9027078|  0.1018028| 8.867221|          0.0000000|
+```
+## 
+## z test of coefficients:
+## 
+##           Estimate Std. Error z value  Pr(&gt;|z|)    
+## op_75_79   0.37026    0.11815  3.1339  0.001725 ** 
+## co_65_69   0.66254    0.15364  4.3124 1.615e-05 ***
+## co_70_74   0.75974    0.17766  4.2763 1.900e-05 ***
+## co_75_79   0.36974    0.24584  1.5040  0.132589    
+## lnservice  0.90271    0.10180  8.8672 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
 
 
 ---
@@ -560,7 +541,7 @@ Zeros are produce for two reasons.
 
 2. There are a set of zeros that are caused by the count process.
 
-Example: You may drink alcohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
+Example: You may drink alchohol or you may not. Even if you do drink alcohol you may not drink alcohol everyday. On the days you do drink, you may have 1, 2, 3 or more drinks.
 
 ---
 ## Zero Inflated Model

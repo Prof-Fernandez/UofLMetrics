@@ -149,7 +149,7 @@ $Y_{1i}$ = A measure of person $i$'s health given they _have_ insurance $(D_i=1)
 
 $Y_{0i}$ = A measure of person $i$'s health given they _do not have_ insurance $(D_i=0)$.
 
-The individual treatment effect is $Y_{1i} - Y_{0i}$
+The individual treatment effect is $Y_{1i} , Y_{0i}$
 
 Unfortunately, for $i$, we only observe $Y_{1i}$ if $D_i$ = 1 and $Y_{0i}$ if $D_i$ = 0
 
@@ -292,7 +292,7 @@ catastrophic_stats <- rand_sample %>%
   group_by(variable) %>%
   summarise(Mean = mean(value, na.rm = TRUE),
             `Std. Dev.` = sd(value, na.rm = TRUE))
-catastrophic_stats$variable<-c("Female", "Pct. Black or Hispanic", "Age", "Education","Real Income", "Hospital", "General Health Index", "Mental Health Index")
+catastrophic_stats$variable<-c("Age", "Pct. Black or Hispanic", "Education", "Pct. Female","General Health Index", "Hospital", "Income", "Mental Health Index")
 knitr::kable(catastrophic_stats, digits = 2, caption="Patinet Characteristics")
 
 ```
@@ -387,7 +387,7 @@ table2<-person_diffs %>%
   mutate(estimate = str_c(fmt_num(estimate), " (", fmt_num(std.error), ")")) %>%
   select(-std.error) %>%
   spread(term, estimate) 
-table2$response <- c("face-to-face","Inpatient","Outpatient","Total Cost","Admissions")
+table2$response <- c("face-to-face visits","Inpatient","Outpatient","Total Cost","Admissions")
   knitr::kable(table2,digits = 3, caption="Patient Health Spending by Plan")
 ```
 

@@ -90,10 +90,10 @@ Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c<y} \frac{1}{\sigma}\phi(\frac
 Let's assume your y variable is bottom coded at zero. This means we only observe Y if Y>0.
 
 The unconditional expected value is of Y is
-$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$
+$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
 If we condition on Y>0, then the expected value simplifies to 
 
-$$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$
+$$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
 The $\lambda$ term is the Inverse Mills Ratio.
 
 ---
@@ -129,7 +129,7 @@ data("Affairs")
 fm.ols <- lm(affairs ~ age + yearsmarried + religiousness + occupation + rating,  data = Affairs)
 fm.tobit <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating,  data = Affairs)
 fm.tobit2 <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating,  right = 4, data = Affairs)
-stargazer(fm.ols,fm.tobit,fm.tobit2,type="html",omit.table.layout = "n", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), style = "qje")
+stargazer(fm.ols,fm.tobit,fm.tobit2,type="html",omit.table.layout = "sn", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), style = "qje")
 ```
 ---
 ## Marginal effects with Tobit
@@ -188,6 +188,12 @@ Consequences of not accounting for the truncation is that you will overstate the
 We are throwing out lower values pushing the mean up.
 
 We are throwing out values from the extreme part of the distribution, which means we have less variation in the remaining data.
+
+---
+## Truncated Normal Distribution
+
+![](truncnorm.png)
+
 ---
 ## Estimate of Truncated Normal
 Simply using Ordinary Least Squares will result in a bias.
@@ -229,7 +235,7 @@ fm_trunc <- truncreg(yt ~ x, data = d, point = 1, direction = "left")
 ---
 ## OLS vs Truncreg
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-stargazer::stargazer(fm_full,fm_ols,fm_ols,type="html",dep.var.labels = c("Full Data","Truncated"),column.labels = c("OLS","OLS","Trunc. Reg."),coef=list(NULL,NULL,fm_trunc$coefficients[1:2]),se = list(NULL,NULL,sqrt(diag(fm_trunc$vcov[1:2,1:2]))),omit.stat = c("rsq","adj.rsq","F","ser"), model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "n")
+stargazer::stargazer(fm_full,fm_ols,fm_ols,type="html",dep.var.labels = c("Full Data","Truncated"),column.labels = c("OLS","OLS","Trunc. Reg."),coef=list(NULL,NULL,fm_trunc$coefficients[1:2]),se = list(NULL,NULL,sqrt(diag(fm_trunc$vcov[1:2,1:2]))),omit.stat = c("rsq","adj.rsq","F","ser"), model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "sn")
 ```
 ---
 ## Truncated Regression: Histogram
@@ -255,7 +261,22 @@ ggplot(data_1, aes(x=Y, fill=groups)) +
 ```
 ---
 class: center, middle, inverse
-# Heckman Model
+# Endogenous Censoring
+---
+## Examples of Endogenous Censoring
+- Non-response Bias
+![](https://images.prismic.io/sketchplanations/f2fdb7cb-f126-4897-ad78-4fd11c743172_SP+723+-+Sampling+bias.png?auto=format&ixlib=react-9.0.3&h=1887.6833845104059&w=1600&q=35&dpr=3)
+
+---
+## Examples of Endogenous Censoring
+- Survivorship/Attrition Bias
+![](https://images.prismic.io/sketchplanations/ce000ac3-b8f1-4612-8c86-28f5d65442f7_SP+674+-+Survivorship+bias.png?auto=format&ixlib=react-9.0.3&h=1887.557603686636&w=1600&q=35&dpr=3)
+
+---
+## Examples of Endogenous Censoring
+- Survivorship/Attrition Bias
+![](https://images.prismic.io/sketchplanations/c24b9624-d973-4bf4-9c29-b248005ab56e_78697608699.jpg?auto=format&ixlib=react-9.0.3&h=1888.2591093117408&w=1600&q=35&dpr=3)
+
 ---
 ## Heckman Model
 
@@ -284,6 +305,7 @@ $$\begin{align*}E[Y|X,d=1] &= X\beta+\sigma E[u|d=1] \\
 &= X\beta+\sigma \rho \lambda(z'\gamma) \end{align*}$$
 
 where $\lambda(z\gamma)$ is called the _Inverse Mills Ratio_ $$\lambda(z\gamma)=\frac{\phi(z'\gamma)}{\Phi(z'\gamma)}$$
+Notice, this is the ratio between the _normal pdf_ and the _normal cdf_ of our probit coefficients with the person's X's. 
 ---
 ## Heckman Two Step
 
@@ -301,11 +323,67 @@ Now is a good time to think about how Heckman corrects OLS.
 
 Let's restate the omitted variable bias (OVB) table, but using the correction factor as the OV. If x affects both the participation equation and the level equation, then we will have some sort of OVB.
 
-Signs      | $Corr(x,\text{Mills Ratio})>0$ | $Corr(x,\text{Mills Ratio})<0$ 
+Signs      | $Corr(x,\text{Mills Ratio})>0$ | $Corr(x,\text{Mills Ratio})<0$
 ---------  | ------------------- | ------------------
 $\alpha>0$| Positive Bias       | Negative Bias
 $\alpha<0$| Negative Bias       | Positive Bias
+---
+## Simulation Example
+```{r message=FALSE, warning=FALSE, echo=TRUE, eval=FALSE}
+library(tidyverse)
+library(sampleSelection)
+set.seed(123456)
+N = 10000
+educ = sample(1:16, N, replace = TRUE)
+age  = sample(18:64, N, replace = TRUE)
+covmat = matrix(c(.46^2, .25*.46, .25*.46, 1), ncol = 2)
+errors = mvtnorm::rmvnorm(N, sigma = covmat)
+z = rnorm(N)
+e = errors[, 1]
+v = errors[, 2]
+wearnl = 4.49 + .08 * educ + .012 * age + e
+d_star = -1.5 + 0.15 * educ + 0.01 * age + 0.15 * z + v
 
+observed_index  = d_star > 0
+d = data.frame(wearnl, educ, age, z, observed_index)
+# lm based on full data
+lm_all = lm(wearnl ~ educ + age, data=d)
+
+# lm based on observed data
+lm_obs = lm(wearnl ~ educ + age, data=d[observed_index,])
+# Sample Selection model
+selection_2step = selection(observed_index ~ educ + age + z, wearnl ~ educ + age, method = '2step')
+```
+---
+## Simulation Example
+<small>
+```{r message=FALSE, warning=FALSE, echo=FALSE, eval=TRUE, results='asis'}
+library(tidyverse)
+library(sampleSelection)
+set.seed(123456)
+N = 10000
+educ = sample(1:16, N, replace = TRUE)
+age  = sample(18:64, N, replace = TRUE)
+covmat = matrix(c(.46^2, .25*.46, .25*.46, 1), ncol = 2)
+errors = mvtnorm::rmvnorm(N, sigma = covmat)
+z = rnorm(N)
+e = errors[, 1]
+v = errors[, 2]
+wearnl = 4.49 + .08 * educ + .012 * age + e
+d_star = -1.5 + 0.15 * educ + 0.01 * age + 0.15 * z + v
+
+observed_index  = d_star > 0
+d = data.frame(wearnl, educ, age, z, observed_index)
+# lm based on full data
+lm_all = lm(wearnl ~ educ + age, data=d)
+
+# lm based on observed data
+lm_obs = lm(wearnl ~ educ + age, data=d[observed_index,])
+# Sample Selection model
+selection_2step = selection(observed_index ~ educ + age + z, wearnl ~ educ + age, method = '2step')
+stargazer::stargazer(lm_all,lm_obs,selection_2step, type = "html", font.size = "tiny", single.row = TRUE, star.char = c("c","b","a"), style = "qje", model.numbers = FALSE, omit.stat = c("rsq","f","adj.rsq","ser"))
+```
+</small>
 ---
 ## Heckman Model in R
 ```{r eval=FALSE, message=FALSE, warning=FALSE}
@@ -321,11 +399,11 @@ heck.m2 <- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
    wage ~ exper + I( exper^2 ) + educ + city, Mroz87, method = "ml" ) 
 # OLS Estimator
 ols.m1 <- lm(wage ~ exper + I( exper^2 ) + educ + city, Mroz87)
-stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "n")
+stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), omit.table.layout = "sn")
 ```
 
 ---
-
+<small>
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 library(sampleSelection)
 data( Mroz87 )
@@ -341,20 +419,26 @@ heck.m2 <- heckit( lfp ~ age + I( age^2 ) + faminc + kids + educ,
 ols.m1 <- lm(wage ~ exper + I( exper^2 ) + educ + city, Mroz87)
 stargazer::stargazer(ols.m1,heck.m1,heck.m2,type="html", omit.stat = c("rsq","f","adj.rsq","ser"), model.numbers = FALSE, font.size = "small", single.row = TRUE, star.char = c("c","b","a"), style = "qje")
 ```
+</small>
 ---
 ### The two step method 
 We can do the two step method by brute force as well.
 
 ```{r}
-first.stage<-glm(lfp ~ age + I( age^2 ) + faminc + kids + educ , data=Mroz87, family=binomial(link = "probit"))
+first.stage<-glm(lfp ~ age + I( age^2 ) 
+                 + faminc + kids + educ , data=Mroz87, 
+                 family=binomial(link = "probit"))
 Mroz87$z1 <- predict.glm(first.stage)
 Mroz87$millsratio <- dnorm(Mroz87$z1)/(pnorm(Mroz87$z1))
-second.stage <- lm(wage ~ exper + I( exper^2 ) + educ + city+millsratio, Mroz87)
+second.stage <- lm(wage ~ exper + I( exper^2 ) 
+                   + educ + city+millsratio, Mroz87)
 ```
 ---
+<small>
 ```{r echo=FALSE, results='asis'}
 stargazer(second.stage,heck.m1,type="html", single.row = TRUE)
 ```
+</small>
 ---
 ## Summary
 ```{r fig.align='center',echo=FALSE,out.width="100%"}

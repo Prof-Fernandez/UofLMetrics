@@ -571,3 +571,9 @@ Although there is little difference in the parameter estimates, the likelihood r
 * Machine learning methods are improving on survival models
 * We have only discussed X's that are constant over time, but what about time-varying covariates (or worse yet time-dependent covariates)
 * There are also issues of competing risks
+
+[Read More Here](https://rpubs.com/omironenko/survival_churn)
+
+---
+## This is only the beginning
+![](survivalgif1.png)
