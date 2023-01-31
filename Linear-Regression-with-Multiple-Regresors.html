@@ -4,7 +4,7 @@
     <title>Linear Regression Review</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.20/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -29,7 +29,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2022-06-17)
+### 2020-7-4 (updated: 2023-01-31)
 ]
 
 ---
@@ -135,6 +135,10 @@ qplot(x=str, y=testscr, data=CASchools, geom="point",
       xlab="Student/Teacher Ratio", ylab="Test Scores")
 ```
 
+```
+## Warning: `qplot()` was deprecated in ggplot2 3.4.0.
+```
+
 &lt;img src="Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 ---
 ## Correlation and Scatterplot (3)
@@ -181,7 +185,7 @@ __See the notes for the derivation__
 ## The Ordinary Least Squares Estimator (2)
 
 The OLS estimator of `\(\beta_1\)` is 
-`$$\hat{\beta}_1 = \frac{\sum_i (X_i - \bar{X})(Y_i - \bar{Y})}{\sum_i (X_i - \bar{X})^2} = \frac{s_{XY}}{s_X^2}$$`
+`$$\hat{\beta}_1 = \frac{\sum_i (X_i - \bar{X})(Y_i - \bar{Y})}{\sum_i (X_i - \bar{X})^2} = \frac{s_{XY}}{s_X^2}=\frac{COV(X,Y)}{Var(X)}$$`
 
 The OLS estimator of `\(\beta_0\)` is 
 `$$\hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X}$$`
@@ -273,6 +277,7 @@ Since we don't observe `\(u_1,\dots, u_n\)` we need to estimate this standard de
 We use `\(\hat{u}_1,\dots, \hat{u}_n\)` to calculate our estimate
 
 `$$SER = s_{\hat{u}}$$` where `$$s_{\hat{u}}^2 = \frac{1}{n-2}\sum_i \hat{u}_i^2 = \frac{SSR}{n-2}$$`
+Notice the `\(n-2\)` in the denominator? Since we estimated two parameters `\(\beta_0\)` and `\(\beta_1\)`, we lost two degrees of freedom.
 ---
 ## Measure of Fit of Test Score on STR Regression
 
@@ -296,34 +301,52 @@ Let's Run a Regression
 
 ```r
 library(knitr)
-library(stargazer)
+library(modelsummary)
 regress.results=lm(formula = testscr ~ str, data=CASchools)
 ```
 ---
 ## Regression in R 
-&lt;small&gt;
+
 
 ```r
-stargazer(regress.results, type = "html", dep.var.labels.include = FALSE, column.labels = "Test Score", covariate.labels = "Student-Teacher Ratio", fontsize = "small", style = "qje", single.row = TRUE)
+modelsummary(regress.results, coef_rename = c("str"="Student-Teacher Ratio"), gof_map = c("nobs", "r.squared"))
 ```
 
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Test Score&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Student-Teacher Ratio&lt;/td&gt;&lt;td&gt;-2.280&lt;sup&gt;***&lt;/sup&gt; (0.480)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;698.933&lt;sup&gt;***&lt;/sup&gt; (9.467)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;420&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.051&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.049&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;18.581 (df = 418)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;22.575&lt;sup&gt;***&lt;/sup&gt; (df = 1; 418)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  (1) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 698.933 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (9.467) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Student-Teacher Ratio &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −2.280 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1px"&gt; (0.480) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 420 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.051 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;small&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/small&gt;
 ---
 ## The Least Squares Assumptions
 
@@ -360,8 +383,9 @@ stargazer(regress.results, type = "html", dep.var.labels.include = FALSE, column
 For all `\(i\)`, `\((X_i, Y_i)\)` are i.i.d.
 
 - Since all observation pairs `\((X_i, Y_i)\)` are picked from the same population, then they are identically distributed.
-- Since all observations are randomly picked, then they should be independent.
+- Since all observations are randomly picked, then each observation should be independent.
 - The majority of data we will encounter will be i.i.d., except for data collected from the same entity over time (panel data, time series data)
+- Randomization over the __whole__ distribution also eliminates sample selection issues.
 ---
 ## Assumption A.3: Large Outliers are Unlikely
 
@@ -1318,7 +1342,7 @@ A simple linear regression of Avg. Hourly Earnings on Gender will give us a quic
 .pull-right[
 &lt;small&gt;
 
-|            | Model 1 |
+|            |   (1)   |
 |:-----------|:-------:|
 |(Intercept) | 20.086  |
 |            | (0.054) |
@@ -1457,29 +1481,36 @@ However, there are some variables we use often that are always positive
 * income
 * wages 
 
-One method used to insure that we have a positive depedent variable is to transform the dependent variable by taking the natural log. 
+One method used to insure that we have a positive dependent variable is to transform the dependent variable by taking the natural log. 
+---
+## Log Transformation
+
+Since wage is always positive perhaps we should consider log wages instead.
+
+![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
 
 ---
 ## Log Transformation
 &lt;small&gt;
 
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;earnings&lt;/td&gt;&lt;td&gt;log(earnings)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.983&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.062&lt;sup&gt;c&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;MidWest&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;-0.001&lt;sup&gt;c&lt;/sup&gt; (0.00002)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;South&lt;/td&gt;&lt;td&gt;1.706&lt;sup&gt;c&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;1.701&lt;sup&gt;c&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;0.084&lt;sup&gt;c&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;West&lt;/td&gt;&lt;td&gt;-4.847&lt;sup&gt;c&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;td&gt;-4.797&lt;sup&gt;c&lt;/sup&gt; (0.404)&lt;/td&gt;&lt;td&gt;-0.507&lt;sup&gt;c&lt;/sup&gt; (0.022)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education*Female&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.257&lt;sup&gt;c&lt;/sup&gt; (0.105)&lt;/td&gt;&lt;td&gt;-0.056&lt;sup&gt;c&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.217&lt;sup&gt;c&lt;/sup&gt; (0.101)&lt;/td&gt;&lt;td&gt;-0.073&lt;sup&gt;c&lt;/sup&gt; (0.005)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age Squared&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.425&lt;sup&gt;c&lt;/sup&gt; (0.106)&lt;/td&gt;&lt;td&gt;-0.027&lt;sup&gt;c&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;0.044 (0.029)&lt;/td&gt;&lt;td&gt;0.042 (0.029)&lt;/td&gt;&lt;td&gt;0.020&lt;sup&gt;c&lt;/sup&gt; (0.002)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-25.529&lt;sup&gt;c&lt;/sup&gt; (0.544)&lt;/td&gt;&lt;td&gt;-24.603&lt;sup&gt;c&lt;/sup&gt; (0.550)&lt;/td&gt;&lt;td&gt;0.375&lt;sup&gt;c&lt;/sup&gt; (0.030)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;log(earnings)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;0.062&lt;sup&gt;***&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Age Sq&lt;/td&gt;&lt;td&gt;-0.001&lt;sup&gt;***&lt;/sup&gt; (0.00002)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;0.084&lt;sup&gt;***&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-0.507&lt;sup&gt;***&lt;/sup&gt; (0.022)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Midwest&lt;/td&gt;&lt;td&gt;-0.056&lt;sup&gt;***&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;South&lt;/td&gt;&lt;td&gt;-0.073&lt;sup&gt;***&lt;/sup&gt; (0.005)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;West&lt;/td&gt;&lt;td&gt;-0.027&lt;sup&gt;***&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Female x Education&lt;/td&gt;&lt;td&gt;0.020&lt;sup&gt;***&lt;/sup&gt; (0.002)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;0.375&lt;sup&gt;***&lt;/sup&gt; (0.030)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;0.474 (df = 61386)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;2,812.963&lt;sup&gt;***&lt;/sup&gt; (df = 8; 61386)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/small&gt;
 ---
@@ -1601,7 +1632,7 @@ Quickly, eye ball the data. What is unusual about this demand function?
 
 ---
 ## Graph
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
 ---
 ### Panel Data
 You observe multiple cities for 2 years each.
@@ -1683,7 +1714,7 @@ Thus, we have eliminated the key source of omitted variable bias, namely, unobse
 
 ---
 ### Graph without adjusting for fixed effects
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
 
 ---
 ### Graph with adjusting for fixed effects
@@ -1695,7 +1726,7 @@ library(tidyverse)
 data1 %&gt;% ggplot(aes(x=difquantity, y=difprice))+geom_point()+geom_smooth(method = "lm", formula = y~x)
 ```
 
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
 
 ---
 ### Graph with adjusting for fixed effects

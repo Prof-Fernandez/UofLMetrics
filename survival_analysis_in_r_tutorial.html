@@ -4,7 +4,7 @@
     <title>Survival Analysis</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.20/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2022-06-17)
+### 2020-7-4 (updated: 2023-01-31)
 ]
 
 ---
@@ -534,7 +534,7 @@ So we would say that a person with AB blood type has 1.21 times increased hazard
 
 ```r
 # First let's import the data 
-q = read.csv('https://3jd8gl2iires146kaw2hgqy9-wpengine.netdna-ssl.com/wp-content/uploads/2018/01/turnover.csv', header = TRUE, sep = ",", na.strings = c("",NA))
+q = read.csv('https://www.aihr.com/wp-content/uploads/2018/01/turnover.csv', header = TRUE, sep = ",", na.strings = c("",NA))
 ```
 
 Our case uses data of 1785 employees.
@@ -552,6 +552,37 @@ Our case uses data of 1785 employees.
 `\(pipeline\)` - source of recruitment
 
 Please note that the data is already prepared for survival analysis. Moreover, length of employment is counted in months up to two decimal places, according to the following formula: (date fire - date hire) / (365.25 / 12).
+---
+## Survival Plot
+
+
+```r
+w = coxph(Surv(exp, event) ~ 1 , data = q)
+quantile(survfit(w), conf.int = FALSE)
+
+par(bg="grey")
+
+plot(survfit(w), xlim = c(0, 12) , ylim = c(0.0, 1), col = c("red"), lwd = 3, xaxt='n', yaxt='n')
+
+axis(side=1, at=seq(0, 12, 1), cex.axis=1.8)
+
+axis(side=2, at=seq(0.0 , 1.0, 0.1), las=2, cex.axis=1.8)
+
+abline(v=(seq(0, 12, 1)), col="black", lty="dotted")
+
+abline(h=(seq(0.0, 1, 0.1)), col="black", lty="dotted")
+```
+
+---
+## Survival Plot
+
+
+```
+##   25   50   75 
+## 1.61 3.52 9.12
+```
+
+![](survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -561,14 +592,14 @@ Please note that the data is already prepared for survival analysis. Moreover, l
 &lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;exp&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfirst&lt;/td&gt;&lt;td&gt;-0.089 (0.164)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfourth&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;c&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchsecond&lt;/td&gt;&lt;td&gt;-0.424&lt;sup&gt;c&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchthird&lt;/td&gt;&lt;td&gt;-0.466&lt;sup&gt;b&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineea&lt;/td&gt;&lt;td&gt;-0.214 (0.267)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinejs&lt;/td&gt;&lt;td&gt;0.503&lt;sup&gt;b&lt;/sup&gt; (0.201)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineref&lt;/td&gt;&lt;td&gt;0.322 (0.214)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinesm&lt;/td&gt;&lt;td&gt;0.361 (0.258)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;First Branch&lt;/td&gt;&lt;td&gt;-0.089 (0.164)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Fourth Branch&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;c&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Second Branch&lt;/td&gt;&lt;td&gt;-0.424&lt;sup&gt;c&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Third Branch&lt;/td&gt;&lt;td&gt;-0.466&lt;sup&gt;b&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Employment Agency&lt;/td&gt;&lt;td&gt;-0.214 (0.267)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Job Sites&lt;/td&gt;&lt;td&gt;0.503&lt;sup&gt;b&lt;/sup&gt; (0.201)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Referals&lt;/td&gt;&lt;td&gt;0.322 (0.214)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Social Media&lt;/td&gt;&lt;td&gt;0.361 (0.258)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.037&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Max. Possible R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.000&lt;/td&gt;&lt;/tr&gt;
@@ -581,9 +612,35 @@ Please note that the data is already prepared for survival analysis. Moreover, l
 &lt;/tiny&gt;
 
 ---
-##Accelerated failure-time models
+## Vizualizing 
 
-###survreg(formula, dist='weibull')
+
+```r
+w = coxph(Surv(exp, event) ~  pipeline , data = q)
+
+plot(survfit(w, newdata=data.frame(pipeline = c('cs', 'ea','js','ref', 'sm'))) , xlim = c(0, 12) , ylim = c(0.0, 1),conf.int = FALSE, col = c("red", "blue", "yellow", "green", "grey1"), lwd = 4, xaxt='n', yaxt='n')
+
+axis(side=1, at=seq(0, 12, 1), cex.axis=1.5)
+
+axis(side=2, at=seq(0.0 , 1.0, 0.1), las=2, cex.axis=1.5)
+
+abline(v=(seq(0, 12, 1)), col="black", lty="dotted")
+
+abline(h=(seq(0.0, 1, 0.1)), col="black", lty="dotted")
+
+legend("bottomleft", legend=c('cs', 'ea','js','ref', 'sm'), col = c("red", "blue", "yellow", "green", "grey1"), cex = 1.5, lty = 1, pch = "",
+
+lwd = 4, x.intersp = 0.1, y.intersp = 0.3, text.width = 1, box.lwd = 0)
+```
+---
+## Vizualizing 
+
+![](survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+---
+## Accelerated failure-time models
+
+### survreg(formula, dist='weibull')
 
 An accelerated failure-time (AFT) model is a parametric model with covariates and failure times following the survival function of the form `\(S(x|Z) = S_0 (x exp[\theta Z])\)`, where `\(S_0\)` is a function for the baseline survival rate. The term `\(exp[\theta Z]\)` is called the acceleration factor. 
 
@@ -625,31 +682,29 @@ The _survial_ package allows us to estimate all of these models. We will use the
 ```r
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE, star.char = c("a","b","c"))
+stargazer::stargazer(w2,w3,type = "html", single.row = TRUE, star.char = c("a","b","c"), font.size = "tiny", covariate.labels = c("First Branch","Fourth Branch","Second Branch","Third Branch","Employment Agency","Job Sites","Referals","Social Media"))
 ```
 
 ---
 ## Weibul Model in R
 &lt;small&gt;
 
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;exp&lt;/td&gt;&lt;/tr&gt;
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Weibull&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;exponential&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfirst&lt;/td&gt;&lt;td&gt;0.142 (0.147)&lt;/td&gt;&lt;td&gt;0.119 (0.164)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfourth&lt;/td&gt;&lt;td&gt;0.494&lt;sup&gt;***&lt;/sup&gt; (0.157)&lt;/td&gt;&lt;td&gt;0.524&lt;sup&gt;***&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchsecond&lt;/td&gt;&lt;td&gt;0.433&lt;sup&gt;***&lt;/sup&gt; (0.146)&lt;/td&gt;&lt;td&gt;0.441&lt;sup&gt;***&lt;/sup&gt; (0.163)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchthird&lt;/td&gt;&lt;td&gt;0.434&lt;sup&gt;**&lt;/sup&gt; (0.189)&lt;/td&gt;&lt;td&gt;0.469&lt;sup&gt;**&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineea&lt;/td&gt;&lt;td&gt;0.228 (0.239)&lt;/td&gt;&lt;td&gt;0.239 (0.267)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinejs&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;***&lt;/sup&gt; (0.180)&lt;/td&gt;&lt;td&gt;-0.537&lt;sup&gt;***&lt;/sup&gt; (0.200)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineref&lt;/td&gt;&lt;td&gt;-0.383&lt;sup&gt;**&lt;/sup&gt; (0.192)&lt;/td&gt;&lt;td&gt;-0.372&lt;sup&gt;*&lt;/sup&gt; (0.213)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinesm&lt;/td&gt;&lt;td&gt;-0.376 (0.232)&lt;/td&gt;&lt;td&gt;-0.386 (0.258)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;1.831&lt;sup&gt;***&lt;/sup&gt; (0.220)&lt;/td&gt;&lt;td&gt;1.860&lt;sup&gt;***&lt;/sup&gt; (0.245)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;First Branch&lt;/td&gt;&lt;td&gt;0.142 (0.147)&lt;/td&gt;&lt;td&gt;0.119 (0.164)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Fourth Branch&lt;/td&gt;&lt;td&gt;0.494&lt;sup&gt;c&lt;/sup&gt; (0.157)&lt;/td&gt;&lt;td&gt;0.524&lt;sup&gt;c&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Second Branch&lt;/td&gt;&lt;td&gt;0.433&lt;sup&gt;c&lt;/sup&gt; (0.146)&lt;/td&gt;&lt;td&gt;0.441&lt;sup&gt;c&lt;/sup&gt; (0.163)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Third Branch&lt;/td&gt;&lt;td&gt;0.434&lt;sup&gt;b&lt;/sup&gt; (0.189)&lt;/td&gt;&lt;td&gt;0.469&lt;sup&gt;b&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Employment Agency&lt;/td&gt;&lt;td&gt;0.228 (0.239)&lt;/td&gt;&lt;td&gt;0.239 (0.267)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Job Sites&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;c&lt;/sup&gt; (0.180)&lt;/td&gt;&lt;td&gt;-0.537&lt;sup&gt;c&lt;/sup&gt; (0.200)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Referals&lt;/td&gt;&lt;td&gt;-0.383&lt;sup&gt;b&lt;/sup&gt; (0.192)&lt;/td&gt;&lt;td&gt;-0.372&lt;sup&gt;a&lt;/sup&gt; (0.213)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Social Media&lt;/td&gt;&lt;td&gt;-0.376 (0.232)&lt;/td&gt;&lt;td&gt;-0.386 (0.258)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;1.831&lt;sup&gt;c&lt;/sup&gt; (0.220)&lt;/td&gt;&lt;td&gt;1.860&lt;sup&gt;c&lt;/sup&gt; (0.245)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-2,712.426&lt;/td&gt;&lt;td&gt;-2,721.241&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;chi&lt;sup&gt;2&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;td&gt;74.713&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;69.134&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;chi&lt;sup&gt;2&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;td&gt;74.713&lt;sup&gt;c&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;69.134&lt;sup&gt;c&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/small&gt;
 ---
@@ -688,7 +743,7 @@ Although there is little difference in the parameter estimates, the likelihood r
 
 ---
 ## This is only the beginning
-![](survivalgif1.png)
+![](survivalgif1.png){height=20%}
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

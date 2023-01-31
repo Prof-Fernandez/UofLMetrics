@@ -40,14 +40,32 @@ $$a\sum^n_{i=1} x_i=ax_1+ax_2+ax_3+...ax_n$$
 A place you will see this a lot is with the mean. In this case, the mean essentially sums up all of the values and multiplies it by 1/n. **WHY?**
 $$\frac{1}{n}\sum^n_{i=1} x_i=\frac{x_1}{n}+\frac{x_2}{n}+\frac{x_3}{n}+...\frac{x_n}{n}$$
 ---
+## Multiplying a summation
+
+We can think of 1/n as the constant. 
+
+If we had the three values 1, 2, 3 and we wanted to know the mean
+$$\frac{1}{3}+\frac{2}{3}+\frac{3}{3}=\frac{6}{3}=2$$
+
+---
 ## Weighted Average
-We can also multiply our $x_i$'s with other items that vary.
+We can also multiply our $x_i$'s with other items that vary by x.
 
 Two examples:
 - a weighted average is $$\sum^n_{i=1}Pr(x_i) x_i=Pr(x_1)x_1+Pr(x_2)x_2+Pr(x_3)x_3+...Pr(x_n)x_n$$ where $Pr(x_i)$ is the probability that $x_i$ will be observed.
   +   The probabilities must sum to 1, $\sum_{i=1}^n Pr(x_i)=1$
   +   The previous mean we discuss is a special case of the weighted average where all of the $Pr(x_i)=\frac{1}{n}$.
 - a covariance has two variables using the same index. $$\frac{1}{n}\sum^n_{i=1}(y_i-\mu_y)(x_i-\mu_x)$$
+
+---
+## Examples of Weighted Average
+The mean $$\bar{x}=\frac{1}{n}\sum^{n}_{i=1} x_i$$
+is a special case of a weight average. In this case, the Pr(x)=1/n for all values of x.
+
+Another example of a weighted average is your grade average.
+Remember that 60 percent of your grade is the in class assignments and 40 percent are your quiz scores. 
+
+$$\begin{align} Grade &= Pr(Quiz)*\text{AVG QUIZ} + Pr(HW)*\text{AVG HW} \\ &= 0.4*\text{AVG QUIZ} + 0.6*\text{AVG HW}\end{align}$$
 
 ---
 ## The Expected Value operator, E[]
@@ -256,3 +274,19 @@ u_2\\
 ...\\ 
 u_n
 \end{bmatrix} \\ \\Y=X\beta+u$$
+
+---
+## Multiple Regression in matrix form
+
+We can actually solve for the $\beta$'s using matrix notation.
+
+There are two key assumptions about the regression error.
+1. The mean of the error is zero.
+2. The X's are independent of the error.
+
+These two assumptions imply $$X'u = 0$$
+
+So let's use this fact to solve for $\beta$.
+Pre-multiply everything in the regression equation by $X'$.
+
+$$\begin{align} X'Y &= X'X\beta+X'u \\ &= X'X\beta \\ (X'X)^{-1}X'Y &= (X'X)^{-1}X'X\beta \\ (X'X)^{-1}X'Y &= \beta \end{align}$$

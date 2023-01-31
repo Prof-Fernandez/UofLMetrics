@@ -467,7 +467,7 @@ So we would say that a person with AB blood type has 1.21 times increased hazard
 
 ```{r}
 # First let's import the data 
-q = read.csv('https://3jd8gl2iires146kaw2hgqy9-wpengine.netdna-ssl.com/wp-content/uploads/2018/01/turnover.csv', header = TRUE, sep = ",", na.strings = c("",NA))
+q = read.csv('https://www.aihr.com/wp-content/uploads/2018/01/turnover.csv', header = TRUE, sep = ",", na.strings = c("",NA))
 ```
 
 Our case uses data of 1785 employees.
@@ -485,6 +485,45 @@ $branch$ - branch
 $pipeline$ - source of recruitment
 
 Please note that the data is already prepared for survival analysis. Moreover, length of employment is counted in months up to two decimal places, according to the following formula: (date fire - date hire) / (365.25 / 12).
+---
+## Survival Plot
+
+```{r echo=TRUE, eval=FALSE}
+w = coxph(Surv(exp, event) ~ 1 , data = q)
+quantile(survfit(w), conf.int = FALSE)
+
+par(bg="grey")
+
+plot(survfit(w), xlim = c(0, 12) , ylim = c(0.0, 1), col = c("red"), lwd = 3, xaxt='n', yaxt='n')
+
+axis(side=1, at=seq(0, 12, 1), cex.axis=1.8)
+
+axis(side=2, at=seq(0.0 , 1.0, 0.1), las=2, cex.axis=1.8)
+
+abline(v=(seq(0, 12, 1)), col="black", lty="dotted")
+
+abline(h=(seq(0.0, 1, 0.1)), col="black", lty="dotted")
+```
+
+---
+## Survival Plot
+
+```{r echo=FALSE, eval=TRUE}
+w = coxph(Surv(exp, event) ~ 1 , data = q)
+quantile(survfit(w), conf.int = FALSE)
+
+par(bg="grey")
+
+plot(survfit(w), xlim = c(0, 12) , ylim = c(0.0, 1), col = c("red"), lwd = 3, xaxt='n', yaxt='n')
+
+axis(side=1, at=seq(0, 12, 1), cex.axis=1.8)
+
+axis(side=2, at=seq(0.0 , 1.0, 0.1), las=2, cex.axis=1.8)
+
+abline(v=(seq(0, 12, 1)), col="black", lty="dotted")
+
+abline(h=(seq(0.0, 1, 0.1)), col="black", lty="dotted")
+```
 
 ---
 
@@ -493,14 +532,55 @@ Please note that the data is already prepared for survival analysis. Moreover, l
 ```{r results='asis', echo=FALSE}
 w = coxph(Surv(exp, event) ~ 1 , data = q)
 w1 = coxph(Surv(exp, event) ~ . , data = q)
-stargazer::stargazer(w1, type = "html", single.row = TRUE, star.char = c("a","b","c"), font.size = "tiny")
+stargazer::stargazer(w1, type = "html", single.row = TRUE, star.char = c("a","b","c"), font.size = "tiny", covariate.labels = c("First Branch","Fourth Branch","Second Branch","Third Branch","Employment Agency","Job Sites","Referals","Social Media"))
 ```
 </tiny>
 
 ---
-##Accelerated failure-time models
+## Vizualizing 
 
-###survreg(formula, dist='weibull')
+```{r echo=TRUE, eval=FALSE}
+w = coxph(Surv(exp, event) ~  pipeline , data = q)
+
+plot(survfit(w, newdata=data.frame(pipeline = c('cs', 'ea','js','ref', 'sm'))) , xlim = c(0, 12) , ylim = c(0.0, 1),conf.int = FALSE, col = c("red", "blue", "yellow", "green", "grey1"), lwd = 4, xaxt='n', yaxt='n')
+
+axis(side=1, at=seq(0, 12, 1), cex.axis=1.5)
+
+axis(side=2, at=seq(0.0 , 1.0, 0.1), las=2, cex.axis=1.5)
+
+abline(v=(seq(0, 12, 1)), col="black", lty="dotted")
+
+abline(h=(seq(0.0, 1, 0.1)), col="black", lty="dotted")
+
+legend("bottomleft", legend=c('cs', 'ea','js','ref', 'sm'), col = c("red", "blue", "yellow", "green", "grey1"), cex = 1.5, lty = 1, pch = "",
+
+lwd = 4, x.intersp = 0.1, y.intersp = 0.3, text.width = 1, box.lwd = 0)
+```
+---
+## Vizualizing 
+
+```{r echo=FALSE, eval=TRUE}
+w = coxph(Surv(exp, event) ~  pipeline , data = q)
+
+plot(survfit(w, newdata=data.frame(pipeline = c('cs', 'ea','js','ref', 'sm'))) , xlim = c(0, 12) , ylim = c(0.0, 1),conf.int = FALSE, col = c("red", "blue", "yellow", "green", "grey1"), lwd = 4, xaxt='n', yaxt='n')
+
+axis(side=1, at=seq(0, 12, 1), cex.axis=1.5)
+
+axis(side=2, at=seq(0.0 , 1.0, 0.1), las=2, cex.axis=1.5)
+
+abline(v=(seq(0, 12, 1)), col="black", lty="dotted")
+
+abline(h=(seq(0.0, 1, 0.1)), col="black", lty="dotted")
+
+legend("bottomleft", legend=c('cs', 'ea','js','ref', 'sm'), col = c("red", "blue", "yellow", "green", "grey1"), cex = 1.5, lty = 1, pch = "",
+
+lwd = 4, x.intersp = 0.1, y.intersp = 0.3, text.width = 1, box.lwd = 0)
+```
+
+---
+## Accelerated failure-time models
+
+### survreg(formula, dist='weibull')
 
 An accelerated failure-time (AFT) model is a parametric model with covariates and failure times following the survival function of the form $S(x|Z) = S_0 (x exp[\theta Z])$, where $S_0$ is a function for the baseline survival rate. The term $exp[\theta Z]$ is called the acceleration factor. 
 
@@ -538,10 +618,10 @@ If $\rho < 1$, then the risk decreases over time.
 
 ## Weibul Model in R
 The _survial_ package allows us to estimate all of these models. We will use the same model with a small change to estimate a Weibul AFT model.
-```{r message=FALSE, warning=FALSE, eval=FALSE}
+```{r message=FALSE, warning=FALSE, eval=FALSE, results='asis'}
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE, star.char = c("a","b","c"))
+stargazer::stargazer(w2,w3,type = "html", single.row = TRUE, star.char = c("a","b","c"), font.size = "tiny", covariate.labels = c("First Branch","Fourth Branch","Second Branch","Third Branch","Employment Agency","Job Sites","Referals","Social Media"))
 ```
 
 ---
@@ -550,7 +630,7 @@ stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE, star.cha
 ```{r message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="html",style = "qje",single.row = TRUE)
+stargazer::stargazer(w2,w3,type = "html", single.row = TRUE, star.char = c("a","b","c"), font.size = "tiny", covariate.labels = c("First Branch","Fourth Branch","Second Branch","Third Branch","Employment Agency","Job Sites","Referals","Social Media"),dep.var.labels.include = FALSE,model.numbers = FALSE)
 ```
 </small>
 ---
@@ -576,4 +656,4 @@ Although there is little difference in the parameter estimates, the likelihood r
 
 ---
 ## This is only the beginning
-![](survivalgif1.png)
+![](survivalgif1.png){height=20%}

@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.20/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -14,11 +14,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Limited Dependent Variables
+]
+.subtitle[
 ## Multinomial Logit
+]
+.author[
 ### Jose M. Fernandez
+]
+.institute[
 ### University of Louisville
-### 2020-7-4 (updated: 2021-02-09)
+]
+.date[
+### 2020-7-4 (updated: 2023-01-31)
+]
 
 ---
 
@@ -235,6 +245,34 @@ You can never estimate `\(\beta_2\)` in this case.
 &amp;=\frac{exp(\beta_1 X_{ij})exp(\beta_2 Z_i)}{exp(\beta_2 Z_i) \sum_{k=1}^{K}exp(\beta_1 X_{ik}) } \\ \\ 
 &amp;=\frac{exp(\beta_1 X_{ij})}{ \sum_{k=1}^{K}exp(\beta_1 X_{ik}) }\end{align*}$$`
 ---
+## Conditional Logit example
+Let's look at the market for yogurt and the effects of advertising on sales. We have a dataset of individual customers, we know what yogurts they bought and what advertisements they have seen.
+
+```r
+library(Ecdat)
+library(mlogit)
+data(Yogurt)
+YT &lt;- mlogit.data(Yogurt,choice = "choice", shape = "wide",varying = c(2:9))
+m1&lt;-mlogit(choice ~ feat+price,data = YT)
+```
+---
+## Conditional logit example
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;choice&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;(Intercept):hiland&lt;/td&gt;&lt;td&gt;-3.716&lt;sup&gt;***&lt;/sup&gt; (0.145)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;(Intercept):weight&lt;/td&gt;&lt;td&gt;-0.641&lt;sup&gt;***&lt;/sup&gt; (0.054)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;(Intercept):yoplait&lt;/td&gt;&lt;td&gt;0.735&lt;sup&gt;***&lt;/sup&gt; (0.081)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;feat&lt;/td&gt;&lt;td&gt;0.491&lt;sup&gt;***&lt;/sup&gt; (0.120)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;price&lt;/td&gt;&lt;td&gt;-0.367&lt;sup&gt;***&lt;/sup&gt; (0.024)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;2,412&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.062&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-2,656.888&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;LR Test&lt;/td&gt;&lt;td&gt;352.089&lt;sup&gt;***&lt;/sup&gt; (df = 5)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+---
 ## Fixed Effect Logit
 
 The conditional logit model can effectively removes certain fixed effects. 
@@ -255,9 +293,7 @@ If you allow for random coefficients (unobserved heterogeneity also known as ran
 
 We will use the mlogit package in R
 
-
 ```r
-library(mlogit)
 data("Fishing", package = "mlogit")
 Fish &lt;- mlogit.data(Fishing, varying = c(2:9), shape = "wide", choice = "mode")
 ## a pure "conditional" model
@@ -351,6 +387,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
