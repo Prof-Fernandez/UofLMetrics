@@ -1553,3 +1553,15 @@ For example, say you have a panel data set with a bunch of different test scores
 You may want to cluster your sample by state, by school district, or even by town. 
 
 Economic theory and intuition will guide you in this decision.
+
+---
+## Fixest Method
+```{r results='asis'}
+library(fixest)
+library(pander)
+res <- feols(mrall ~ beertax, fatality.data, panel.id = "state")
+res1 <- feols(mrall ~ beertax| year, fatality.data, panel.id = "state")
+res2 <- feols(mrall ~ beertax| state+year, fatality.data, panel.id = "state")
+etable(res,res1,res2, vcov = "cluster",dict = c("beertax"="Beer Tax"), postprocess.df = pandoc.table.return, style = 'rmarkdown')
+```
+

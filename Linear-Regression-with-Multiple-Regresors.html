@@ -2112,6 +2112,36 @@ For example, say you have a panel data set with a bunch of different test scores
 You may want to cluster your sample by state, by school district, or even by town. 
 
 Economic theory and intuition will guide you in this decision.
+
+---
+## Fixest Method
+
+```r
+library(fixest)
+library(pander)
+res &lt;- feols(mrall ~ beertax, fatality.data, panel.id = "state")
+res1 &lt;- feols(mrall ~ beertax| year, fatality.data, panel.id = "state")
+res2 &lt;- feols(mrall ~ beertax| state+year, fatality.data, panel.id = "state")
+etable(res,res1,res2, vcov = "cluster",dict = c("beertax"="Beer Tax"), postprocess.df = pandoc.table.return, style = 'rmarkdown')
+```
+
+
+
+|     &amp;nbsp;      |        res        |       res1        |       res2        |
+|:---------------:|:-----------------:|:-----------------:|:-----------------:|
+| Dependent Var.: |       mrall       |       mrall       |       mrall       |
+|                 |                   |                   |                   |
+|    Constant     | 1.853*** (0.1185) |                   |                   |
+|    Beer Tax     | 0.3646** (0.1197) | 0.3663** (0.1214) | -0.6400. (0.3571) |
+| Fixed-Effects:  | ----------------- | ----------------- | ----------------- |
+|      year       |        No         |        Yes        |        Yes        |
+|      state      |        No         |        No         |        Yes        |
+| _______________ | _________________ | _________________ | _________________ |
+| S.E.: Clustered |     by: state     |     by: state     |     by: state     |
+|  Observations   |        336        |        336        |        336        |
+|       R2        |      0.09336      |      0.09865      |      0.90893      |
+|    Within R2    |        --         |      0.09454      |      0.03606      |
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
