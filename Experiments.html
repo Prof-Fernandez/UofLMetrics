@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020/6/29 (updated: 2023-01-31)
+### 2020/6/29 (updated: 2023-02-27)
 ]
 
 ---
@@ -112,7 +112,7 @@ Potentially confusing examples:
 
 ## Examples
 
-&lt;img src="sociology.png" width="2773" style="display: block; margin: auto;" /&gt;&lt;img src="kymarriage.png" width="2773" style="display: block; margin: auto;" /&gt;
+&lt;img src="sociology.png" style="display: block; margin: auto;" /&gt;&lt;img src="kymarriage.png" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -215,6 +215,11 @@ hence:
 - the selection effect is zeroed out and 
 - the treatment effect on the treated is equal to the ATE.
 
+`$$E[Y_{1i} - Y_{0i}|D_i = 1] = E[Y_{1i} - Y_{0i}|D_i = 0] = E[Y_{1i} - Y_{0i}]$$` This relationship now holds. So the naive comparison works! This holds true only for randomized control trials.
+
+---
+# Break for Perfect Doctor
+
 ---
 ## Types of randomized experiments
 A randomized experiment is designed and implemented consciously by social scientists. It entails conscious use of a treatment and control group with random assignment.
@@ -245,7 +250,7 @@ Experiments provide a very transparent and simple empirical strategy. They solve
       * Cost, political issues (policy makers need to acknowledge ignorance),...
   2. Ethical issues
       * Note that the ethical argument is not obvious when (i) the treatment cannot be applied to everybody (maybe due to some budget constraints) and (ii) the optimal assignment rule is unknown.
-  3. Hawthorne effect
+  3. [Hawthorne effect](https://youtu.be/o4XX90lqT6E)
       * The Illumination Experiment (Landsberger 1950, Levitt and List 2011)
       * Audit study in France (Behaghel et al. 2015)
 
