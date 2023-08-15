@@ -1,6 +1,6 @@
 ---
 title: "Linear Regression Review"
-subtitle: "MSBA Data Analytics III"
+subtitle: "Advanced Analytical Tools"
 author: "Jose M. Fernandez"
 institute: "University of Louisville"
 date: "2020-7-4 (updated: `r Sys.Date()`)"
@@ -297,6 +297,8 @@ $$E[u_i|X_i] = 0$$
 - Other factors unaccounted for in the regression are unrelated to the regressor $X_i$
 - While the dependent variable varies around the population regression line, on average the predicted value is correct
 
+__Two important take aways: (1) there error has a mean of zero and (2) the error and X's are independent.
+
 ---
 ## Assumption A.1 Plot
 ```{r echo=FALSE}
@@ -327,14 +329,18 @@ For all $i$, $(X_i, Y_i)$ are i.i.d.
 - Since all observation pairs $(X_i, Y_i)$ are picked from the same population, then they are identically distributed.
 - Since all observations are randomly picked, then they should be independent.
 - The majority of data we will encounter will be i.i.d., except for data collected from the same entity over time (panel data, time series data)
+
+__Main takeaway: there should be no sample selection bias. The random sample should be a good representation of the population.__
+
 ---
 ## Assumption A.3: Large Outliers are Unlikely
 
 $$0 < E[Y_i^4] < \infty$$
 
-- None of observed data should have extreme and "unexpected" values
+- None of the observed data should have extreme and "unexpected" values (larger than 3 standard deviations)
 - Technically, this means that the fourth moment should be positive and finite
-- You should look at your data (plot it) to see if any of the observations are suspicious, and then double check there was no error in the data
+- You should look at your data (plot it) to see if any of the observations are suspicious, and then double check there was no error in the data.
+
 ---
 ## Assumption A.3 Plot
 
@@ -342,7 +348,7 @@ $$0 < E[Y_i^4] < \infty$$
 ---
 ### Sometimes the relationship is not Linear
 
-![](quartet.png)
+![These are all the same simiple linear regresion line.](quartet.png)
 ---
 class: inverse, middle, center
 # Sampling Distribution of the OLS Estimators
@@ -439,7 +445,7 @@ $$wages_{i}=\beta_0+\beta_1Education_{i}+\beta_2Experience_{i}+\beta_3Experience
 ---
 ## Multiple Regression: Equation (3)
 
-The relative increase in wages for an additional year of experience is given by the first partial derivative
+The relative increase in wages for an additional year of experience is given by the first partial derrivative
 
 $$\frac{\partial wages_i}{\partial Experience}=\beta_2+2\beta_3 *Experience$$
 
@@ -567,7 +573,7 @@ In a multiple regression model, we allow for more than one regressor.
 
 This allows us to isolate the effect of a particular variable holding all others constant.
 
-In other words, we can minimize the OVB by including variables in the regression equation that are important and potentially correlated with other regressors.
+In otherwords, we can minimize the OVB by including variables in the regression equation that are important and potentially correlated with other regressors.
 
 ---
 Look at what happens when we break down scores by Pct. English and Student-Teacher Ratio
@@ -799,7 +805,7 @@ Instead of adjusting for the two degrees of freedom used to estimate two coeffic
 
 $$ R^2 = \frac{EES}{TSS} = 1 - \frac{SSR}{TSS} $$
 
-* Since OLS estimation is a minimization of $SSR$ problem, every time a new regressor is added to a regression, the $R^2$ would be non-decreasing.
+* Since OLS estimation is a minimization of $SSR$ problem, every time a new regressor is added to a regression, the $R^2$ would be nondecreasing.
 * This does not correctly evaluate the explanatory power of adding regressors-it tends to inflate it
 
 ---
@@ -1069,14 +1075,14 @@ However, there are some variables we use often that are always positive
 * income
 * wages 
 
-One method used to insure that we have a positive dependent variable is to transform the dependent variable by taking the natural log. 
+One method used to insure that we have a positive depedent variable is to transform the dependent variable by taking the natural log. 
 
 ---
 ## Log Transformation
 <small>
 ```{r results='asis', echo=FALSE}
 m6 = lm(log(earnings) ~ age+age2+education+education*factor(gender)+factor(region), data=CPSSW8)
-stargazer(m4,m5,m6,type="html", covariate.labels = c("Age", "Age Squared","Education","Female","Midwest","West","South","Education*Female"),omit.stat = c("f","ser"), style = "qje", single.row=TRUE, star.char = c("a","b","c"))
+stargazer(m4,m5,m6,type="html", covariate.labels = c("Female", "MidWest","South","West","Education*Female","Age","Age Squared","Education"),omit.stat = c("f","ser"), style = "qje", single.row=TRUE, star.char = c("a","b","c"))
 ```
 </small>
 ---
@@ -1518,7 +1524,7 @@ pbgtest(regress.results.fe.time)
 ---
 ## Robust Standard Errors
 
-We will use two types of robust standard errors to deal with the problem of heteroskedasticity.
+We will use two types of robust standard erros to deal with the problem of heteroskedasticity.
 
 - General Robust Standard errors
 - Clustered Robust Standard Errors
@@ -1528,7 +1534,7 @@ We will use two types of robust standard errors to deal with the problem of hete
 
 In regression and time-series modelling, basic forms of models make use of the assumption that the errors or disturbances $u_i$ have the same variance across all observation points. 
 
-When this is not the case, the errors are said to be heteroscedastic, or to have heteroscedasticity, and this behavior will be reflected in the residuals $u_i$  estimated from a fitted model. 
+When this is not the case, the errors are said to be heteroscedastic, or to have heteroscedasticity, and this behaviour will be reflected in the residuals $u_i$  estimated from a fitted model. 
 
 Heteroscedasticity-consistent standard errors are used to allow the fitting of a model that does contain heteroscedastic residuals. 
 
@@ -1553,15 +1559,3 @@ For example, say you have a panel data set with a bunch of different test scores
 You may want to cluster your sample by state, by school district, or even by town. 
 
 Economic theory and intuition will guide you in this decision.
-
----
-## Fixest Method
-```{r results='asis'}
-library(fixest)
-library(pander)
-res <- feols(mrall ~ beertax, fatality.data, panel.id = "state")
-res1 <- feols(mrall ~ beertax| year, fatality.data, panel.id = "state")
-res2 <- feols(mrall ~ beertax| state+year, fatality.data, panel.id = "state")
-etable(res,res1,res2, vcov = "cluster",dict = c("beertax"="Beer Tax"), postprocess.df = pandoc.table.return, style = 'rmarkdown')
-```
-

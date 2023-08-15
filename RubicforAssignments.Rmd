@@ -3,8 +3,8 @@ title: "Grading Rubric for Assignments"
 author: "Jose Fernandez"
 date: '2022-06-23'
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 One person from the team will upload the R markdown file used to produce the responses. Either the TA or myself will replace the location of the data to where it is located on our local computer. We will then knit the R markdown file.
 
 Assignments will be graded on a four level scale.
+
 - 0 percentage points: The R markdown file does not run from beginning to end when the grader knits it. Be sure your file runs all the way through before submitting your work.
 - 80 percentage points: The R markdown file runs, but the response are mostly wrong and no effort was made to clean up tables.
 - 90 percentage points: The responses are mostly right and some effort has been made to clean up the tables.
