@@ -171,13 +171,11 @@ include_graphics("maxresdefault.jpg")
 The problem is we cannot observe you as both having and not having insurance.
 
 Solution is to look for the __AVERAGE TREATMENT EFFECT__ (ATE)!
-$$E[Y_{1i}] - E[Y_{0i}] \\ \text{Health w/ Ins} - \text{Health w/o Ins}$$
+$$E[Y_{1i}] - E[Y_{0i}]$$
 And a naive comparison of averages does not tell us what we want to
 know:
 $$E[Y_{1i}|D_{i} = 1] - E[Y_{0i}|D_{i} = 0]$$
 $$=\begin{array}{c}\underbrace{E[Y_{1i}|D_{i} = 1] - E[Y_{0i}|D_{i} = 1] }\\ ATE\end{array}+\begin{array}{c}\underbrace{E[Y_{0i}|D_{i} = 1] - E[Y_{0i}|D_{i} = 0] }\\ Sample \, Selection \, Bias\end{array}$$
-
-The Naive Comparison doesn't consider that people endogenously choose to have health insurance. Health Insurance is not randomly assigned so there could be a bias.
 
 ---
 ## Average Treatment effect on the Treated
@@ -186,7 +184,6 @@ Average treatment effect (ATE) and average treatment effect on the treated (ATT)
 
 They will be the same only if treatment is homogeneous across groups:
 $$E[Y_{1i} - Y_{0i}|D_i = 1] = E[Y_{1i} - Y_{0i}|D_i = 0] = E[Y_{1i} - Y_{0i}]$$
-In our example, what this means is that if we were to take someone randomly from the control group (i.e. no insurance) and give them insurance, then we would expect them to have the same benefit, on average, as those people in the treatment group.
 
 That is, the treatment is assigned randomly.
 
@@ -201,8 +198,6 @@ Solution : __Random assignment__
 include_graphics('rct1.png')
 ```
 
-We start with a single group of people and randomly assign them to two groups, treatment and control. 
-Random assignment insures that the two groups look a like initially (i.e. same average age, education, percent female). The only difference between the groups at the end of the experiment should be due to the treatment
 ---
 ## Random Assignment
 
@@ -210,11 +205,6 @@ Random assignment makes $D_i$ independent of potential outcomes,
 hence: 
 - the selection effect is zeroed out and 
 - the treatment effect on the treated is equal to the ATE.
-
-$$E[Y_{1i} - Y_{0i}|D_i = 1] = E[Y_{1i} - Y_{0i}|D_i = 0] = E[Y_{1i} - Y_{0i}]$$ This relationship now holds. So the naive comparison works! This holds true only for randomized control trials.
-
----
-# Break for Perfect Doctor
 
 ---
 ## Types of randomized experiments
@@ -246,7 +236,7 @@ Experiments provide a very transparent and simple empirical strategy. They solve
       * Cost, political issues (policy makers need to acknowledge ignorance),...
   2. Ethical issues
       * Note that the ethical argument is not obvious when (i) the treatment cannot be applied to everybody (maybe due to some budget constraints) and (ii) the optimal assignment rule is unknown.
-  3. [Hawthorne effect](https://youtu.be/o4XX90lqT6E)
+  3. Hawthorne effect
       * The Illumination Experiment (Landsberger 1950, Levitt and List 2011)
       * Audit study in France (Behaghel et al. 2015)
 

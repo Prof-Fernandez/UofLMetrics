@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.24/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2023-09-15)
+### 2020-7-4 (updated: 2022-06-07)
 ]
 
 ---
@@ -109,10 +109,10 @@ Log Likelihood Function `$$LL(\beta,\sigma)=\sum_{c&lt;y} \frac{1}{\sigma}\phi(\
 Let's assume your y variable is bottom coded at zero. This means we only observe Y if Y&gt;0.
 
 The unconditional expected value is of Y is
-`$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$`
+`$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
 If we condition on Y&gt;0, then the expected value simplifies to 
 
-`$$E[Y_i|Y_i&gt;0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$`
+`$$E[Y_i|Y_i&gt;0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$`
 The `\(\lambda\)` term is the Inverse Mills Ratio.
 
 ---

@@ -1,0 +1,448 @@
+---
+title: "Linear Regression"
+subtitle: "Introduction Mulitiple Regression"
+author: "Jose M. Fernandez"
+institute: "University of Louisville"
+date: "2020-7-4 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, uol, uol-fonts, "extra.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: middle, center, inverse
+# Multiple Regression
+
+---
+## Multiple Regression
+
+* In the previous chapters, we consider a simple model with only two parameters
+  + constant
+  + slope
+  
+* In this model, we used only one explanatory variable to predict the dependent variable.
+
+## What is Multiple Regression (1)
+Let's say we are interested in the effects of education on wages.
+In reality, there are many factors affecting wages
+
+- Education: Years of schooling, type of school, IQ
+- Experience: Previous Position, Previous Company, Previous Responsibilities
+- Occupation: Lawyer, Doctor, Engineer, Mathematician
+- Discrimination: Sex, Age, Race, Health, or Nationality
+- Location: New York City or Downtown Louisville
+
+How do we control for each of these factors?
+What pays more 2 years in graduate school or 2 years of work experience?
+
+## What is Multiple Regression (2)
+
+Multiple Regression allows us to answer these questions.
+
+1.  Identify the relative importance of each variable
+2.  Which variables matter in the prediction of wages and which do not
+3.  Identify the marginal effect of each variable on wages
+
+## Multiple Regression: Equation (1)
+  $$wages_{i}=\beta_0+\beta_1Education_{i}+\beta_2Experience_{i}+e_{i}$$
+
+
+* $\beta_2$ tells us the effect 1 additional year of schooling has on your wages, holding your level of Experience constant
+* $\beta_1$ tells us the effect 1 additional year of work experience has on your wages, holding your level of Education constant
+* $\beta_0$ tells us your level of wages if you had no schooling and no work experience. (You can think of this as minimum wage)
+    + Note, each variable is index by (i), this index represent a specific person in our data set.
+    + The observed levels of education, experience, and wages changes with each person.  The index give us a method to keep track of these changes.
+
+## Multiple Regression: Equation (2)
+
+Multiple Regression also helps you generalize the functional relationships between variables
+
+Although, wage increases with experience it may do so at a decreasing rate
+    Each additional year of experience increases your wage by less than the previous year.
+    Example: Wages
+
+$$wages_{i}=\beta_0+\beta_1Education_{i}+\beta_2Experience_{i}+\beta_3Experience^2_{i}+e_{i}$$
+
+## Multiple Regression: Equation (3)
+
+The relative increase in wages for an additional year of experience is given by the first partial derrivative
+
+$$\frac{\partial wages_i}{\partial Experience}=\beta_2+2\beta_3 *Experience$$
+
+If $\beta_2 <0$, then wages are increasing at a decreasing rate (and may eventually decrease altogether)
+
+# Omitted Variable Bias
+
+Omitted Factors in the Test Score Regression (1)
+--------------------------------------------------
+
+Recall that our regression model was
+
+\[ TestScore = \beta_0 + \beta_1 STR + u_i,~i=1,\dots,n \]
+
+* There are probably other factors that are characteristics of school districts that would influence test scores in addition to STR. For example
+    + teacher quality 
+    + computer usage 
+    + and other student characteristics such as family background     
+
+* By not including them in the regression, they are implicitly included in the error term $u_i$ 
+
+* This is typically not a problem, unless these omitted factors influence an included regressor
+
+## Omitted Factors in the Test Score Regression (2)
+
+* Consider the percentage of English learners in a school district as an omitted variable. Suppose that
+    + districts with more English learners do worse on test scores
+    + districts with more English learners tend to have larger classes
+```{r message=FALSE, warning=FALSE}
+CASchools$stratio <- with(CASchools, students/teachers)
+CASchools$score <- with(CASchools, (math + read)/2)
+cor(CASchools$english, CASchools$score)
+cor(CASchools$stratio, CASchools$english)
+```
+
+## Omitted Factors in the Test Score Regression (3)
+
+* Unobservable fluctuations in the percentage of English learners would influence test scores and the _student teacher ratio_ variable
+* The regression will then incorrectly report that STR is causing the change in test scores 
+* Thus we would have a biased estimator of the effect of STR on test scores
+
+## Omitted Variable Bias (1)
+> An OLS estimator will have omitted variable bias (OVB) if
+
+>    1. The omitted variable is correlated with an included regressor
+>
+>    2. The omitted variable is a determinant of the dependent variable
+
+What OLS assumption does OVB violate?
+
+
+## Omitted Variable Bias (2)
+
+What OLS assumption does OVB violate?
+
+It violates the OLS assumption A.1: $E[u_i|X_i] = 0$.
+
+As $u_i$ and $X_i$ are correlated due to $u_i$'s causal influence on $X_i$, $E[u_i|X_i] \neq 0$. This causes a bias in the estimator that does not vanish in very large samples.
+
+## Omitted Variable Bias - Math (1)
+
+Suppose the true model is given as
+$$y=\beta_0+\beta_1 x_1+\beta_2 x_2+u$$
+but we estimate $\widetilde{y}=\widetilde{\beta_0} + \widetilde{\beta_1} x_1 + u$, then
+$$ \widetilde{\beta}_1=\frac{\sum{(x_{i1}-\overline{x})y_i}}{\sum{(x_{i1}-\overline{x})^2}}$$
+
+## Omitted Variable Bias - Math (2)
+
+Recall the true model, $$y=\beta_0+\beta_1 x_1+\beta_2 x_2+u$$
+
+The numerator in our estimate for $\beta_1$ is $$\widetilde{\beta}_1=\frac{\sum{(x_{i1}-\overline{x})(\beta_0+\beta_1 x_{i1}+\beta_2 x_{i2}+u_i)}}{\sum{(x_{i1}-\overline{x})^2}} \\
+=\frac{\beta_1\sum{(x_{i1}-\overline{x})^2}+\beta_2\sum{(x_{i1}-\overline{x})x_{i2}}+\sum{(x_{i1}-\overline{x})u_i}}{\sum{(x_{i1}-\overline{x})^2}} \\ = \beta_1+\beta_2 \frac{\sum{(x_{i1}-\overline{x})x_{i2}}}{\sum{(x_{i1}-\overline{x})^2}}+\frac{\sum{(x_{i1}-\overline{x})u_i}}{\sum{(x_{i1}-\overline{x})^2}}$$
+
+## Omitted Variable Bias - Math (3)
+
+If the $E(u_i)=0$, then by taking expectations we find $$E(\widetilde{\beta}_1)=\beta_1+\beta_2 \frac{\sum{(x_{i1}-\overline{x})x_{i2}}}{\sum{(x_{i1}-\overline{x})^2}}$$
+
+From here we see clearly the two conditions need for an Omitted Variable Bias
+
+1. The omitted variable is correlated with an included regressor (i.e. $\sum{(x_{i1}-\overline{x})x_{i2}})\neq 0$)
+
+2. The omitted variable is a determinant of the dependent variable (i.e. $\beta_2\neq 0$)
+
+## Summary of the Direction of Bias
+
+Signs      | Corr($x_1$,$x_2$)>0 | Corr($x_1$,$x_2$)<0
+---------  | ------------------- | ------------------
+$\beta_2>0$| Positive Bias       | Negative Bias
+$\beta_2<0$| Negative Bias       | Positive Bias
+
+## Formula for the Omitted Variable Bias
+
+Since there is a correlation between $u_i$ and $X_i$,  $Corr(X_i, u_i) = \rho_{Xu} \ne 0$
+
+The OLS estimator has the limit  $$\hat{\beta}_1 \overset{p}{\longrightarrow} \beta_1 + \rho_{Xu}\frac{\sigma_u}{\sigma_X}$$ which means that $\hat{\beta}_1$ approaches the right hand value with increasing probability as the sample size grows.
+
+* The OVB problem exists no matter the size of the sample.
+  + __NO BIG DATA SOLUTION__
+* The larger $\rho_{Xu}$ is the bigger the bias.
+* The direction of bias depends on the sign of $\rho_{Xu}$.
+
+## Addressing OVB by Dividing the Data into Groups
+
+The Multiple Regressor Model: Regressing On More Than One Variable
+
+In a multiple regression model, we allow for more than one regressor. 
+
+This allows us to isolate the effect of a particular variable holding all others constant.
+
+In otherwords, we can minimize the OVB by including variables in the regression equation that are important and potentially correlated with other regressors.
+
+***
+Look at what happens when we break down scores by Pct. English and Student-Teacher Ratio
+```{r out.width="100%", fig.align='center',echo=FALSE}
+include_graphics('STR_groups.png' )
+```
+
+## Multiple Regression Model
+
+Regressing On More Than One Variable
+
+In a multiple regression model we allow for __more than one regressor__. 
+
+This allows us to isolate the effect of a particular variable __holding all others constant__.
+
+## The Population Multiple Regression Line
+
+The population regression line (function) with two regressors would be
+
+\[ E[Y_i|X_{1i} = x_1, X_{2i} = x_2] = \beta_0 + \beta_1 x_1 + \beta_2 x_2 \]
+
+1.  $\beta_0$ is the intercept
+2.  $\beta_1$ is the slope coefficient of $X_{1i}$
+3.  $\beta_2$ is the slope coefficient of $X_{2i}$
+
+## Interpretation of The Slope Coefficient (1)
+
+We interpret $\beta_1$ (also referred to as the coefficient on $X_{1i}$), as the effect on $Y$ of a unit change in $X_1$, holding $X_2$ constant or controlling for $X_2$.
+
+For simplicity let us write the population regression line as
+
+\[ Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 \]
+
+Suppose we change $X_1$ by an amount $\Delta X_1$, which would cause $Y$ to change to $Y + \Delta Y$.
+
+\[ Y + \Delta Y = \beta_0 + \beta_1 (X_1 + \Delta X_1) + \beta_2 X_2 \]
+
+## Interpretation of The Slope Coefficient (2)
+
+$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 \\
+Y + \Delta Y = \beta_0 + \beta_1 (X_1 + \Delta X_1) + \beta_2 X_2$$
+
+Subtract the first equation from the second equation, yielding
+$$\begin{align*} \Delta Y &= \beta_1 \Delta X_1 \\ \beta_1 &= \frac{\Delta Y}{\Delta X_1} \end{align*}$$
+
+$\beta_1$ is also referred to as the partial effect on $Y$ of $X_1$, holding $X_2$ fixed.
+
+
+## The Population Multiple Regression Model
+
+The same as with the single regressor case, the regression line describes the average value of the dependent variable and its relationship with the model regressors.
+
+In reality, the actual population values of $Y$ will not be exactly on the regression line since there are many other factors that are not accounted for in the model.
+
+These other unobserved factors are captured by the error term $u_i$ in the population multiple regression
+$$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_k X_{ki} + u_i,~i=1,\dots,n $$
+
+(Generally, we can have any number of _k_ regressors as shown above)
+
+
+## Homoskedasticity and Heteroskedasticity
+
+As with the case of a single regressor model, the population multiple regression model can be either homoskedastic or heteroskedastic. 
+
+It is homoskedastic if
+
+$$Var(u_i|X_{1i},\dots,X_{ki})$$
+
+is constant for all $i=1,\dots,n$. Otherwise, it is heteroskedastic.
+
+In most cases (read virtually always), you will have heteroskedastic errors.
+
+## The OLS Estimator (1)
+
+Similar to the single regressor case, we do not observe the true population parameters $\beta_0,\dots,\beta_k$.
+From an observed sample $\{(Y_i, X_{1i},\dots,X_{ki})\}_{i=1}^n$ we want to calculate an estimator of the population parameters
+
+We do this by minimizing the sum of squared differences between the observed dependent variable and its predicted value
+
+$$\min_{b_0,\dots,b_k} \sum_i (Y_i - b_0 - b_1 X_{1i} - \cdots - b_k X_{ki})^2$$
+
+Similar to the simple linear regression case, we would have _k+1_ equations and _k+1_ unknowns.
+
+## The OLS Estimator (2)
+
+Let the multiple regression equation be represented by $$Y=X\beta+u$$
+
+where we observe n observations, a dependent variable $Y$ is a nx1 vector, X is a nxk matrix of k difference expanatory variables, $u$ is the error term, which is assumed to have a mean of zero and a finite variance.
+
+We are interested in estimating the parameter $\beta$, which is a kx1 vector.
+
+## The OLS Estimator (3)
+
+Our most important assumption is that $E[X'u]=0$. If so, then we can write the momment condition as $$\begin{align*} X'u &= 0 \\
+X'(Y-X\beta) &=0 \\
+X'Y &= X'X\beta \\
+(X'X)^{-1}X'Y &= \beta \end{align*}$$
+
+where $(X'X)^{-1}$ is the covariance matrix of X and X'Y is the covariance of X and Y. Notice this is exactly like the simple linear case, where our slope estimator is the COV(X,Y)/VAR(X)
+
+## The OLS Estimator (4)
+
+The resulting estimators are called the ordinary least squares (OLS) estimators: $\hat{\beta}_0,\hat{\beta}_1,\dots,\hat{\beta}_k$
+
+The predicted values would be
+
+$$\hat{Y}_i = \hat{\beta}_0 + \hat{\beta}_1 X_{1i} + \cdots + \hat{\beta}_k X_{ki},~i=1,\dots,n$$
+
+The OLS residuals would be
+
+$$\hat{u}_i = Y_i - \hat{Y}_i,~i=1,\dots, n$$
+
+
+## Application to Test Scores and the STR (1)
+
+Recall that, using observations from 420 school districts, we regressed student test scores on STR we got $$\widehat{TestScore} = 698.9 - 2.28 \times STR$$
+
+However, there was concern about the possibility of OVB due to the exclusion of the percentage of English learners in a district, when it influences both test scores and STR.
+
+
+## Application to Test Scores and the STR (2)
+
+We can now address this concern by including the percentage of English learners in our model
+
+$$ TestScore_i = \beta_0 + \beta_1 \times STR_i + \beta_2 \times PctEL_i + u_i $$
+
+where $PctEL_i$ is the percentage of English learners in school district $i$.
+
+## Test Scores Multiple Regression in R
+
+(Notice that we are using heteroskedastic-robust standard errors)
+
+```{r}
+regress.results <- lm(score ~ stratio + english, data = CASchools)
+het.se <- vcovHC(regress.results)
+coeftest(regress.results, vcov.=het.se)
+```
+
+## Comparing Estimates
+
+In the single regressor case our estimates were $$\widehat{TestScore} = 698.9 - 2.28 \times STR$$ and with the added regressor we have $$\widehat{TestScore} = 686.0 - 1.10 \times STR - 0.65 \times PctEL$$
+
+Notice the lower effect of STR in the second regression.
+
+The second regression captures the effect of STR holding the percentage of English learners constant. We can conclude that the first regression does suffer from OVB.
+This multiple regression approach is superior to the tabular approach shown before; we can give a clear estimate of the effect of STR and it is possible to easily add more regressors if the need arises.
+
+# Measures of Fit
+
+## The Standard Error of the Regression (SER)
+
+Similar to the single regressor case, except for the modified adjustment for the degrees of freedom, the $SER$ is
+
+$$SER = s_{\hat{u}}\text{ where }s_{\hat{u}}^2 = \frac{\sum_i \hat{u}^2_i}{n - k - 1} = \frac{SSR}{n - k - 1}$$
+
+Instead of adjusting for the two degrees of freedom used to estimate two coefficients, we now need to adjust for $k+1$ estimations.
+
+
+## The R Squared
+
+$$ R^2 = \frac{ESS}{TSS} = 1 - \frac{SSR}{TSS} $$
+
+* Since OLS estimation is a minimization of $SSR$ problem, every time a new regressor is added to a regression, the $R^2$ would be nondecreasing.
+* This does not correctly evaluate the explanatory power of adding regressors-it tends to inflate it
+
+
+## The Adjusted R Squared
+
+* In order to address the inflation problem of the $R^2$ we can calculated an "adjusted" version to corrects for that $$\bar{R}^2 = 1 - \frac{n-1}{n-k-1}\frac{SSR}{TSS} = 1 - \frac{s_{\hat{u}}^2}{s_Y^2}$$
+
+* The factor $\frac{n-1}{n-k-1}$ is always $> 1$, and therefore we always have $\bar{R}^2 < R^2$.
+* When a regressor is added, it has two effects on $\bar{R}^2$
+    + The Sum of Squared Residuals, $SSR$, decreases
+    + $\frac{n-1}{n-k-1}$ increases, "adjusting" for the inflation effect
+   
+* It is possible to have $\bar{R}^2 < 0$
+
+## Application to Test Scores (1)
+
+From our multiple regression of the test scores on STR and the percentage of English learners we have the $R^2$, $\bar{R}^2$, and $SER$
+
+```{r}
+regress.summary <- summary(regress.results)
+regress.summary$r.squared
+regress.summary$adj.r.squared
+regress.summary$sigma
+```
+
+
+## Application to Test Scores (2)
+
+We notice a large increase in the $R^2 = 0.426$ compared to that of the single regressor estimation 0.051. Adding the percentage of English learners has added a significant increase in the explanatory power of the regression.
+
+Because $n$ is large compared to the two regressors used, $\bar{R}^2$ is not very different from $R^2$.
+
+We must be careful not to let the increase in $R^2$ (or $\bar{R}^2$) drive our choice of regressors.
+
+# The Least Squares Assumptions in Multiple Regression
+
+## Updated Single Regressor Assumptions
+
+For multiple regressions we have four assumptions: three of them are updated versions of the single regressor assumptions and one new assumption.
+
+* A.1: The conditional distribution of $u_i$ given $X_{1i},\dots,X_{ki}$ has a mean of zero $E[u_i|X_{1i},\dots,X_{ki}] = 0$
+* A.2: $\forall i, (X_{1i}, \dots, X_{ki}, Y_i)$ are i.i.d.
+* A.3: Large outliers are unlikely
+
+## Assumption A.4: No Perfect Multicollinearity (1)
+
+The regressors exhibit perfect multicollinearity if one of the regressors is a linear function of the other regressor.
+
+> Assumption A.4 requires that there be no perfect multicollinearity
+
+Perfect multicollinearity can occur if a regressor is accidentally repeated, for example, if we regress $TestScore$ on $STR$ and $STR$ again (R simply ignores the repeated regressor). 
+
+This could also occur if a regressor is a multiple of another.
+
+
+## Assumption A.4: No Perfect Multicollinearity (2)
+
+Mathematically, this is not allowed because it leads to division by zero.
+
+Intuitively, we cannot logically think of measuring the effect of $STR$ while holding other regressors constant since the other regressor is $STR$ as well (or a multiple of)
+
+## Examples of Perfect Multicollinearity
+
+Fraction of English learners
+
+"Not very small" classes:
+
+Let $NVS_i = 1 \) if \( STR_i \geq 12$
+
+None of the data available has $STR_i \le 12 \) therefore \( NVS_i$ is always equal to $1$.
+
+
+## Example 2: The Dummy Variable Trap
+
+Suppose we want to categorize school districts as rural, suburban, and urban
+
+* We use three dummy variables $Rural_i$, $Suburban_i$, and $Urban_i$
+* If we included all three dummy variables in our regress we would have perfect multicollinearity: $Rural_i + Suburban_i + Urban_i = 1$ for all $i$
+* Generally, if we have $G$ binary variables and each observation falls into one and only one category we must eliminate one of them: we only use $G-1$ dummy variables
+
+
+## Imperfect Multicollinearity (1)
+
+> Imperfect multicollinearity means that two or more regressors are highly correlated. It differs from perfect     multicollinearity it that they don't have to be exact linear functions of each other.
+
+
+## Imperfect Multicollinearity (2)
+
+* For example, consider regressing $TestScore$ on $STR$, $PctEL$ (the percentage of English learners), and a third regressor that is the percentage of first-generation immigrants in the district.
+* There will be strong correlation between $PctEL$ and the percentage of first-generation immigrants
+* Sample data will not be very informative about what happens when we change $PctEL$ holding other regressors fixed
+* Imperfect multicollinearity does not pose any problems to the theory of OLS estimation
+      + OLS estimators will remain unbiased.
+      + However, the variance of the coefficient on correlated regressors will be larger than if they were uncorrelated.
+
+
+## The Distribution of the OLS Estimators in Multiple Regression
+
+* Since our OLS estimates depend on the sample, and we rely on random sampling, there will be uncertainty about how close these estimates are to the true model parameters
+* We represent this uncertainty by a sampling distribution of $\hat{\beta}_0, \hat{\beta}_1,\dots,\hat{\beta}_k$
+* The estimators $\hat{\beta}_0, \hat{\beta}_1,\dots,\hat{\beta}_k$ are unbiased and consistent
+* In large samples, the joint sampling distribution of the estimators is well approximated by a multivariate normal distribution, where each $\hat{\beta}_j \sim N(\beta_j, \sigma_{\hat{\beta}_j}^2)$
+
+

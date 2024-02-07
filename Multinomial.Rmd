@@ -20,7 +20,7 @@ class: middle, center, inverse
 Examples of multinomial choice (polytomous) situations:
 
 1. Choice of a laundry detergent: Tide, Cheer, Arm & Hammer, Wisk, etc. 
-```{r out.width="50%", fig.align='center', echo=FALSE, warning=FALSE, message=FALSE}
+```{r out.width="50%", fig.align='center', echo=FALSE}
 library(knitr)
 include_graphics("https://reviewed-com-res.cloudinary.com/image/fetch/s--ILdgWui---/b_white,c_fill,cs_srgb,f_auto,fl_progressive.strip_profile,g_xy_center,q_auto,w_1200,x_2301,y_1292/https://reviewed-production.s3.amazonaws.com/1478026682000/Best-Detergent-TBRN-Hero.jpg")
 ```
@@ -212,21 +212,6 @@ $$\begin{align*} Pr(Y_i=j) &=\frac{exp(\beta_1 X_{ij}+\beta_2 Z_i)}{\sum_{k=1}^{
 &=\frac{exp(\beta_1 X_{ij})exp(\beta_2 Z_i)}{exp(\beta_2 Z_i) \sum_{k=1}^{K}exp(\beta_1 X_{ik}) } \\ \\ 
 &=\frac{exp(\beta_1 X_{ij})}{ \sum_{k=1}^{K}exp(\beta_1 X_{ik}) }\end{align*}$$
 ---
-## Conditional Logit example
-Let's look at the market for yogurt and the effects of advertising on sales. We have a dataset of individual customers, we know what yogurts they bought and what advertisements they have seen.
-```{r message=FALSE, warning=FALSE}
-library(Ecdat)
-library(mlogit)
-data(Yogurt)
-YT <- mlogit.data(Yogurt,choice = "choice", shape = "wide",varying = c(2:9))
-m1<-mlogit(choice ~ feat+price,data = YT)
-```
----
-## Conditional logit example
-```{r echo=FALSE, results='asis'}
-stargazer::stargazer(m1,type = "html", single.row = TRUE)
-```
----
 ## Fixed Effect Logit
 
 The conditional logit model can effectively removes certain fixed effects. 
@@ -246,7 +231,9 @@ If you allow for random coefficients (unobserved heterogeneity also known as ran
 ## Conditional/Multinomial/Mixed Logit in R
 
 We will use the mlogit package in R
+
 ```{r echo=TRUE, eval=FALSE}
+library(mlogit)
 data("Fishing", package = "mlogit")
 Fish <- mlogit.data(Fishing, varying = c(2:9), shape = "wide", choice = "mode")
 ## a pure "conditional" model

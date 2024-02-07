@@ -138,133 +138,12 @@ We choose the value of `\(\beta_0\)` and `\(\beta_1\)`, which minimize the varia
 ### The Betas
 The estimated values of our `\(\beta\)`'s are `\(\widehat{\beta}_{0}\)` and `\(\widehat{\beta}_{1}\)`. 
 
+`$$\widehat{\beta}_{0}=\bar{Y} - \hat{\beta_1}\bar{X}$$`
+`$$\widehat{\beta}_{1}=\frac{COV(Y,X)}{VAR(X)}$$`
+
 The regression line improves on the model fit over just using the mean. `$$\widehat{y}_{i} = \widehat{\beta}_{0}+\widehat{\beta}_{1}X_i$$`
 
-![[Image Credit](https://cnx.org/contents/zddObXQQ@1.1:Ae4araUY@1/The-Regression-Equation)](https://cnx.org/resources/440525fca3a9401f5b93021c76e2e27839e7e46b/variation.PNG)
-
----
-## SSR and SSE
-
-- You can think of the SSR (Sum of Square Regression) as the amount of the total variation that the regression line explains. 
-- Essentially, it tells us how much better using a line is over just using the mean of the dependent variable. 
-- The SSE (Sum of Square Error) tells us how much of the total variation is left unexplained. 
-
----
-## The OLS Assumptions
-
-1. The error term `\(u_i\)` has a mean of zero, `\(E[u_i]=0\)`.
-2. The error term is independent of the X's, `\(E[X_i u_i]=COV(X_i,u_i)=0\)`.
-3. The error term has a constant variance, `\(Var[u_i|X_i]=\sigma^2\)`.
-4. The variables `\(Y_i\)` and `\(X_i\)` are independently identically distributed (i.e. they are a random sample)
-5. The relationship between `\(Y_i\)` and `\(X_i\)` is linear with respect to the parameters
-6. There are no large outliers.
-7. For testing reasons, we do assume the error terms are normally distributed. 
-
-We use these assumptions along with some algebra/calculus to solve for the optimal values of the `\(\beta\)`'s.
-
----
-## Method of Momments
-
-We will use the OLS assumptions to find the optimal values of the `\(\beta\)`'s.
-
-The first assumption states the mean of the error term is zero. `$$\frac{1}{n}\sum u_i = \frac{1}{n}\sum y_i-\beta_0-\beta_1 X_i = 0$$`
-We can simplify this equation.
-`$$\frac{1}{n}\sum y_i-\beta_0-\beta_1 X_i = \frac{1}{n}\sum y_i - \beta_0 -\beta_1 \frac{1}{n}\sum X_i = 0$$`
-Which can be simplified further to `$$\frac{1}{n}\sum y_i - \beta_0 -\beta_1 \frac{1}{n}\sum X_i = \bar{y}-\beta_0-\beta_1 \bar{X}=0$$`
-
-And we can solve this equation for `\(\beta_0\)`. `$$\beta_0 = \bar{y}-\beta_1 \bar{X}$$`
-
----
-# Now for the slope
-We will use the second assumption that states `\(COV(X_i,u_i)=\frac{1}{n}\sum (X_i-\bar{X}) u_i=0\)`
-
-We can replace the error term with the regression equation.
-$$\frac{1}{n}\sum (X_i-\bar{X}) u_i=\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\beta_0-\beta_1 X_i)=0 $$
-Recall, the optimal value `\(\beta_0=\bar{Y}-\beta \bar{X}\)`. We can substitute this value into our equation.
-$$\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\beta_0-\beta_1 X_i)=\frac{1}{n}\sum (X_i-\bar{X})(Y_i -(\bar{Y}-\beta \bar{X})-\beta_1 X_i) $$
-We can simplify this further, `$$\frac{1}{n}\sum (X_i-\bar{X})(Y_i -(\bar{Y}-\beta \bar{X})-\beta_1 X_i)= \frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y}-\beta(X_i-\bar{X}))=0$$`
-
----
-### The Slope Estimate Continued
-
-We are almost there. We can solve this equation for the slope parameter, `\(\beta_1\)`. `$$\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y}-\beta_1(X_i-\bar{X}))=\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y})-\beta_1\frac{1}{n}\sum(X_i-\bar{X})^2=0$$`
-I want to point out two things.
-1. `\(\frac{1}{n}\sum (X_i-\bar{X})(Y_i -\bar{Y})\)` is the `\(COV(X,Y)\)`.
-2. `\(\frac{1}{n}\sum(X_i-\bar{X})^2\)` is the `\(VAR(X)\)`.
-
-We can rewrite the equation as `$$COV(X,Y)-\beta_1 VAR(X)\Rightarrow \beta_1 = COV(X,Y)/VAR(X)$$`
-
-Summary
-- The estimate of the constant, `\(\widehat{\beta_0}=\bar{Y}-\widehat{\beta_1}\bar{X_i}\)`
-- The estimate of the slope, `\(\widehat{\beta_1}=COV(X,Y)/VAR(X)=\frac{\sum(X_i-\bar{X})(Y_i-\bar{Y})}{\sum(X_i-\bar{X})^2}\)`
-
----
-class: inverse, middle, center
-# The Calculus Method
-
----
-# Minimizing the variance with calculus
-
-Remember that the error term represents everything that effects the dependent variable that we do not observe. 
-
-We want to choose `\(\beta_0\)` and `\(\beta_1\)` that minimize the variance of the error term, `\(u_i\)`.
-
-`$$L = \min_{\beta_0,\beta_1} \frac{1}{n} \sum u^2_i =\min_{\beta_0,\beta_1} \frac{1}{n}\sum[Y_i-\beta_0-\beta_1X_i]^2$$`
-
-We will take the derrivative the equation with respect to `\(\beta_0\)` and `\(\beta_1\)`.
-
-The principle is similar to finding the minimum of parable.
----
-### Two equations and Two Unknowns
-
-We need to use partial derrivatives 
-
-Here is the partial derrivative with respect to the constant.
-
-`$$\frac{\partial L}{\partial \beta_0}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)=0$$`
-
-Here is the partial derrivative with respect to the slope
-
-`$$\frac{\partial L}{\partial \beta_1}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)X_i=0$$`
-
-We need to choose `\(\beta_0\)` and `\(\beta_1\)` such that both equations are equal to zero simultaneously. So we have two equations and two unknowns.
-
----
-# Solve for the Constant
-
-We can simplify the first equation to `$$\frac{\partial L}{\partial \beta_0}=\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)=0$$`
-We know that addition has the communitative property (it doesn't matter if you add 1+2 or 2+1 in order to get 3). So we re-write the equation and simplify again.
-`$$\frac{1}{n}\sum Y_i-\frac{1}{n}\sum \beta_0-\frac{1}{n}\sum \beta_1 X_i=0$$`
-The mean of a constant is the just the constant so `\(\frac{1}{n}\sum \beta_0=\beta_0\)` so we can simplify again. `$$\hat{\beta_0}=\bar{Y}-\hat{\beta_1}\bar{X}$$`
-
----
-### Slope
-
-Now we can use the formula for the constant in the equation for the slope.
-`$$\frac{\partial L}{\partial \beta_1}=-2*\frac{1}{n}\sum (Y_i-\beta_0-\beta_1X_i)X_i=\sum (Y_i-(\bar{Y}-\hat{\beta_1}\bar{X})-\beta_1X_i)X_i=0$$`
-We will re-arrange some terms
-`$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))(X_i-\bar{X}+\bar{X})=0$$`
----
-### Slope
-It can be shown that `$$\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))\bar{X}=0$$`
-1. `\(\bar{X}\)` is a constant so it can be pulled out.
-2. Remember that the mean of `\(Y\)` is `\(\bar{Y}=\frac{1}{n}\sum Y_i\)` so `$$n\bar{Y}=\sum Y_i \text{ and } \sum \bar{Y}=n\bar{Y}.$$`
-
-Now if you look at the first term `\(\sum (Y_i-\bar{Y})=n\bar{Y}-n\bar{Y}=0\)`
-3. You can do the same thing as above for `\(\sum(X_i-\bar{X})=0\)`
-
-Therefore, `\(\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))\bar{X}=0\)`
-
----
-# Solving for Slope
-
-Now, we can solve for slope `$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y}-\hat{\beta_1}(X_i-\bar{X}))(X_i-\bar{X})=0$$`
-`$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y})(X_i-\bar{X})-\hat{\beta_1}(X_i-\bar{X})^2=0$$`
-`$$\frac{\partial L}{\partial \beta_1}=\sum (Y_i-\bar{Y})(X_i-\bar{X})-\hat{\beta_1}\sum(X_i-\bar{X})^2=0$$`
-`$$\hat{\beta_1}=\frac{\sum (Y_i-\bar{Y})(X_i-\bar{X})}{\sum(X_i-\bar{X})^2}=\frac{COV(X,Y)}{VAR(X)}$$`
----
-class: center, inverse, middle
-# Return to Notes
+A proof can be found on blackboard or the ebook
 
 ---
 
@@ -294,7 +173,7 @@ CASchools$testscr=(CASchools$read+CASchools$math)/2
 qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher Ratio", ylab="Test Scores")
 ```
 
-![](Simplelinearregression_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+![](Simplelinearregression_OL_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
 
 ---
 ## The Ordinary Least Squares Estimator (1)
@@ -330,7 +209,7 @@ where `\(\widehat{TestScore}\)` is the predicted value. (This is referred to as 
 qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher Ratio", ylab="Test Scores") + geom_abline(intercept=698.9, slope=-2.28, color='blue')
 ```
 
-![](Simplelinearregression_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+![](Simplelinearregression_OL_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 
 ---
 class: center, inverse, middle
@@ -347,7 +226,7 @@ Now that we've run an OLS regression we want to know
 We have two useful measures
 
 - The regression `\(R^2\)`
-- The standard error of the regression ($SER$)
+- The standard error of the regression `\((SER)\)`
 
 ---
 ## The R Squared (1)
@@ -370,6 +249,13 @@ Let us define the total sum of squares ($TSS$), the explained sum of squares ($E
 `$$TSS = ESS + SSR$$`
 
 `\(R^2\)` can be defined as `$$R^2 = \frac{ESS}{TSS} = 1 - \frac{SSR}{TSS}$$`
+
+---
+## SSR and SSE
+
+- You can think of the ESS (Explained sum of squres) as the amount of the total variation that the regression line explains. 
+- Essentially, it tells us how much better using a line is over just using the mean of the dependent variable. 
+- The SSR (Sum of Square Residual) tells us how much of the total variation is left unexplained. 
 
 ---
 ## The Standard Error of the Regression
@@ -431,55 +317,7 @@ summary(regress.results)
 ## F-statistic: 22.58 on 1 and 418 DF,  p-value: 2.783e-06
 ```
 
----
-class: center, inverse, middle
-# The Least Squares Assumptions
 
----
-## Assumption A.1
-
-`$$E[u_i|X_i] = 0$$`
-
-- Other factors unaccounted for in the regression are unrelated to the regressor `\(X_i\)`
-- While the dependent variable varies around the population regression line, on average the predicted value is correct
-
----
-## Assumption A.1 Plot
-![](ch4pic3.png)
-
----
-## Randomized Controlled Experiment
-
-- In a randomized controlled experiment, subjects are placed in treatment group `\((X_i = 1)\)` or the control group ($X_i = 0$) randomly, not influenced by their characteristics. Hence, `\(E[u_i|X_i] = 0\)`.
-- Using observational data, `\(X_i\)` is not assigned randomly, therefore we must then think carefully about making assumption A.1.
-
----
-## Correlation and Conditional Mean
-
-- Recall that if `\(E[u_i|X_i] = 0\)` then `\(Corr(u_i, X_i) = 0\)`
-- However, `\(u_i\)` and `\(X_i\)` being uncorrelated is not sufficient for assumption A.1 to hold.
-
----
-## Assumption A.2
-
-For all `\(i\)`, `\((X_i, Y_i)\)` are i.i.d.
-
-- Since all observation pairs `\((X_i, Y_i)\)` are picked from the same population, then they are identically distributed.
-- Since all observations are randomly picked, then they should be independent.
-- The majority of data we will encounter will be i.i.d., except for data collected from the same entity over time (panel data, time series data)
-
----
-## Assumption A.3: Large Outliers are Unlikely
-
-`$$0 &lt; E[Y_i^4] &lt; \infty$$`
-
-- None of observed data should have extreme and "unexpected" values
-- Technically, this means that the fourth moment should be positive and finite
-- You should look at your data (plot it) to see if any of the observations are suspicious, and then double check there was no error in the data
-
----
-## Assumption A.3 Plot
-![](ch4pic4.png)
 
 ---
 class: center, inverse, middle
@@ -525,6 +363,19 @@ Yet another implication of the variance of `\(\hat{\beta}_1\)`
 `$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$`
 
 is that the smaller the variance `\(u_i\)` the smaller is `\(\sigma_{\hat{\beta}_1}^2\)` and hence tighter is our prediction of `\(\beta_1\)`.
+
+---
+## The OLS Assumptions
+
+1. The error term `\(u_i\)` has a mean of zero, `\(E[u_i]=0\)`.
+2. The error term is independent of the X's, `\(E[X_i u_i]=COV(X_i,u_i)=0\)`.
+3. The error term has a constant variance, `\(Var[u_i|X_i]=\sigma^2\)`.
+4. The variables `\(Y_i\)` and `\(X_i\)` are independently identically distributed (i.e. they are a random sample)
+5. The relationship between `\(Y_i\)` and `\(X_i\)` is linear with respect to the parameters
+6. There are no large outliers.
+7. For testing reasons, we do assume the error terms are normally distributed. 
+
+These assumptions are necessary for us to be able to estimate, test, and interpret the `\(\beta\)`'s.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

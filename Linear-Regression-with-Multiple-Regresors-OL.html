@@ -29,7 +29,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2024-02-06)
+### 2020-7-4 (updated: 2024-02-07)
 ]
 
 ---
@@ -135,14 +135,7 @@ qplot(x=str, y=testscr, data=CASchools, geom="point",
       xlab="Student/Teacher Ratio", ylab="Test Scores")
 ```
 
-```
-## Warning: `qplot()` was deprecated in ggplot2 3.4.0.
-## This warning is displayed once every 8 hours.
-## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-## generated.
-```
-
-&lt;img src="Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-3-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-2-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 ---
 ## Correlation and Scatterplot (3)
 &lt;img src="linear-regression.png" width="100%" /&gt;
@@ -214,7 +207,7 @@ qplot(x=str, y=testscr, data=CASchools, geom="point", xlab="Student/Teacher
                                                 color='blue')
 ```
 
-&lt;img src="Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-5-1.png" width="50%" style="display: block; margin: auto;" /&gt;
+&lt;img src="Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-4-1.png" width="50%" style="display: block; margin: auto;" /&gt;
 ---
 ## Goodness of Fit
 
@@ -268,6 +261,7 @@ ESS = Explained Sum of Squares, but some books also use ESS as the Error Sum of 
 RSS = Residual Sum of Squares, but some books use RSS as the Regression Sum of Squares, which means the opposite. 
 
 SSE = Sum of Squared Errors 
+
 SSR = Sum of Squared Regression 
 
 Confused yet
@@ -303,68 +297,115 @@ Let's Run a Regression
 
 ```r
 library(knitr)
-library(stargazer)
+library(modelsummary)
 regress.results=lm(formula = testscr ~ str, data=CASchools)
 ```
 ---
 ## Regression in R 
-&lt;small&gt;
 
 ```r
-stargazer(regress.results, type = "html", dep.var.labels.include = FALSE, column.labels = "Test Score", covariate.labels = "Student-Teacher Ratio", fontsize = "small", style = "qje", single.row = TRUE)
+modelsummary(list("Test Score"=regress.results), coef_rename = c("str"="Student-Teacher Ratio"), stars = TRUE)
 ```
 
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Test Score&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Student-Teacher Ratio&lt;/td&gt;&lt;td&gt;-2.280&lt;sup&gt;***&lt;/sup&gt; (0.480)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;698.933&lt;sup&gt;***&lt;/sup&gt; (9.467)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;420&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.051&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.049&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;18.581 (df = 418)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;22.575&lt;sup&gt;***&lt;/sup&gt; (df = 1; 418)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Test Score &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 698.933*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (9.467) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Student-Teacher Ratio &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −2.280*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.480) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 420 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.051 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 Adj. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.049 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3650.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3662.6 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log.Lik. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1822.250 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; F &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 22.575 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RMSE &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 18.54 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; + p &amp;lt; 0.1, * p &amp;lt; 0.05, ** p &amp;lt; 0.01, *** p &amp;lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
 &lt;/table&gt;
 
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;small&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
-&lt;/small&gt;
 ---
 ## The Least Squares Assumptions
 
-**Assumption A.1**
+1. The error term `\(u_i\)` has a mean of zero, `\(E[u_i]=0\)`.
+2. The error term is independent of the X's, `\(E[X_i u_i]=COV(X_i,u_i)=0\)`.
+3. The error term has a constant variance, `\(Var[u_i|X_i]=\sigma^2\)`.
+4. The variables `\(Y_i\)` and `\(X_i\)` are independently identically distributed (i.e. they are a random sample)
+5. The relationship between `\(Y_i\)` and `\(X_i\)` is linear with respect to the parameters
+6. There are no large outliers.
+7. For testing reasons, we do assume the error terms are normally distributed. 
+
+These assumptions are necessary for us to be able to estimate, test, and interpret the `\(\beta\)`'s.
+
+
+---
+## Mean Zero and Independence
 
 `$$E[u_i|X_i] = 0$$`
 
 - Other factors unaccounted for in the regression are unrelated to the regressor `\(X_i\)`
 - While the dependent variable varies around the population regression line, on average the predicted value is correct
 
-__Two important take aways: (1) there error has a mean of zero and (2) the error and X's are independent.
+__Two important take aways:__ 
 
----
-## Assumption A.1 Plot
-![](https://slideplayer.com/slide/12910416/78/images/23/Least+squares+assumption+%231%3A+E%28u%7CX+%3D+x%29+%3D+0..jpg)&lt;!-- --&gt;
-
-
+__(1) there error has a mean of zero and__ 
+__(2) the error and X's are independent.__
 
 ---
 ## Randomized Controlled Experiment
 
-- In a randomized controlled experiment, subjects are placed in treatment group `\((X_i = 1)\)` or the control group ($X_i = 0$) randomly, not influenced by their characteristics. 
+- In a randomized controlled experiment, subjects are placed in treatment group `\((X_i = 1)\)` or the control group `\((X_i = 0)\)` randomly, not influenced by their unobservable characteristics, `\(u_i\)`. 
   
   + Hence, `\(E[u_i|X_i] = 0\)`.
 
 - Using observational data, `\(X_i\)` is not assigned randomly, therefore we must then think carefully about making assumption A.1.
 
-**Correlation and Conditional Mean**
-
-- Recall that if `\(E[u_i|X_i] = 0\)` then `\(Corr(u_i, X_i) = 0\)`
-- However, `\(u_i\)` and `\(X_i\)` being uncorrelated is not sufficient for assumption A.1 to hold.
-
 ---
-## Assumption A.2
+## Random Sample
 
 For all `\(i\)`, `\((X_i, Y_i)\)` are i.i.d.
 
@@ -372,10 +413,10 @@ For all `\(i\)`, `\((X_i, Y_i)\)` are i.i.d.
 - Since all observations are randomly picked, then they should be independent.
 - The majority of data we will encounter will be i.i.d., except for data collected from the same entity over time (panel data, time series data)
 
-__Main takeaway: there should be no sample selection bias. The random sample should be a good representation of the population.__
+__Main takeaway: there should be no sample selection bias. The random sample should be a good representation of the population. Additionally, you want Y and X to be continuous throughout. For example an always positive number might not be represented well by a normal distribution.__
 
 ---
-## Assumption A.3: Large Outliers are Unlikely
+## Large Outliers are Unlikely
 
 `$$0 &lt; E[Y_i^4] &lt; \infty$$`
 
@@ -384,7 +425,7 @@ __Main takeaway: there should be no sample selection bias. The random sample sho
 - You should look at your data (plot it) to see if any of the observations are suspicious, and then double check there was no error in the data.
 
 ---
-## Assumption A.3 Plot
+## Outlier Plot
 
 ![](ch4pic4.png)
 ---
@@ -404,30 +445,30 @@ class: inverse, middle, center
 ## Review of Sampling Distribution of the Sample Mean of Y
 
 When we have a large sample, we can approximate the distribution of the random variable `\(\bar{Y}\)` by a normal distribution with mean `\(\mu_Y\)`.
+
+![](https://miro.medium.com/v2/resize:fit:1400/1*9bw2s17I3akpvZ8PdEx44w.png)&lt;!-- --&gt;
+
 ---
 ## The Sampling Distribution of the Model Coefficient Estimators (1)
 
+When the linear regression assumption hold, we can do the same thing with our parameter estimates.
+
 - Both estimates are unbiased: `\(E[\hat{\beta}_0] = \beta_0\)` and `\(E[\hat{\beta}_1] = \beta_1\)`.
 - Using the same reasoning as we did with `\(\bar{Y}\)`, we can use the CLT to argue that `\(\hat{\beta}_0\)` and `\(\hat{\beta}_1\)` are both approximately normal
-- The large sample variance of `\(\hat{\beta}_1\)` is `$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$`
-- Since `\(\sigma_{\hat{\beta}_1}^2\)` decreases to zero the large the sample, `\(\hat{\beta}_1\)` is said to be consistent
+- The sample variance of `\(\hat{\beta}_1\)` is `$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n-1}\frac{Var(u_i)}{Var(X_i)}$$`
+
 ---
 ## The Sampling Distribution of the Model Coefficient Estimators (2)
 
-Another implication of the variance of `\(\hat{\beta}_1\)` `$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$`
+`$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n-1}\frac{Var(u_i)}{Var(X_i)}$$`
 
-is the larger `\(Var(X_i)\)` the smaller is `\(\sigma_{\hat{\beta}_1}^2\)` and hence tighter is our prediction of `\(\beta_1\)`.
+1. As the sample size increases, `\(n\)`, `\(\sigma_{\hat{\beta}_1}^2\)` decreases to zero. This property is known as consistency. The OLS estimate of `\(\hat{\beta}_1\)` is said to be consistent. This is the reason people were so excited about BIG DATA.
+2. The larger `\(Var(X_i)\)` is (aka more variation in X), then the smaller is `\(\sigma_{\hat{\beta}_1}^2\)` and hence a tighter prediction of `\(\beta_1\)`.
+3. The larger the variance of the error term is, the less precise our estimates are. There is more we do not know.
 ---
 ## The Effect of Greater Variance in X
 &lt;img src="ch4pic5.png" width="80%" style="display: block; margin: auto;" /&gt;
----
-## The Sampling Distribution of the Model Coefficient Estimators (3)
-
-Yet another implication of the variance of `\(\hat{\beta}_1\)`
-
-`$$\sigma_{\hat{\beta}_1}^2 = \frac{1}{n}\frac{Var[(X_i - \mu_X)u_i]}{[Var(X_i)]^2}$$`
-
-is that the smaller the variance `\(u_i\)` the smaller is `\(\sigma_{\hat{\beta}_1}^2\)` and hence tighter is our prediction of `\(\beta_1\)`.
+You can see an illustration of this principle in a video on blackboard.
 ---
 class: middle, center, inverse
 # Multiple Regression
@@ -715,7 +756,7 @@ library(ggplot2)
 ggplot(data = food, aes(y = resi, x = income)) + geom_point(col = 'blue') + geom_abline(slope = 0)
 ```
 
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 ---
 ## Two ways to test
 
@@ -905,26 +946,99 @@ where `\(PctEL_i\)` is the percentage of English learners in school district `\(
 
 ---
 ## Test Scores Multiple Regression in R
-
 (Notice that we are using heteroskedastic-robust standard errors)
 
 ```r
 regress.results &lt;- lm(score ~ stratio + english, data = CASchools)
-het.se &lt;- vcovHC(regress.results)
-coeftest(regress.results, vcov.=het.se)
+modelsummary(list(regress.results,regress.results), vcov = c("classical","stata"))
 ```
 
-```
-## 
-## t test of coefficients:
-## 
-##               Estimate Std. Error  t value Pr(&gt;|t|)    
-## (Intercept) 686.032245   8.812242  77.8499  &lt; 2e-16 ***
-## stratio      -1.101296   0.437066  -2.5197  0.01212 *  
-## english      -0.649777   0.031297 -20.7617  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  (1) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;   (2) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 686.032 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 686.032 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (7.411) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (8.728) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; stratio &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.101 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.101 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.380) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.433) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; english &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.650 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.650 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.039) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.031) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 420 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 420 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.426 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.426 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 Adj. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.424 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.424 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3441.1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3441.1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3457.3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3457.3 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log.Lik. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1716.561 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1716.561 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; F &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 155.014 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 223.823 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RMSE &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 14.41 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 14.41 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Std.Errors &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; IID &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; HC1 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 ---
 ## Comparing Estimates
@@ -1076,6 +1190,113 @@ Suppose we want to categorize school districts as rural, suburban, and urban
       + However, the variance of the coefficient on correlated regressors will be larger than if they were uncorrelated.
 
 ---
+## Example of Multicollinearity (3)
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Both X1 and X2 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Only X1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Only X2 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.270 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.111 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.393 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.195) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.244) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.210) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; x1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.657 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 4.052 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.389) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.309) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; x2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.095 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 4.555 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.421) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.275) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 100 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.818 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.703 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.780 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 Adj. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.814 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.700 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.778 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 417.4 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 464.2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 434.1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 427.8 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 472.1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 441.9 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Log.Lik. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −204.693 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −229.119 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −214.041 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; F &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 167.019 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 171.932 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 274.124 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RMSE &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.87 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.39 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.06 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Std.Errors &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; HC3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; HC3 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; HC3 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+---
 ## The Distribution of the OLS Estimators in Multiple Regression
 
 * Since our OLS estimates depend on the sample, and we rely on random sampling, there will be uncertainty about how close these estimates are to the true model parameters
@@ -1207,7 +1428,7 @@ modelsummary::datasummary_balance(~1,data = CPSSW8, output = "html")
 &lt;/table&gt;
 &lt;/small&gt;
 ---
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
 
 ---
 &lt;small&gt;
@@ -1329,17 +1550,44 @@ One thing we can do with categorical variables is to identify statistical discri
 A simple linear regression of Avg. Hourly Earnings on Gender will give us a quick comparison of earnings between females and males.
 ]
 .pull-right[
-&lt;small&gt;
-
-|             |   (1)   | 
-|:------------|--------:|
-| (Intercept) |  20.086 | 
-|             | (0.054) | 
-| Female      |  -3.748 | 
-|             | (0.081) | 
-| Num.Obs.    |  61395  | 
-| R2          |  0.034  | 
-&lt;/small&gt;
+&lt;tiny&gt;
+&lt;table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 1 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 20.086*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.054) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −3.748*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.081) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.034 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; + p &amp;lt; 0.1, * p &amp;lt; 0.05, ** p &amp;lt; 0.01, *** p &amp;lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+&lt;/tiny&gt;
 ]
 
 ---
@@ -1347,22 +1595,71 @@ A simple linear regression of Avg. Hourly Earnings on Gender will give us a quic
 In this second regression we include some additional explanatory variables.
 
 `$$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age + \beta_3 education$$`
-&lt;small&gt;
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;earnings&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-3.748&lt;sup&gt;c&lt;/sup&gt; (0.081)&lt;/td&gt;&lt;td&gt;-4.250&lt;sup&gt;c&lt;/sup&gt; (0.071)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.157&lt;sup&gt;c&lt;/sup&gt; (0.003)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.748&lt;sup&gt;c&lt;/sup&gt; (0.014)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;20.086&lt;sup&gt;c&lt;/sup&gt; (0.054)&lt;/td&gt;&lt;td&gt;-10.026&lt;sup&gt;c&lt;/sup&gt; (0.237)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;font size="2"&gt;
+&lt;table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 2 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 20.086*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −10.026*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.054) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.237) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −3.748*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.250*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.081) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.071) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.157*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.003) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.748*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.014) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.034 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.249 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; + p &amp;lt; 0.1, * p &amp;lt; 0.05, ** p &amp;lt; 0.01, *** p &amp;lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
 &lt;/table&gt;
-&lt;/small&gt;
+&lt;/font&gt;
 ---
 ## Quadratic function
 
@@ -1370,32 +1667,102 @@ Economic theory tells us that there are diminishing returns to productivity. As 
 
 `$$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age + \beta_3 age^2 +\beta_4 education$$`
 
+We can include quadratics and other functions of the X's directly in the `lm()` function using `I()`. This method is beneficial as it allows us to take marginal effects with respect to the X variable.
+
 
 ```r
-CPSSW8$age2=CPSSW8$age*CPSSW8$age
-m3 = lm(earnings ~ factor(gender)+age+age2+education, data=CPSSW8)
-stargazer(m1,m2,m3,type="html",omit.stat = c("f","ser"), covariate.labels = c("Female","Age","Age Sq","Education"), star.char = c("a","b","c"))
+m3 = lm(earnings ~ factor(gender)+age+I(age^2)+education, data=CPSSW8)
+modelsummary(list("Model 1"=m1,"Model 2"=m2,"Model 3"=m3), estimate = "{estimate}{stars} ({std.error})", statistic = NULL,coef_rename = coef_rename,gof_map = c("nobs", "r.squared"))
 ```
 
 ---
 ## Quadratic function
-&lt;small&gt;
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3"&gt;earnings&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-3.748&lt;sup&gt;c&lt;/sup&gt; (0.081)&lt;/td&gt;&lt;td&gt;-4.250&lt;sup&gt;c&lt;/sup&gt; (0.071)&lt;/td&gt;&lt;td&gt;-4.239&lt;sup&gt;c&lt;/sup&gt; (0.071)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.157&lt;sup&gt;c&lt;/sup&gt; (0.003)&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age Sq&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.748&lt;sup&gt;c&lt;/sup&gt; (0.014)&lt;/td&gt;&lt;td&gt;1.724&lt;sup&gt;c&lt;/sup&gt; (0.014)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;20.086&lt;sup&gt;c&lt;/sup&gt; (0.054)&lt;/td&gt;&lt;td&gt;-10.026&lt;sup&gt;c&lt;/sup&gt; (0.237)&lt;/td&gt;&lt;td&gt;-25.762&lt;sup&gt;c&lt;/sup&gt; (0.522)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;font size="2"&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Model 1 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 2 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 3 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 20.086*** (0.054) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −10.026*** (0.237) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −25.762*** (0.522) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −3.748*** (0.081) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.250*** (0.071) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.239*** (0.071) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.157*** (0.003) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.986*** (0.025) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.748*** (0.014) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.724*** (0.014) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt; (Age^2) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; −0.010*** (0.000) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.034 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.249 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.262 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
 &lt;/table&gt;
-&lt;/small&gt;
+&lt;/font&gt;
+
+---
+## Quadratic function with marginal effects
+
+
+```r
+library(margins)
+summary(margins(m2))
+```
+
+```
+##        factor     AME     SE        z      p   lower   upper
+##           age  0.1572 0.0034  46.8851 0.0000  0.1506  0.1638
+##     education  1.7481 0.0144 121.0718 0.0000  1.7198  1.7764
+##  genderfemale -4.2502 0.0715 -59.4778 0.0000 -4.3903 -4.1102
+```
+
+```r
+summary(margins(m3))
+```
+
+```
+##        factor     AME     SE        z      p   lower   upper
+##           age  0.1617 0.0033  48.6376 0.0000  0.1552  0.1682
+##     education  1.7245 0.0143 120.3937 0.0000  1.6964  1.7526
+##  genderfemale -4.2390 0.0708 -59.8687 0.0000 -4.3778 -4.1002
+```
+
+Notice, there is a slight difference between when we include or exclude the quadratic term for age.
+
 ---
 ## Interaction term 
 
@@ -1404,28 +1771,84 @@ Potentially, the returns from education are different by gender. We add this fea
 `$$earnings_i = \beta_0+\beta_1 Female_i +\beta_2 age+ \beta_3 age^2 \\
 +\beta_4 education+ \beta_5 education *Female$$`
 
-We see from the regression results that there are not much difference with respect to education
+Including an interaction term is as easy as multiplying the two variables together.
+
+
+```r
+m4 = lm(earnings ~ age+I(age^2)+education
+        +education*factor(gender), data=CPSSW8)
+modelsummary(list("Model 2"=m2,"Model 3"=m3,"Model 4"=m4), 
+             estimate = "{estimate}{stars} ({std.error})", 
+             statistic = NULL,coef_rename = coef_rename,
+             gof_map = c("nobs", "r.squared"))
+```
 
 ---
 ## Interaction Term
-&lt;small&gt;
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="5" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="4"&gt;earnings&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;td&gt;(4)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="5" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-3.748&lt;sup&gt;c&lt;/sup&gt; (0.081)&lt;/td&gt;&lt;td&gt;-4.250&lt;sup&gt;c&lt;/sup&gt; (0.071)&lt;/td&gt;&lt;td&gt;-4.239&lt;sup&gt;c&lt;/sup&gt; (0.071)&lt;/td&gt;&lt;td&gt;-4.847&lt;sup&gt;c&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Female*Educ&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.044 (0.029)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.157&lt;sup&gt;c&lt;/sup&gt; (0.003)&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age Sq&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.748&lt;sup&gt;c&lt;/sup&gt; (0.014)&lt;/td&gt;&lt;td&gt;1.724&lt;sup&gt;c&lt;/sup&gt; (0.014)&lt;/td&gt;&lt;td&gt;1.706&lt;sup&gt;c&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;20.086&lt;sup&gt;c&lt;/sup&gt; (0.054)&lt;/td&gt;&lt;td&gt;-10.026&lt;sup&gt;c&lt;/sup&gt; (0.237)&lt;/td&gt;&lt;td&gt;-25.762&lt;sup&gt;c&lt;/sup&gt; (0.522)&lt;/td&gt;&lt;td&gt;-25.529&lt;sup&gt;c&lt;/sup&gt; (0.544)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.034&lt;/td&gt;&lt;td&gt;0.249&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="5" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="4" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="4" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="4" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;font size="2"&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 2 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 3 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 4 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −10.026*** (0.237) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −25.762*** (0.522) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −25.529*** (0.544) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.250*** (0.071) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.239*** (0.071) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.847*** (0.405) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.157*** (0.003) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.986*** (0.025) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.986*** (0.025) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.748*** (0.014) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.724*** (0.014) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.706*** (0.019) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Age^2) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.010*** (0.000) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.010*** (0.000) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt; Education:female &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; 0.044 (0.029) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.249 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.262 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.262 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
 &lt;/table&gt;
-&lt;/small&gt;
+&lt;/font&gt;
+
+We see from the regression results that there are not much differences with respect to education. 
 ---
 ## Location, Location, Location
 
@@ -1434,30 +1857,106 @@ There are often unobservable characteristics about markets that we would like to
 One way to handle this problem is to use categorical variables for the location of the person or firm. 
 
 These categorical variables will capture any time invariant differences between locations.  
+---
+## Location, Location, Location: Code 
+
+
+```r
+m5 = lm(earnings ~ age+I(age^2)+education+education*factor(gender)+factor(region), data=CPSSW8)
+modelsummary(list("Model 3"=m3,"Model 4"=m4,"Model 5"=m5), 
+             estimate = "{estimate}{stars} ({std.error})", 
+             statistic = NULL,coef_rename = coef_rename,
+             gof_map = c("nobs", "r.squared"))
+```
+
+One advantage of using modelsummary is that it is very customizable and does a few things for you. I want to point out three things.
+
+1. I can label each regression within the list command.
+2. Not only can you customize the variable names using the `coef_rename` function option, but modelsummary also includes a built function that cleans up the most common data label problems (see `coef_rename = coef_rename`)
+3. You can reduce the number of items that are printed out. I have chosen to only include the number of observations and `\(R^2\)`.
 
 ---
-## Location, Location, Location 
-&lt;small&gt;
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3"&gt;earnings&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;-4.239&lt;sup&gt;c&lt;/sup&gt; (0.071)&lt;/td&gt;&lt;td&gt;-4.847&lt;sup&gt;c&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;td&gt;-4.797&lt;sup&gt;c&lt;/sup&gt; (0.404)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;MidWest&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.257&lt;sup&gt;c&lt;/sup&gt; (0.105)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;South&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.217&lt;sup&gt;c&lt;/sup&gt; (0.101)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;West&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.425&lt;sup&gt;c&lt;/sup&gt; (0.106)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education*Female&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.044 (0.029)&lt;/td&gt;&lt;td&gt;0.042 (0.029)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.983&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age Squared&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;1.724&lt;sup&gt;c&lt;/sup&gt; (0.014)&lt;/td&gt;&lt;td&gt;1.706&lt;sup&gt;c&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;1.701&lt;sup&gt;c&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-25.762&lt;sup&gt;c&lt;/sup&gt; (0.522)&lt;/td&gt;&lt;td&gt;-25.529&lt;sup&gt;c&lt;/sup&gt; (0.544)&lt;/td&gt;&lt;td&gt;-24.603&lt;sup&gt;c&lt;/sup&gt; (0.550)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+## Location, Location, Location: Results 
+&lt;font size="2"&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 3 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 4 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  Model 5 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −25.762*** (0.522) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −25.529*** (0.544) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −24.603*** (0.550) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.239*** (0.071) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.847*** (0.405) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.797*** (0.404) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.986*** (0.025) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.986*** (0.025) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.983*** (0.025) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Age^2) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.010*** (0.000) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.010*** (0.000) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.010*** (0.000) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.724*** (0.014) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.706*** (0.019) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.701*** (0.019) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education:female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.044 (0.029) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.042 (0.029) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Midwest &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.257*** (0.105) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.217*** (0.101) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt; West &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; −0.425*** (0.106) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.262 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.262 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.265 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
 &lt;/table&gt;
-&lt;/small&gt;
+&lt;/font&gt;
 ---
 ## Log Transformation
 
@@ -1470,657 +1969,123 @@ However, there are some variables we use often that are always positive
 * income
 * wages 
 
-One method used to insure that we have a positive depedent variable is to transform the dependent variable by taking the natural log. 
+One method used to increase the fit of a positive dependent variable is to transform the dependent variable by taking the natural log. 
 
 ---
 ## Log Transformation
-&lt;small&gt;
+Let's look at log earnings instead of the level of earnings. Does it look more normally distributed?
 
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;earnings&lt;/td&gt;&lt;td&gt;log(earnings)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;td&gt;(3)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Female&lt;/td&gt;&lt;td&gt;0.986&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.983&lt;sup&gt;c&lt;/sup&gt; (0.025)&lt;/td&gt;&lt;td&gt;0.062&lt;sup&gt;c&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;MidWest&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;-0.010&lt;sup&gt;c&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;-0.001&lt;sup&gt;c&lt;/sup&gt; (0.00002)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;South&lt;/td&gt;&lt;td&gt;1.706&lt;sup&gt;c&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;1.701&lt;sup&gt;c&lt;/sup&gt; (0.019)&lt;/td&gt;&lt;td&gt;0.084&lt;sup&gt;c&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;West&lt;/td&gt;&lt;td&gt;-4.847&lt;sup&gt;c&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;td&gt;-4.797&lt;sup&gt;c&lt;/sup&gt; (0.404)&lt;/td&gt;&lt;td&gt;-0.507&lt;sup&gt;c&lt;/sup&gt; (0.022)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education*Female&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.257&lt;sup&gt;c&lt;/sup&gt; (0.105)&lt;/td&gt;&lt;td&gt;-0.056&lt;sup&gt;c&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-1.217&lt;sup&gt;c&lt;/sup&gt; (0.101)&lt;/td&gt;&lt;td&gt;-0.073&lt;sup&gt;c&lt;/sup&gt; (0.005)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Age Squared&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.425&lt;sup&gt;c&lt;/sup&gt; (0.106)&lt;/td&gt;&lt;td&gt;-0.027&lt;sup&gt;c&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Education&lt;/td&gt;&lt;td&gt;0.044 (0.029)&lt;/td&gt;&lt;td&gt;0.042 (0.029)&lt;/td&gt;&lt;td&gt;0.020&lt;sup&gt;c&lt;/sup&gt; (0.002)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-25.529&lt;sup&gt;c&lt;/sup&gt; (0.544)&lt;/td&gt;&lt;td&gt;-24.603&lt;sup&gt;c&lt;/sup&gt; (0.550)&lt;/td&gt;&lt;td&gt;0.375&lt;sup&gt;c&lt;/sup&gt; (0.030)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;td&gt;61,395&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.262&lt;/td&gt;&lt;td&gt;0.265&lt;/td&gt;&lt;td&gt;0.268&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/small&gt;
----
-class: center, middle, inverse
-# Panel Data
+```r
+histogram(~log(CPSSW8$earnings) | CPSSW8$gender, xlab = "Earnings")
+```
+
+![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
 
 ---
-## Panel Data
-
-Panel (or longitudinal) data are observations for `\(n\)` entities observed at `\(T\)` different periods. 
-
-A balanced panel data has observations for all the `\(n\)` entities at every period.
-
-An unbalanced panel data will have some observations missing at some periods.
-
-
-In this chapter we will focus on state traffic fatalities `\((n = 48\)` and `\(T = 7)\)`
-
-An observed variable is denoted as `\(Y_{it}\)`
-
----
-## Example: Traffic Deaths and Alcohol Taxes (1)
-
-There are approximately 40,000 highway traffic fatalities each year in the US.
-
-Approximately a quarter of fatal crashes involve a driver who was drinking.
-
-It is estimated that 25% of drivers on the road between 1am and 3am have been drinking.
-
-A driver who is legally drunk is at least 13 times as likely to cause a fatal crash as a driver who has not been drinking.
-
----
-## Example: Traffic Deaths and Alcohol Taxes (2)
-
-We want to study government policies that can be used to discourage drunk driving.
+## Log Transformation: Code
 
 
 ```r
-library("AER")
-data("Fatalities")
-fatality.data=Fatalities
-fatality.data$year &lt;- factor(fatality.data$year)
-fatality.data$mrall &lt;- with(Fatalities, fatal/pop * 10000) 
-fatal.82.88.data &lt;- subset(fatality.data, year %in% c("1982", "1988"))
+m6 &lt;- lm(log(earnings) ~ age+I(age^2)+education+education*factor(gender)
+         +factor(region), data=CPSSW8)
+modelsummary(list("Earnings"=m4,"Earnings"=m5,"Log(Earnings)"=m6),
+             output = "html", estimate = "{estimate}{stars} ({std.error})", 
+             statistic = NULL, coef_rename = coef_rename,
+             gof_map = c("nobs", "r.squared"))
 ```
 
+In the code, you can see that we include the log term directly into the `lm()` function.
 ---
-## Example: Traffic Deaths and Alcohol Taxes (3)
-
-Consider regressing `\(FatalityRate\)` (annual traffic deaths per 10,000 people in a state) on `\(BeerTax\)` `$$\begin{alignat*}{3} \widehat{FatalityRate} = &amp;~2.01 &amp;{}+{} &amp;0.15 BeerTax \qquad \text{(1982 data)} \\ &amp;(0.15) &amp; &amp;(0.13) \\ \widehat{FatalityRate} = &amp;~1.86 &amp;{}+{} &amp;0.44 BeerTax \qquad \text{(1988 data)} \\ &amp;(0.11) &amp; &amp;(0.13) \end{alignat*}$$`
-
----
-class: middle, inverse, center
-# Panel Data with Two Time Periods: "Before and After" Comparisons
-
----
-## Dealing with Possible OVB
-
-The previous regression very likely suffer from OVB (which omitted variables?).
-
-We can expand our specification to include these omitted variables, but some, like cultural attitudes towards drinking and driving in different states, would be difficult to control for.
-
-If such omitted variables are constant across time, then we can control for them using panel data methods.
-
-Suppose we have observations for `\(T = 2\)` periods for each of the `\(n = 48\)` states.
-
-This approach is based on comparing the _"differences''_ in the regression variables.
-
----
-## Modeling the Time-Constant Omitted Variable
-
-Consider having an omitted variable `\(Z_i\)` that is state specific but constant across time
-
-`$$FatalityRate_{it} = \beta_0 + \beta_1 BeerTax_{it} + \beta_2 Z_i + u_{it}$$`
-
-Consider the model for the years 1982 and 1988
-
-`$$\begin{align*} FatalityRate_{i,1982} &amp;= \beta_0 + \beta_1 BeerTax_{i,1982} + \beta_2 Z_i + u_{i,1982} \\ FatalityRate_{i,1988} &amp;= \beta_0 + \beta_1 BeerTax_{i,1988} + \beta_2 Z_i + u_{i,1988} \end{align*}$$`
----
-## Regress on Changes (1)
-
-Subtract the previous models for the two observed years
-
-`$$\begin{align*} FatalityRate_{i,1988}&amp; - FatalityRate_{i,1982} = \\ &amp;\beta_1 (BeerTax_{i,1988} - BeerTax_{i,1982}) \\ {} &amp;+ (u_{i,1988} - u_{i,1982}) \end{align*}$$`
-
-Intuitively, by basing our regression on the change in fatalities we can ignore the time constant omitted variables.
-
----
-## Regress on Changes (2)
-
-If we regress the change in fatalities in states on the change in taxes we get `$$\begin{align*} &amp;\widehat{FatalityRate_{1988} - FatalityRate_{1982}} = \\ &amp;\qquad {} - 0.072 - 1.04 (BeerTax_{1988} - BeerTax_{1982}) \end{align*}$$`
-
-(with standard errors `\(0.064\)` and `\(0.26\)`, respectively)
-
-We reject the hypothesis that `\(\beta_1\)` is zero at the 5% level. 
-
-According to this estimate an increase of $1 tax would reduce traffic fatalities by 1.04 deaths/10,000 people (a reduction by 2 of current average fatality in the data).
-
----
-class: center, middle, inverse
-
-# Fixed Effects Models
-
----
-## Suppose you want to estimate demand
-
-Suppose you want to learn the effect of price on the demand for back massages. You have the following data from four Midwest locations:
-
-Location |	Year |	Per capita Quantity |	Price 
----------|-------|----------------------|------
-Madison |	2003|	0.8	| $55 
-Peoria |	2003 |	1	 | $50 
-Milwaukee |	2003 |	1.5 |	$60 
-Chicago |	2003 |	2 |	$75 
-
-Notice, these data are cross-sectional data for the year 2003
-
-Quickly, eye ball the data. What is unusual about this demand function?
-
----
-## Graph
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
----
-### Panel Data
-You observe multiple cities for 2 years each.
-
-Location |	Year |	Per capita Quantity |	Price 
----------|-------|----------------------|------
-Madison |	2003|	0.8	| $55 
-Madison | 2004 | 0.7 | $60
-Peoria |	2003 |	1	 | $50 
-Peoria | 2004 | 1.1 | $48
-Milwaukee |	2003 |	1.5 |	$60 
-Milwaukee | 2004 | 1.4 | $65
-Chicago |	2003 |	2 |	$75 
-Chicago | 2004 | 1.8 | $85
-
-Within each of the four cities, price and quantity are inversely correlated, as you would expect if demand is downward sloping.
----
-### Panel Data
-We can see the relationship clearer if we take first differences of the data.
-
-Location | Year | Per capita Quantity |	Price | `\(\Delta\)`Q | `\(\Delta\)`P 
----------|-------|----------------------|------|--------|----
-Madison  |	2003 |	0.8	                | $55    |      |
-Madison  | 2004  | 0.7                  | $60 | -0.1 | $5
-Peoria |	2003 |	1	 | $50 |   |
-Peoria | 2004 | 1.1 | $48 | .1 | $2
-Milwaukee |	2003 |	1.5 |	$60 |  | 
-Milwaukee | 2004 | 1.4 | $65 | -.1 | $5
-Chicago |	2003 |	2 |	$75 |  |
-Chicago | 2004 | 1.8 | $85 | -.2| $10
-
-A simple regression on these differences will give us our result. But what if we have more data?
-
----
-### More years of data
-
-If we have lots of years of data, things get messier. We could, in principle, compute all of the differences (i.e., 2004 versus 2003, 2005 versus 2004, etc.) and then run a single regression, but there is an easier way. 
-
-Instead of thinking of each year’s observation in terms of how much it differs from the prior year for the same city, let’s think about how much each
-observation differs from the average for that city. With two key variables, price and quantity, we will be concerned with the following:
-
-- Variations in prices around the mean price for each city
-- Variations in quantities around the mean quantity for each city.
-
-We want to know whether variations in the quantities (around their means) are related to variations in prices (around their means). 
-
----
-### More years of data
-
-With our relatively small massage data set, we can do this by hand. 
-
-Location | Year | Price |	`\(\bar{P}\)` | Quantity | `\(\bar{Q}\)` 
----------|-------|----------------------|------|--------|----
-Madison  |	2003 |	$55	  | $57.5    |  0.8    | 0.75
-Madison  | 2004  | $60   | $57.5 | 0.7 | 0.75
-Peoria |	2003 |	$50	 | $49 |  1 | 1.05
-Peoria | 2004 | $48 | $49 | 1.1 | 1.05
-Milwaukee |	2003 |	$60 |	$62.5 | 1.5 | 1.45 
-Milwaukee | 2004 | $65 | $62.5 | 1.4 | 1.45
-Chicago |	2003 |	$75 |	$80 |  2.0 | 1.9
-Chicago | 2004 | $85 | $80 | 1.8 | 1.9
-
----
-### More years of data
-Location | Year | Price |	`\(\bar{P}\)` | Price - `\(\bar{P}\)` | Quantity | `\(\bar{Q}\)` |  Quantity - `\(\bar{Q}\)`
----------|-------|------|-----------|---|-------|----
-Madison  |	2003 |	$55	  | $57.5    | -2.5  | 0.8    | 0.75 | 0.05
-Madison  | 2004  | $60   | $57.5 | 2.5  |0.7 | 0.75 | -.05
-Peoria |	2003 |	$50	 | $49 | 1  | 1 | 1.05 | -0.05 
-Peoria | 2004 | $48 | $49 | -1 |1.1 | 1.05 | 0.05
-Milwaukee |	2003 |	$60 |	$62.5 |-2.5 | 1.5 | 1.45 | 0.05
-Milwaukee | 2004 | $65 | $62.5| 2.5 | 1.4 | 1.45 | -0.05
-Chicago |	2003 |	$75 |	$80 |-5  |2.0 | 1.9 | 0.2
-Chicago | 2004 | $85 | $80 | 5  |1.8 | 1.9 | -0.2
-
-Note that by subtracting the means, we have restricted all of the action in the regression to within-city action. 
-
-Thus, we have eliminated the key source of omitted variable bias, namely, unobservable across-city differences.
-
----
-### Graph without adjusting for fixed effects
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
-
----
-### Graph with adjusting for fixed effects
-
-```r
-data1 &lt;- data1 %&gt;% group_by(Location) %&gt;% mutate(price_m = mean(Price), quantity_m = mean(Quantity))
-data1 &lt;- data1 %&gt;% mutate(difprice = Price-price_m, difquantity= Quantity-quantity_m)
-library(tidyverse)
-data1 %&gt;% ggplot(aes(x=difquantity, y=difprice))+geom_point()+geom_smooth(method = "lm", formula = y~x)
-```
-
-![](Linear-Regression-with-Multiple-Regresors_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
-
----
-### Graph with adjusting for fixed effects
-
-```r
-library(stargazer)
-library(plm)
-reg1&lt;-lm(Price ~ Quantity, data = data1)
-reg2 &lt;-lm(difprice ~ difquantity, data = data1)
-reg3 &lt;- lm(Price ~ Quantity + factor(Location), data = data1)
-reg4 &lt;- plm(Price ~ Quantity, data = data1, model = "within", effect = "individual", index = c("Location","Year"))
-stargazer(reg1,reg2,reg3,reg4, type = "html")
-```
----
-
-### Graph with adjusting for fixed effects
-&lt;small&gt;
-&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
-&lt;caption&gt;Statistical models&lt;/caption&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 3&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 4&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+## Log Transformation: Results
+&lt;font size="2"&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Earnings &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Earnings  &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Log(Earnings) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
 &lt;tbody&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;35.62&lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.00&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;166.86&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(9.52)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.28)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(11.54)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Quantity&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;20.69&lt;sup&gt;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-45.71&lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-45.71&lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(7.00)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(6.06)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(6.06)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;difquantity&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-45.71&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(4.29)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;factor(Location)Madison&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-75.07&lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(7.06)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;factor(Location)Milwaukee&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-38.07&lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(2.95)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;factor(Location)Peoria&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-69.86&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(5.28)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.59&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.95&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1.00&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.95&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.53&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.94&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.99&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.88&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-bottom: 2px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;8&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;8&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;8&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;8&lt;/td&gt;
-&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −25.529*** (0.544) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −24.603*** (0.550) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.375*** (0.030) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.986*** (0.025) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.983*** (0.025) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.062*** (0.001) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Age^2) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.010*** (0.000) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.010*** (0.000) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.001*** (0.000) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.706*** (0.019) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.701*** (0.019) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.084*** (0.001) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.847*** (0.405) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −4.797*** (0.404) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.507*** (0.022) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Education:female &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.044 (0.029) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.042 (0.029) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.020*** (0.002) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Midwest &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.257*** (0.105) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.056*** (0.006) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; South &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.217*** (0.101) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.073*** (0.005) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt; West &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; −0.425*** (0.106) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; −0.027*** (0.006) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 61395 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.262 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.265 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.268 &lt;/td&gt;
+  &lt;/tr&gt;
 &lt;/tbody&gt;
-&lt;tfoot&gt;
-&lt;tr&gt;
-&lt;td style="font-size: 0.8em;" colspan="5"&gt;&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tfoot&gt;
 &lt;/table&gt;
-&lt;/small&gt;
----
-class: middle, inverse, center
-# Fixed Effect Regression
+&lt;/font&gt;
 
 ---
-## The Fixed Effects Regression Model
-
-We can modify our previous model
-
-`$$Y_{it} = \beta_0 + \beta_1 X_{it} + \beta_2 Z_i + u_{it}$$`
-
-as
-
-`$$Y_{it} = \beta_1 X_{it} + \alpha_i + u_{it}$$`
-
-where `\(\alpha_i = \beta_0 + \beta_2Z_i\)` are the `\(n\)` entity specific intercepts.
-
-These are also known as entity fixed effects, since they represent the constant effect of being in entity `\(i\)`.
-
----
-## Dummy Variable Fixed Effects Regression Model
-
-Let the dummy variable `\(D1_i\)` be binary variable that equal 1 when `\(i = 1\)`, 0 otherwise. 
-
-We can likewise define `\(n\)` dummy variables `\(Dj_i\)` which are equal to 1 when `\(j = i\)`. We can write our model as
-
-`$$Y_{it} = \beta_0 + \beta_1 X_{it} + \underbrace{\gamma_2 D2_i + \gamma_3 D3_i + \cdots + \gamma_n Dn_i}_{n-1 \text{ dummy variables}} + u_{it}$$`
----
-## Fixed Effects Animated
-
-&lt;img src="myFE.gif" style="display: block; margin: auto;" /&gt;
-
----
-## Multiple Regression Model
-
-We can easily extend both forms of the fixed effects model to include multiple regressors
-
-`$$\begin{align*} Y_{it} &amp;= \beta_1 X_{1,it} + \cdots + \beta_k X_{k,it} + \alpha_i + u_{it} \\ Y_{it} &amp;= \beta_0 + \beta_1 X_{1,it} + \cdots + \beta_k X_{k,it}\\ {} &amp;+ \gamma_2 D2_i + \gamma_3 D3_i + \cdots + \gamma_n Dn_i + u_{it} \end{align*}$$`
-
----
-## Estimation and Inference (1)
-
-We now have `\(k + n\)` coefficients to estimate
-
-We are not interested in estimating the entity-specific effects so we need a way to subtract them from the regression. We use an "entity-demeaned" OLS algorithm.
-
-  * We subtract the entity specific average from each variables
-  * We regress the demeaned dependent variable on the demeaned regressors
-
----
-## Estimation and Inference (2)
-
-Taking averages of the fixed effects model 
-`$$\bar{Y}_i = \beta_1\bar{X}_i + \alpha_i + \bar{u}_i$$` 
-and subtract it from the original model 
-`$$Y_{it} - \bar{Y}_i = \beta_1(X_{it} - \bar{X}_i) + (u_{it} - \bar{u}_i)$$`
-or 
-`$$\tilde{Y}_{it} = \beta_1 \tilde{X}_{it} + \tilde{u}_{it}$$`
-We will discuss needed assumptions in order to carry out OLS regression and inference below.
-
----
-## Application to Traffic Deaths
-
-
-```r
-library(plm)
-regress.results.fe.only &lt;- plm(mrall ~ beertax, 
-                               data=fatality.data, 
-                               index=c('state', 'year'), 
-                               effect='individual', 
-                               model='within')
-robust.se &lt;- vcovHC(regress.results.fe.only, method="arellano", type="HC2")
-coeftest(regress.results.fe.only, vcov = robust.se)
-```
-
-```
-## 
-## t test of coefficients:
-## 
-##         Estimate Std. Error t value Pr(&gt;|t|)  
-## beertax -0.65587    0.29294 -2.2389  0.02593 *
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
----
-## Regressions with Time Fixed Effects
-
-__Time Fixed Effects__
-
-In the previous regression there is still a possibility of OVB due to effects are constant across states by different across time.
-
-We can modify our model to
-
-`$$Y_{it} = \beta_0 + \beta_1 X_{it} + \beta_2 Z_i + \beta_3 S_t + u_{it}$$`
-
-where `\(S_t\)` is unobserved.
-
----
-## Time Effects Only (1)
-
-Suppose that entity specific effects ($Z_i$) are not present in our model but time effects are.
-
-The same as with entity fixed effects we can model time effects as having a different intercept per time period 
-`$$Y_{it} = \beta_1 X_{it} + \lambda_t + u_{it}$$` 
-where `\(\lambda_1,\dots, \lambda_T\)` are the time fixed effects.
-
----
-## Time Effects Only (2)
-
-We can also use the dummy variable approach. Let `\(Bs_t\)` be equal to 1 if `\(s = t\)` and 0 otherwise.
-
-`$$Y_{it} = \beta_0 + \beta_1 X_{it} + \underbrace{\delta_2 B2_t + \cdots + \delta_T BT_t}_{T-1\text{ dummy variables}} + u_{it}$$`
----
-## Application to Traffic Deaths
-
-
-```r
-library(plm)
-regress.results.fe.time1 &lt;- plm(mrall ~ beertax, 
-                               data=fatality.data, 
-                               index=c('state', 'year'), 
-                               effect='time', 
-                               model='within')
-robust.se &lt;- vcovHC(regress.results.fe.time1, method="arellano", type="HC2")
-coeftest(regress.results.fe.time1, vcov = robust.se)
-```
-
-```
-## 
-## t test of coefficients:
-## 
-##         Estimate Std. Error t value Pr(&gt;|t|)   
-## beertax  0.36634    0.12000  3.0527 0.002453 **
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
----
-## Both Entity and Time Fixed Effects
-
-Now to control for both `\(Z_i\)` and `\(S_t\)` we have the combined entity and time fixed effects regression model
-
-`$$Y_{it} = \beta_1 X_{it} + \alpha_i + \lambda_t + u_{it}$$`
-
-or
-
-`$$\begin{align*} Y_{it} &amp;= \beta_0 + \beta_1 X_{it} + \gamma_2 D2_i + \cdots + \gamma_n Dn_i \\ {}&amp;+ \delta_2 B2_t + \cdots + \delta_T BT_t + u_{it} \end{align*}$$`
----
-## Application to Traffic Deaths
-
-
-```r
-regress.results.fe.time &lt;- plm(mrall ~ beertax,
-                               data = fatality.data, 
-                               index = c('state', 'year'), 
-                               effect = 'twoways', 
-                               model = 'within')
-robust.se &lt;- vcovHC(regress.results.fe.time, method="arellano", type="HC2")
-coeftest(regress.results.fe.time, vcov = robust.se)
-```
-
-```
-## 
-## t test of coefficients:
-## 
-##         Estimate Std. Error t value Pr(&gt;|t|)  
-## beertax -0.63998    0.35725 -1.7914   0.0743 .
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
----
-class: middle, center, inverse
-## The Fixed Effects Regression Assumptions and Standard Errors for Fixed Effects Regression
-
----
-## The Fixed Effects Regression Assumptions
-
-`$$Y_{it} = \beta_1 X_{it} + \alpha_i + u_{it},~~i = 1, \dots,n,~~t = 1,\dots,T.$$`
-
-- FE.A.1: `\(u_{it}\)` has conditional mean zero: `\(E[u_{it}|X_{i1}, \dots, X_{iT}, \alpha_i] = 0\)`.
-- FE.A.2: `\((X_{i1}, \dots, X_{iT}, u_{i1},\dots,u_{iT})\)`, `\(i = 1,\dots,n\)` are i.i.d. draws from their joint distribution.
-- FE.A.3: Large outliers are unlikely.
-- FE.A.4: No perfect multicollinearity.
-
----
-## Serial Correlation of Standard Errors (1)
-
-An important assumption for fixed effects regressions is FE.A.2
-
-The assumption requires variables to be independent across entities but not necessarily within entities.
-
-For example any `\(X_{it}\)` and `\(X_{is}\)` for `\(t \ne s\)` can be correlated: this is called autocorrelation or serial correlation.
-
----
-## Serial Correlation of Standard Errors (2)
-
-Autocorrelation is common in time series and panel data: 
-
-what happens in one period is probably correlated with what happens in other periods for the same entity.
-
-The same can be said for the error terms `\(u_{it}\)`.
-
-For that reason we need to use heteroskedasticity- and autocorrelation-consistent (HAC) standard errors.
-
----
-## Let us test for Serial Correlation in R
-
-
-```r
-pbgtest(regress.results.fe.time)
-```
-
-```
-## 
-## 	Breusch-Godfrey/Wooldridge test for serial correlation in panel models
-## 
-## data:  mrall ~ beertax
-## chisq = 54.188, df = 7, p-value = 2.159e-09
-## alternative hypothesis: serial correlation in idiosyncratic errors
-```
-
----
-## Robust Standard Errors
-
-We will use two types of robust standard erros to deal with the problem of heteroskedasticity.
-
-- General Robust Standard errors
-- Clustered Robust Standard Errors
-
----
-## Robust Standard Errors
-
-In regression and time-series modelling, basic forms of models make use of the assumption that the errors or disturbances `\(u_i\)` have the same variance across all observation points. 
-
-When this is not the case, the errors are said to be heteroscedastic, or to have heteroscedasticity, and this behaviour will be reflected in the residuals `\(u_i\)`  estimated from a fitted model. 
-
-Heteroscedasticity-consistent standard errors are used to allow the fitting of a model that does contain heteroscedastic residuals. 
-
-The first such approach was proposed by Huber (1967), and further improved procedures have been produced since for cross-sectional data, time-series data and GARCH estimation.
-
----
-## How to test for heteroscedasticity in R
-
-We use the Breusch-Pagan test to detect heteroskedasticity. The null hypothesis is homoskedasticity in the errors.
-
-
-```r
-library(lmtest)
-bptest(mrall ~ beertax+factor(state)+factor(year), data = fatality.data, studentize=F)
-```
-
-```
-## 
-## 	Breusch-Pagan test
-## 
-## data:  mrall ~ beertax + factor(state) + factor(year)
-## BP = 295.57, df = 54, p-value &lt; 2.2e-16
-```
-
----
-## Clustered Robust Standard Errors
-Let's say that you want to relax the Gauss-Markov homoskedasticity assumption, and account for the fact that there may be several different covariance structures within your data sample that vary by a certain characteristic - a "cluster" - but are homoskedastic within each cluster.
-
-For example, say you have a panel data set with a bunch of different test scores from different schools around the country. 
-
-You may want to cluster your sample by state, by school district, or even by town. 
-
-Economic theory and intuition will guide you in this decision.
+## Log Transformation Interpretation
+We do need to change our interpretation of the parameters when using log transformations.
+
+1. `\(Y=\hat{\beta_0}+\hat{\beta_1} X \implies\)` A one unit increase in `\(X\)` leads to a `\(\hat{\beta_1}\)` unit change in `\(Y\)`.
+2. `\(lnY=\hat{\beta_0}+\hat{\beta_1} X \implies\)` A one unit increase in `\(X\)` leads to a `\(\hat{\beta_1}\)` percent change in `\(Y\)`.
+3. `\(Y=\hat{\beta_0}+\hat{\beta_1} lnX \implies\)` A one percent increase in `\(X\)` leads to a `\(\hat{\beta_1}\)`*.01 unit change in `\(Y\)`.
+4. `\(lnY=\hat{\beta_0}+\hat{\beta_1} lnX \implies\)` A one percent increase in `\(X\)` leads to a `\(\hat{\beta_1}\)` percent change in `\(Y\)`.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

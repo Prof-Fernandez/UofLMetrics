@@ -4,7 +4,6 @@
     <title>Linear Regression</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.20/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -14,21 +13,11 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-.title[
 # Linear Regression
-]
-.subtitle[
 ## Instrumental Variables
-]
-.author[
 ### Jose M. Fernandez
-]
-.institute[
 ### University of Louisville
-]
-.date[
-### 2020-7-4 (updated: 2023-01-31)
-]
+### 2020-7-4 (updated: 2020-07-10)
 
 ---
 
@@ -112,165 +101,7 @@ Three important threats to internal validity are:
 
 Instrumental variables regression can eliminate bias when 
 `\(E(u|X) \ne 0\)` by using an _instrumental variable, Z_
----
-## Omitted Variable Bias
 
-Remember that an omitted variable bias is present when
-1. An omitted variables W explains Y
-2. The omitted variable is correlated with X.
-
-I will show you how big of a difference this can have on your estimates.
----
-## OVB example 1
-rho = 0.6
-
-```r
-library(MASS)
-N &lt;- 200 # Number of random samples
-set.seed(123)
-# Target parameters for univariate normal distributions
-rho &lt;- 0.6; mu1 &lt;- 1; s1 &lt;- 2; mu2 &lt;- 1; s2 &lt;- 8
-# Parameters for bivariate normal distribution
-mu &lt;- c(mu1,mu2) # Mean
-bvn1 &lt;- as.data.frame(mvrnorm(N, c(1,1),matrix(c(s1^2, s1*s2*rho, s1*s2*rho, s2^2),2)))
-colnames(bvn1) &lt;- c("X","W")
-u1 &lt;- rnorm(N,sd=4)
-bvn1$y &lt;- 12+2*bvn1$X-4*bvn1$W
-summary(lm(y~X,data = bvn1))
-```
-
-```
-## 
-## Call:
-## lm(formula = y ~ X, data = bvn1)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -82.155 -13.782   1.483  16.295  60.015 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  16.5646     1.9031   8.704 1.25e-15 ***
-## X            -7.0219     0.8739  -8.035 8.25e-14 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 24.37 on 198 degrees of freedom
-## Multiple R-squared:  0.2459,	Adjusted R-squared:  0.2421 
-## F-statistic: 64.57 on 1 and 198 DF,  p-value: 8.249e-14
-```
-
----
-## OVB example 2
-rho = -0.6
-
-```r
-library(MASS)
-N &lt;- 200 # Number of random samples
-set.seed(123)
-# Target parameters for univariate normal distributions
-rho &lt;- -0.6; mu1 &lt;- 1; s1 &lt;- 2; mu2 &lt;- 1; s2 &lt;- 8
-# Parameters for bivariate normal distribution
-mu &lt;- c(mu1,mu2) # Mean
-bvn1 &lt;- as.data.frame(mvrnorm(N, c(1,1),matrix(c(s1^2, s1*s2*rho, s1*s2*rho, s2^2),2)))
-colnames(bvn1) &lt;- c("X","W")
-u1 &lt;- rnorm(N,sd=4)
-bvn1$y &lt;- 12+2*bvn1$X-4*bvn1$W
-summary(lm(y~X,data = bvn1))
-```
-
-```
-## 
-## Call:
-## lm(formula = y ~ X, data = bvn1)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -63.072 -16.568  -1.038  16.010  61.824 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) -0.02937    1.97281  -0.015    0.988    
-## X           10.83142    0.92176  11.751   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 25.03 on 198 degrees of freedom
-## Multiple R-squared:  0.4109,	Adjusted R-squared:  0.4079 
-## F-statistic: 138.1 on 1 and 198 DF,  p-value: &lt; 2.2e-16
-```
----
-## OVB example 3
-rho = 0
-
-```r
-library(MASS)
-N &lt;- 200 # Number of random samples
-set.seed(123)
-# Target parameters for univariate normal distributions
-rho &lt;- 0; mu1 &lt;- 1; s1 &lt;- 2; mu2 &lt;- 1; s2 &lt;- 8
-# Parameters for bivariate normal distribution
-mu &lt;- c(mu1,mu2) # Mean
-bvn1 &lt;- as.data.frame(mvrnorm(N, c(1,1),matrix(c(s1^2, s1*s2*rho, s1*s2*rho, s2^2),2)))
-colnames(bvn1) &lt;- c("X","W")
-u1 &lt;- rnorm(N,sd=4)
-bvn1$y &lt;- 12+2*bvn1$X-4*bvn1$W
-summary(lm(y~X,data = bvn1))
-```
-
-```
-## 
-## Call:
-## lm(formula = y ~ X, data = bvn1)
-## 
-## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -104.812  -18.707    1.722   20.135   72.846 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)    8.659      2.355   3.677 0.000304 ***
-## X              1.580      1.076   1.468 0.143684    
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 30.25 on 198 degrees of freedom
-## Multiple R-squared:  0.01077,	Adjusted R-squared:  0.005771 
-## F-statistic: 2.155 on 1 and 198 DF,  p-value: 0.1437
-```
-
----
-## Measurement Error
-
-Measurement error can occur for several reasons. 
-
-1) Recall error: sometimes people just do not remember the exact number. Could you tell me how much your take home pay is? How many minutes you slept last night? How much you weigh?
-
-2) Lying: Maybe you know the true value, but you do not want to report it so you make up a number. Again, think of income, weight, and height. 
-
-3) Data Entry error: Sometimes a finger slips or a number is transposed.
-
-4) Not understanding the question. 
-
----
-## Types of Measurement Error
-
-Two types of measurement error
-1. Measurement error in Y
-2. Measurement error in X
-
-Measurement error in Y does not tend to have a large consequence.
-Suppose we observe `\(y^*\)` and `\(y* = y + v\)`, where `\(y\)` is the true value and `\(v\)` is a random independent error.
-
-If the true regression equation is `$$y = \beta_0+\beta_1X+e$$`, but we use `\(y*\)` instead of `\(y\)`, then the regression model changes to 
-`$$\begin{align} y^* &amp;= \beta_0+\beta_1X+e \\ y+v &amp;= \beta_0+\beta_1X+e \\ y &amp;= \beta_0+\beta_1X+e-v \end{align}$$`
-Consequence, our regression error has a larger variance.
----
-## Measurement error in X
-If X has measurement error, then we will have bias in our estimate.
-Recall, `\(\beta_1=cov(x,y)/var(x)\)` in the simple linear regression case. 
-Consider, the following regression. `$$y=\beta_0+\beta_1X^*+u$$` where `\(X^*=X+v\)`. This means our estimate of `$$\begin{align}\hat{\beta_1}&amp;=\frac{COV(X^*,y)}{Var(X^*)}=\frac{COV(X+v,y)}{Var(X+v)} \\ &amp;=\frac{COV(X,y)+COV(y,v)}{Var(X)+Var(v)} \\ &amp;=\beta_1\frac{\sigma^2_x}{\sigma^2_x+\sigma^2_v} \end{align}$$`
-The result is an attenuation bias. That is, the estimated parameter is biased toward zero. As the measurement error, `\(\sigma^2_v\)`, becomes smaller the bias goes away.
 ---
 class: middle, center, inverse
 ## The IV Estimator with a Single Regressor and a Single Instrument
@@ -418,6 +249,13 @@ with `\(R^2 = 0.47\)`.
 
 ```r
 suppressMessages(library("AER"))
+```
+
+```
+## Warning: package 'survival' was built under R version 4.0.2
+```
+
+```r
 suppressMessages(library("plm"))
 data("CigarettesSW")
 ```
@@ -917,7 +755,6 @@ J. Angrist and A. Krueger, "Does Compulsory School Attendance Affect Schooling a
 J. Angrist, et al., "Who benefits from KIPP?", J. of Policy Analysis and Management, Fall 2012.
 
 J. Angrist, V. Lavy, and A. Schlosser, "Multiple Experiments for the Quantity and Quality of Children", Journal of Labor Economics 28, October 2010.
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -965,19 +802,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
-// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
-// screen reader (see PR #262)
-(function(d) {
-  let res = {};
-  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
-    const t = tr.querySelector('td:nth-child(2)').innerText;
-    tr.querySelectorAll('td:first-child .key').forEach(key => {
-      const k = key.innerText;
-      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
-    });
-  });
-  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
-})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
