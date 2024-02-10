@@ -116,7 +116,7 @@ include_graphics('correlation.png')
 
 In the physical sciences:
 - Often, one can answer this type of question by running an experiment on a specific unit.
-- Example: Galileo Galilei Leaning Tower of Pisa experiment
+- Example: [Galileo Galilei Leaning Tower of Pisa experiment](https://ket.pbslearningmedia.org/resource/nvmm-math-fallingbodies/galileos-falling-bodies/)
     + Necessary conditions (ceteris paribus, other things being equal):
     + Temporal stability: the response does not change if we change the moment when the treatment is applied.
     + Causal transience: the response of one treatment is not affected by prior exposure of the unit to the other treatment.
@@ -210,12 +210,13 @@ hence:
 ## Types of randomized experiments
 A randomized experiment is designed and implemented consciously by social scientists. It entails conscious use of a treatment and control group with random assignment.
   - __Lab experiments__
-      - The effect of feedback on relative performance (Azmat and Iriberri, 2012). __Yes you work harder__
+      - The effect of feedback on relative performance ([Azmat and Iriberri, 2012]()). __Yes you work harder__
   - __Field experiments__ (Lab-in-the-field)
-      - The effect of feedback on relative performance: (Bagues et al, work in progress) __Yes Students work harder__
+      - The effect of feedback on relative performance: ([Bagues et al, work in progress](https://www.manuelbagues.com/field_experiment%20-%20azmat,%20bagues,%20cabrales%20and%20iriberri%20-%202015.pdf)) __Yes Students work harder__
   - __Natural experiments__ 
     - has a source of randomization that is as if randomly assigned, but not part of real experiment.
-    - Vietnam-era service effect on education and earnings (Flory, Leibbrandt and List 2010) __Women Shy away from competitive work settings__
+    - Student feedback at a high school [Azmat and Iriberri 2010](https://www.sciencedirect.com/science/article/abs/pii/S0047272710000411) _Yes Students work harder__
+    - Vietnam-era service effect on education and earnings ([Flory, Leibbrandt and List 2010](https://www.nber.org/papers/w16546)) __Women Shy away from competitive work settings__
       
 ---
 ## Who uses Experiments in Business?
@@ -230,15 +231,16 @@ They embraced the idea of "Data-Base Management" where the results of experiment
 
 ---
 ## Potential drawbacks of RCTs
-Experiments provide a very transparent and simple empirical strategy. They solve the _selection bias_ problem. However, there are a number of potential problems:
+Experiments provide a very transparent and simple empirical strategy. They solve the _selection bias_ problem. However, there still are some problems:
   1. Problems of implementation
       * Compliance and attrition
       * Cost, political issues (policy makers need to acknowledge ignorance),...
   2. Ethical issues
-      * Note that the ethical argument is not obvious when (i) the treatment cannot be applied to everybody (maybe due to some budget constraints) and (ii) the optimal assignment rule is unknown.
+      * Note that the ethical argument is not obvious when 
+      (i) the treatment cannot be applied to everybody (maybe due to some budget constraints) and 
+      (ii) the optimal assignment rule is unknown.
   3. Hawthorne effect
-      * The Illumination Experiment (Landsberger 1950, Levitt and List 2011)
-      * Audit study in France (Behaghel et al. 2015)
+      * The Illumination Experiment ([Landsberger 1950](https://youtu.be/o4XX90lqT6E?si=21JOdBvAwA5WkSWT), [Levitt and List 2011](https://www.aeaweb.org/articles?id=10.1257/app.3.1.224))
 
 ---
 ## Rand Health Insurance Study
@@ -299,7 +301,7 @@ knitr::kable(catastrophic_stats, digits = 2, caption="Patinet Characteristics")
 
 ---
 ## Patient Characteristics by Plan 
-
+<font size="3">
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 calc_diffs <- function(x) {
   # programmatically create the formula for lm
@@ -324,10 +326,10 @@ table1$response <- c("Age", "Black/Hisp.", "Educ.", "Female","Gen. Health", "Hos
 knitr::kable(table1, digits = 3, caption="Plan Demographics - Catastrophic")
 
 ```
-
+</font size>
 ---
 ## Patient Health by Plan
-
+<font size="3">
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 load("rand_person_spend.rda")
 rand_person_spend <- mutate(rand_person_spend,
@@ -390,7 +392,7 @@ table2<-person_diffs %>%
 table2$response <- c("face-to-face visits","Inpatient","Outpatient","Total Cost","Admissions")
   knitr::kable(table2,digits = 3, caption="Patient Health Spending by Plan")
 ```
-
+</font size>
 ---
 ## References
 

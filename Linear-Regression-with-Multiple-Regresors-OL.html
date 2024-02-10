@@ -29,7 +29,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2024-02-07)
+### 2020-7-4 (updated: 2024-02-08)
 ]
 
 ---
@@ -658,74 +658,124 @@ The OLS estimator has the limit  `$$\hat{\beta}_1 \overset{p}{\longrightarrow} \
 * The direction of bias depends on the sign of `\(\rho_{Xu}\)`.
 
 ---
-## Addressing OVB by Dividing the Data into Groups
+## Simulation of OVB
 
-The Multiple Regressor Model: Regressing On More Than One Variable
 
-In a multiple regression model, we allow for more than one regressor. 
-
-This allows us to isolate the effect of a particular variable holding all others constant.
-
-In otherwords, we can minimize the OVB by including variables in the regression equation that are important and potentially correlated with other regressors.
-
----
-Look at what happens when we break down scores by Pct. English and Student-Teacher Ratio
-&lt;img src="STR_groups.png" width="100%" style="display: block; margin: auto;" /&gt;
-
----
-## Multiple Regression Model
-
-Regressing On More Than One Variable
-
-In a multiple regression model we allow for __more than one regressor__. 
-
-This allows us to isolate the effect of a particular variable __holding all others constant__.
-
----
-## The Population Multiple Regression Line
-
-The population regression line (function) with two regressors would be
-
-`$$E[Y_i|X_{1i} = x_1, X_{2i} = x_2] = \beta_0 + \beta_1 x_1 + \beta_2 x_2$$`
-
-1.  `\(\beta_0\)` is the intercept
-2.  `\(\beta_1\)` is the slope coefficient of `\(X_{1i}\)`
-3.  `\(\beta_2\)` is the slope coefficient of `\(X_{2i}\)`
+```r
+# Simulated data
+set.seed(123) # Set seed for reproducibility
+n &lt;- 10000 # Number of observations
+p &lt;- .5 # set correlation parameter
+x1 &lt;- rnorm(n)  # independent variable
+x2 &lt;- rnorm(n)+p*x1  # omitted variable
+beta1 &lt;- 1  # true coefficient for x1
+beta2 &lt;- 2  # true coefficient for x2
+epsilon &lt;- rnorm(n)  # error term
+y &lt;- 1 + beta1*x1 + beta2*x2 + epsilon  # dependent variable
+lm_perfect &lt;-lm(y~x1+x2)
+# Model with the omitted variable
+lm_omitted &lt;- lm(y ~ x1)
+# Model without the omitted variable
+p &lt;- 0
+x2 &lt;- rnorm(n)+p*x1  # independent variable
+y &lt;- 1 + beta1*x1 + beta2*x2 + epsilon  # dependent variable
+lm_omitted2 &lt;- lm(y ~ x1)
+# Model with the omitted variable
+p&lt;- -0.5
+x2 &lt;- rnorm(n)+p*x1  # independent variable
+y &lt;- 1 + beta1*x1 + beta2*x2 + epsilon  # dependent variable
+lm_omitted3 &lt;- lm(y ~ x1) # Model with the omitted variable
+lm_no_omitted &lt;- lm(y ~ x1+x2)
+modelsummary(list("Truth"=lm_perfect,"p=0.5"=lm_omitted,"p=0"=lm_omitted2,"p=-0.5"=lm_omitted3,"Both"=lm_no_omitted), gof_map = c("r.squared","nobs"))
+```
 
 ---
-## Interpretation of The Slope Coefficient (1)
+## Simulation of OVB
 
-We interpret `\(\beta_1\)` (also referred to as the coefficient on `\(X_{1i}\)`), as the effect on `\(Y\)` of a unit change in `\(X_1\)`, holding `\(X_2\)` constant or controlling for `\(X_2\)`.
-
-For simplicity let us write the population regression line as
-
-`$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2$$`
-
-Suppose we change `\(X_1\)` by an amount `\(\Delta X_1\)`, which would cause `\(Y\)` to change to `\(Y + \Delta Y\)`.
-
-`$$Y + \Delta Y = \beta_0 + \beta_1 (X_1 + \Delta X_1) + \beta_2 X_2$$`
+&lt;table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Truth &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  p=0.5 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; p=0 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  p=-0.5 &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Both &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.993*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.975*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.982*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.023*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.993*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.010) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.022) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.022) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.022) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.010) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; x1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.022*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.032*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.984*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.032 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.022*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.011) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.022) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.022) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.022) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.011) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; x2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.997*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 2.004*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.010) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.010) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.890 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.452 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.164 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.801 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10000 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10000 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; + p &amp;lt; 0.1, * p &amp;lt; 0.05, ** p &amp;lt; 0.01, *** p &amp;lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
 
 ---
-## Interpretation of The Slope Coefficient (2)
-
-`$$Y = \beta_0 + \beta_1 X_1 + \beta_2 X_2 \\ Y + \Delta Y = \beta_0 + \beta_1 (X_1 + \Delta X_1) + \beta_2 X_2$$`
-
-Subtract the first equation from the second equation, yielding
-`$$\begin{align*} \Delta Y &amp;= \beta_1 \Delta X_1 \\ \beta_1 &amp;= \frac{\Delta Y}{\Delta X_1} \end{align*}$$`
-
-`\(\beta_1\)` is also referred to as the partial effect on `\(Y\)` of `\(X_1\)`, holding `\(X_2\)` fixed.
-
----
-## The Population Multiple Regression Model
-
-The same as with the single regressor case, the regression line describes the average value of the dependent variable and its relationship with the model regressors.
-
-In reality, the actual population values of `\(Y\)` will not be exactly on the regression line since there are many other factors that are not accounted for in the model.
-
-These other unobserved factors are captured by the error term `\(u_i\)` in the population multiple regression
-`$$Y_i = \beta_0 + \beta_1 X_{1i} + \beta_2 X_{2i} + \cdots + \beta_k X_{ki} + u_i,~i=1,\dots,n$$`
-
-(Generally, we can have any number of _k_ regressors as shown above)
+class: middle, center, inverse
+# Heteroskedasticity
 
 ---
 ## Homoskedasticity and Heteroskedasticity
@@ -741,8 +791,8 @@ is constant for all `\(i=1,\dots,n\)`. Otherwise, it is heteroskedastic.
 In most cases (read virtually always), you will have heteroskedastic errors.
 ---
 ## Visual of Homoskedasticity and Heteroskedasticity
-![](https://www.albert.io/blog/wp-content/uploads/2016/11/heteroscedastic-relationships.png)&lt;!-- --&gt;
 
+![](https://www.albert.io/blog/wp-content/uploads/2016/11/heteroscedastic-relationships.png)&lt;!-- --&gt;
 
 ---
 ## More on Heteroskedasticity
@@ -756,7 +806,7 @@ library(ggplot2)
 ggplot(data = food, aes(y = resi, x = income)) + geom_point(col = 'blue') + geom_abline(slope = 0)
 ```
 
-![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
 ---
 ## Two ways to test
 
@@ -768,28 +818,15 @@ The coefficient `\(\beta_2\)` should equal zero if the errors are homoskedastic.
 
 ```r
 var.func &lt;- lm(resi^2 ~ income, data = food)
-summary(var.func)
+broom::tidy(var.func)
 ```
 
 ```
-## 
-## Call:
-## lm(formula = resi^2 ~ income, data = food)
-## 
-## Residuals:
-##    Min     1Q Median     3Q    Max 
-## -14654  -5990  -1426   2811  38843 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)   
-## (Intercept)  -5762.4     4823.5  -1.195  0.23963   
-## income         682.2      232.6   2.933  0.00566 **
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 9947 on 38 degrees of freedom
-## Multiple R-squared:  0.1846,	Adjusted R-squared:  0.1632 
-## F-statistic: 8.604 on 1 and 38 DF,  p-value: 0.005659
+## # A tibble: 2 × 5
+##   term        estimate std.error statistic p.value
+##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 (Intercept)   -5762.     4824.     -1.19 0.240  
+## 2 income          682.      233.      2.93 0.00566
 ```
 ---
 ## Option 2 The Breusch-Pagan Test
@@ -821,112 +858,56 @@ There are three ways to correct for heteroskedasticity.
 ```r
 library(estimatr)
 food.hetero &lt;- lm_robust(food_exp ~ income, data = food, se_type = "HC3")
+modelsummary(list(food.ols,food.hetero), gof_map = c("r.squared","nobs"), stars = TRUE)
 ```
 
 
 ---
 ## How to correct for Heteroskedasticity
 
-&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
-&lt;caption&gt;Statistical models&lt;/caption&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 1&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Model 2&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
+&lt;table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;  (1) &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt;   (2) &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
 &lt;tbody&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;83.42&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;83.42&lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(43.41)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(28.65)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;income&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;10.21&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;10.21&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(2.09)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(1.89)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.39&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.39&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.37&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.37&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;40&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;40&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-bottom: 2px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;RMSE&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;89.52&lt;/td&gt;
-&lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 83.416+ &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 83.416** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (43.410) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (28.651) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; income &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10.210*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 10.210*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (2.093) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (1.886) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.385 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.385 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 40 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 40 &lt;/td&gt;
+  &lt;/tr&gt;
 &lt;/tbody&gt;
-&lt;tfoot&gt;
-&lt;tr&gt;
-&lt;td style="font-size: 0.8em;" colspan="3"&gt;&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tfoot&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; + p &amp;lt; 0.1, * p &amp;lt; 0.05, ** p &amp;lt; 0.01, *** p &amp;lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
 &lt;/table&gt;
-
-
----
-## The OLS Estimator (1)
-
-Similar to the single regressor case, we do not observe the true population parameters `\(\beta_0,\dots,\beta_k\)`.
-From an observed sample `\(\{(Y_i, X_{1i},\dots,X_{ki})\}_{i=1}^n\)` we want to calculate an estimator of the population parameters
-
-We do this by minimizing the sum of squared differences between the observed dependent variable and its predicted value
-
-`$$\min_{b_0,\dots,b_k} \sum_i (Y_i - b_0 - b_1 X_{1i} - \cdots - b_k X_{ki})^2$$`
-
-Similar to the simple linear regression case, we would have _k+1_ equations and _k+1_ unknowns.
-
----
-## The OLS Estimator (2)
-
-Let the multiple regression equation be represented by `$$Y=X\beta+u$$`
-
-where we observe n observations, a dependent variable `\(Y\)` is a nx1 vector, X is a nxk matrix of k difference explanatory variables, `\(u\)` is the error term, which is assumed to have a mean of zero and a finite variance.
-
-We are interested in estimating the parameter `\(\beta\)`, which is a kx1 vector.
-
----
-## The OLS Estimator (3)
-
-Our most important assumption is that `\(E[X'u]=0\)`. If so, then we can write the moment condition as 
-`$$\begin{align*} X'u &amp;= 0 \\X'(Y-X\beta) &amp;=0 \\ X'Y &amp;= X'X\beta \\ (X'X)^{-1}X'Y &amp;= \beta \end{align*}$$`
-
-where `\((X'X)^{-1}\)` is the covariance matrix of X and X'Y is the covariance of X and Y. Notice this is exactly like the simple linear case, where our slope estimator is the COV(X,Y)/VAR(X)
-
----
-## The OLS Estimator (4)
-
-The resulting estimators are called the ordinary least squares (OLS) estimators: `\(\hat{\beta}_0,\hat{\beta}_1,\dots,\hat{\beta}_k\)`
-
-The predicted values would be
-
-`$$\hat{Y}_i = \hat{\beta}_0 + \hat{\beta}_1 X_{1i} + \cdots + \hat{\beta}_k X_{ki},~i=1,\dots,n$$`
-
-The OLS residuals would be
-
-`$$\hat{u}_i = Y_i - \hat{Y}_i,~i=1,\dots, n$$`
 
 ---
 ## Application to Test Scores and the STR (1)
@@ -1045,9 +1026,10 @@ modelsummary(list(regress.results,regress.results), vcov = c("classical","stata"
 
 In the single regressor case our estimates were `$$\widehat{TestScore} = 698.9 - 2.28 \times STR$$` and with the added regressor we have `$$\widehat{TestScore} = 686.0 - 1.10 \times STR - 0.65 \times PctEL$$`
 
-Notice the lower effect of STR in the second regression.
+__Notice the lower effect of STR in the second regression.__
 
 The second regression captures the effect of STR holding the percentage of English learners constant. We can conclude that the first regression does suffer from OVB.
+
 This multiple regression approach is superior to the tabular approach shown before; we can give a clear estimate of the effect of STR and it is possible to easily add more regressors if the need arises.
 
 ---
@@ -1130,25 +1112,29 @@ class: center, middle, inverse
 ---
 ## Updated Single Regressor Assumptions
 
-For multiple regressions we have four assumptions: three of them are updated versions of the single regressor assumptions and one new assumption.
+For multiple regressions we need to include a new assumptions
 
-* A.1: The conditional distribution of `\(u_i\)` given `\(X_{1i},\dots,X_{ki}\)` has a mean of zero `\(E[u_i|X_{1i},\dots,X_{ki}] = 0\)`
-* A.2: `\(\forall i, (X_{1i}, \dots, X_{ki}, Y_i)\)` are i.i.d.
-* A.3: Large outliers are unlikely
+1. The error term `\(u_i\)` has a mean of zero, `\(E[u_i]=0\)`.
+2. The error term is independent of the X's, `\(E[u_i|X_{1i}, \dots, X_{ki}]=0\)`.
+3. The error term has a constant variance, `\(Var[u_i|X_{1i}, \dots, X_{ki}]=\sigma^2\)`.
+4. The variables `\(Y_i\)` and `\(X_{1i}, \dots, X_{ki}\)` are independently identically distributed (i.e. they are a random sample)
+5. The relationship between `\(Y_i\)` and `\(X_{1i}, \dots, X_{ki}\)` is linear with respect to the parameters
+6. There are no large outliers.
+7. For testing reasons, we do assume the error terms are normally distributed.
+8. __No Perfect Multicollinearity__
 
 ---
-## Assumption A.4: No Perfect Multicollinearity (1)
+## No Perfect Multicollinearity (1)
 
-The regressors exhibit perfect multicollinearity if one of the regressors is a linear function of the other regressor.
+The regressors exhibit perfect multicollinearity if one of the regressors is a linear function of the other regressor. Example:
 
-&gt; Assumption A.4 requires that there be no perfect multicollinearity
-
+`$$X_1 = 2*X_2-4*X_3$$`
 Perfect multicollinearity can occur if a regressor is accidentally repeated, for example, if we regress `\(TestScore\)` on `\(STR\)` and `\(STR\)` again (R simply ignores the repeated regressor). 
 
 This could also occur if a regressor is a multiple of another.
 
 ---
-## Assumption A.4: No Perfect Multicollinearity (2)
+## No Perfect Multicollinearity (2)
 
 Mathematically, this is not allowed because it leads to division by zero.
 
@@ -1177,7 +1163,7 @@ Suppose we want to categorize school districts as rural, suburban, and urban
 ---
 ## Imperfect Multicollinearity (1)
 
-&gt; Imperfect multicollinearity means that two or more regressors are highly correlated. It differs from perfect     multicollinearity it that they don't have to be exact linear functions of each other.
+&gt; Imperfect multicollinearity means that two or more regressors are highly correlated. It differs from perfect multicollinearity in that they don't have to be exact linear functions of each other.
 
 ---
 ## Imperfect Multicollinearity (2)
@@ -1188,6 +1174,8 @@ Suppose we want to categorize school districts as rural, suburban, and urban
 * Imperfect multicollinearity does not pose any problems to the theory of OLS estimation
       + OLS estimators will remain unbiased.
       + However, the variance of the coefficient on correlated regressors will be larger than if they were uncorrelated.
+      
+The reason is that OLS rewards new information. Two variables that are highly correlated provide redundant information. Redundant information decreases the degrees freedom without decreasing the variance of the error. So our estimates become less precise
 
 ---
 ## Example of Multicollinearity (3)
@@ -1428,7 +1416,7 @@ modelsummary::datasummary_balance(~1,data = CPSSW8, output = "html")
 &lt;/table&gt;
 &lt;/small&gt;
 ---
-![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
 
 ---
 &lt;small&gt;
@@ -1979,7 +1967,7 @@ Let's look at log earnings instead of the level of earnings. Does it look more n
 histogram(~log(CPSSW8$earnings) | CPSSW8$gender, xlab = "Earnings")
 ```
 
-![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+![](Linear-Regression-with-Multiple-Regresors-OL_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
 
 ---
 ## Log Transformation: Code

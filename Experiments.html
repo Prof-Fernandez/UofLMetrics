@@ -4,7 +4,7 @@
     <title>Causal Inference</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose Fernandez" />
-    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020/6/29 (updated: 2022-06-07)
+### 2020/6/29 (updated: 2024-02-08)
 ]
 
 ---
@@ -112,7 +112,7 @@ Potentially confusing examples:
 
 ## Examples
 
-&lt;img src="sociology.png" style="display: block; margin: auto;" /&gt;&lt;img src="kymarriage.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="sociology.png" width="2773" style="display: block; margin: auto;" /&gt;&lt;img src="kymarriage.png" width="2773" style="display: block; margin: auto;" /&gt;
 
 ---
 
@@ -128,7 +128,7 @@ Potentially confusing examples:
 
 In the physical sciences:
 - Often, one can answer this type of question by running an experiment on a specific unit.
-- Example: Galileo Galilei Leaning Tower of Pisa experiment
+- Example: [Galileo Galilei Leaning Tower of Pisa experiment](https://ket.pbslearningmedia.org/resource/nvmm-math-fallingbodies/galileos-falling-bodies/)
     + Necessary conditions (ceteris paribus, other things being equal):
     + Temporal stability: the response does not change if we change the moment when the treatment is applied.
     + Causal transience: the response of one treatment is not affected by prior exposure of the unit to the other treatment.
@@ -214,12 +214,13 @@ hence:
 ## Types of randomized experiments
 A randomized experiment is designed and implemented consciously by social scientists. It entails conscious use of a treatment and control group with random assignment.
   - __Lab experiments__
-      - The effect of feedback on relative performance (Azmat and Iriberri, 2012). __Yes you work harder__
+      - The effect of feedback on relative performance ([Azmat and Iriberri, 2012]()). __Yes you work harder__
   - __Field experiments__ (Lab-in-the-field)
-      - The effect of feedback on relative performance: (Bagues et al, work in progress) __Yes Students work harder__
+      - The effect of feedback on relative performance: ([Bagues et al, work in progress](https://www.manuelbagues.com/field_experiment%20-%20azmat,%20bagues,%20cabrales%20and%20iriberri%20-%202015.pdf)) __Yes Students work harder__
   - __Natural experiments__ 
     - has a source of randomization that is as if randomly assigned, but not part of real experiment.
-    - Vietnam-era service effect on education and earnings (Flory, Leibbrandt and List 2010) __Women Shy away from competitive work settings__
+    - Student feedback at a high school [Azmat and Iriberri 2010](https://www.sciencedirect.com/science/article/abs/pii/S0047272710000411) _Yes Students work harder__
+    - Vietnam-era service effect on education and earnings ([Flory, Leibbrandt and List 2010](https://www.nber.org/papers/w16546)) __Women Shy away from competitive work settings__
       
 ---
 ## Who uses Experiments in Business?
@@ -234,15 +235,16 @@ They embraced the idea of "Data-Base Management" where the results of experiment
 
 ---
 ## Potential drawbacks of RCTs
-Experiments provide a very transparent and simple empirical strategy. They solve the _selection bias_ problem. However, there are a number of potential problems:
+Experiments provide a very transparent and simple empirical strategy. They solve the _selection bias_ problem. However, there still are some problems:
   1. Problems of implementation
       * Compliance and attrition
       * Cost, political issues (policy makers need to acknowledge ignorance),...
   2. Ethical issues
-      * Note that the ethical argument is not obvious when (i) the treatment cannot be applied to everybody (maybe due to some budget constraints) and (ii) the optimal assignment rule is unknown.
+      * Note that the ethical argument is not obvious when 
+      (i) the treatment cannot be applied to everybody (maybe due to some budget constraints) and 
+      (ii) the optimal assignment rule is unknown.
   3. Hawthorne effect
-      * The Illumination Experiment (Landsberger 1950, Levitt and List 2011)
-      * Audit study in France (Behaghel et al. 2015)
+      * The Illumination Experiment ([Landsberger 1950](https://youtu.be/o4XX90lqT6E?si=21JOdBvAwA5WkSWT), [Levitt and List 2011](https://www.aeaweb.org/articles?id=10.1257/app.3.1.224))
 
 ---
 ## Rand Health Insurance Study
@@ -260,222 +262,64 @@ Studied effects on health spending and health outcomes
 ---
 ## Rand Health Insurance
 
-&lt;table&gt;
-&lt;caption&gt;Plan Types&lt;/caption&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; plantype &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; n &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; pct &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Catastrophic &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 759 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.1918120 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Deductible &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 881 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2226434 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Coinsurance &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1022 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.2582765 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Free &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 1295 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.3272681 &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+
+Table: Plan Types
+
+|plantype     |    n|       pct|
+|:------------|----:|---------:|
+|Catastrophic |  759| 0.1918120|
+|Deductible   |  881| 0.2226434|
+|Coinsurance  | 1022| 0.2582765|
+|Free         | 1295| 0.3272681|
 
 ---
 ## Patient Characteristics
 
-&lt;table&gt;
-&lt;caption&gt;Patinet Characteristics&lt;/caption&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; variable &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Mean &lt;/th&gt;
-   &lt;th style="text-align:right;"&gt; Std. Dev. &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 32.36 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12.92 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Pct. Black or Hispanic &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.17 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.38 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Education &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 12.10 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 2.88 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Pct. Female &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.56 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.50 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; General Health Index &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 70.86 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 14.91 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Hospital &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.12 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 0.32 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Income &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 31603.21 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 18148.25 &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Mental Health Index &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 73.85 &lt;/td&gt;
-   &lt;td style="text-align:right;"&gt; 14.25 &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+
+Table: Patinet Characteristics
+
+|variable               |     Mean| Std. Dev.|
+|:----------------------|--------:|---------:|
+|Age                    |    32.36|     12.92|
+|Pct. Black or Hispanic |     0.17|      0.38|
+|Education              |    12.10|      2.88|
+|Pct. Female            |     0.56|      0.50|
+|General Health Index   |    70.86|     14.91|
+|Hospital               |     0.12|      0.32|
+|Income                 | 31603.21|  18148.25|
+|Mental Health Index    |    73.85|     14.25|
 
 ---
 ## Patient Characteristics by Plan 
+&lt;font size="3"&gt;
 
-&lt;table&gt;
-&lt;caption&gt;Plan Demographics - Catastrophic&lt;/caption&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; response &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; (Intercept) &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Coinsurance &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Deductible &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Free &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Age &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 32.4 (0.485) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.966 (0.655) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.561 (0.676) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.435 (0.614) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Black/Hisp. &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.172 (0.0199) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.0269 (0.025) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.0188 (0.0266) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.0281 (0.0245) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Educ. &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 12.1 (0.14) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.0613 (0.186) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.157 (0.191) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.263 (0.183) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Female &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.56 (0.0118) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.0247 (0.0153) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.0231 (0.016) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.0379 (0.015) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Gen. Health &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 70.9 (0.694) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.211 (0.922) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -1.44 (0.952) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -1.31 (0.872) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Hospital &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.115 (0.0117) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.00249 (0.0152) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.00449 (0.016) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.00117 (0.0146) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Income &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 31,603 (1,073) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 970 (1,391) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -2,104 (1,386) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -976 (1,346) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Mental Health &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 73.8 (0.619) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 1.19 (0.81) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; -0.12 (0.822) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.89 (0.766) &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+Table: Plan Demographics - Catastrophic
 
+|response      |(Intercept)    |Coinsurance       |Deductible       |Free             |
+|:-------------|:--------------|:-----------------|:----------------|:----------------|
+|Age           |32.4 (0.485)   |0.966 (0.655)     |0.561 (0.676)    |0.435 (0.614)    |
+|Black/Hisp.   |0.172 (0.0199) |-0.0269 (0.025)   |-0.0188 (0.0266) |-0.0281 (0.0245) |
+|Educ.         |12.1 (0.14)    |-0.0613 (0.186)   |-0.157 (0.191)   |-0.263 (0.183)   |
+|Female        |0.56 (0.0118)  |-0.0247 (0.0153)  |-0.0231 (0.016)  |-0.0379 (0.015)  |
+|Gen. Health   |70.9 (0.694)   |0.211 (0.922)     |-1.44 (0.952)    |-1.31 (0.872)    |
+|Hospital      |0.115 (0.0117) |-0.00249 (0.0152) |0.00449 (0.016)  |0.00117 (0.0146) |
+|Income        |31,603 (1,073) |970 (1,391)       |-2,104 (1,386)   |-976 (1,346)     |
+|Mental Health |73.8 (0.619)   |1.19 (0.81)       |-0.12 (0.822)    |0.89 (0.766)     |
+&lt;/font size&gt;
 ---
 ## Patient Health by Plan
+&lt;font size="3"&gt;
 
-&lt;table&gt;
-&lt;caption&gt;Patient Health Spending by Plan&lt;/caption&gt;
- &lt;thead&gt;
-  &lt;tr&gt;
-   &lt;th style="text-align:left;"&gt; response &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; (Intercept) &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Cost Sharing &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Deductible &lt;/th&gt;
-   &lt;th style="text-align:left;"&gt; Free &lt;/th&gt;
-  &lt;/tr&gt;
- &lt;/thead&gt;
-&lt;tbody&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; face-to-face visits &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 2.78 (0.178) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.481 (0.24) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.193 (0.247) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 1.66 (0.248) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Inpatient &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 388 (44.9) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 92.5 (72.8) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 72.2 (68.6) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 116 (59.8) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Outpatient &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 248 (14.8) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 59.8 (20.7) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 41.8 (20.8) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 169 (19.9) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Total Cost &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 636 (54.5) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 152 (84.6) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 114 (79.1) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 285 (72.4) &lt;/td&gt;
-  &lt;/tr&gt;
-  &lt;tr&gt;
-   &lt;td style="text-align:left;"&gt; Admissions &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.0991 (0.00785) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.0023 (0.0108) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.0159 (0.0109) &lt;/td&gt;
-   &lt;td style="text-align:left;"&gt; 0.0288 (0.0105) &lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
+Table: Patient Health Spending by Plan
 
+|response            |(Intercept)      |Cost Sharing    |Deductible      |Free            |
+|:-------------------|:----------------|:---------------|:---------------|:---------------|
+|face-to-face visits |2.78 (0.178)     |0.481 (0.24)    |0.193 (0.247)   |1.66 (0.248)    |
+|Inpatient           |388 (44.9)       |92.5 (72.8)     |72.2 (68.6)     |116 (59.8)      |
+|Outpatient          |248 (14.8)       |59.8 (20.7)     |41.8 (20.8)     |169 (19.9)      |
+|Total Cost          |636 (54.5)       |152 (84.6)      |114 (79.1)      |285 (72.4)      |
+|Admissions          |0.0991 (0.00785) |0.0023 (0.0108) |0.0159 (0.0109) |0.0288 (0.0105) |
+&lt;/font size&gt;
 ---
 ## References
 

@@ -1,7 +1,7 @@
 ---
 title: "Matching Models"
 author: "Jose M. Fernandez"
-date: "MSBA Data Analytics III"
+date: "Advance Analytics Tools"
 output:   
   ioslides_presentation:
     logo: uofl.png
@@ -142,35 +142,36 @@ Participants were randomly selected to participate in the training program. Both
 
 Analysis of the mean differences (unbiased given randomization), was approximately $800.
 
-Lalonde (1986) used data from the Panel Survey of Income Dynamics (PSID) and the Current Population Survey (CPS) to investigate whether non-experimental methods would result in similar results to the randomized experiment. He found results ranging from $\$$ 700 to $\$$ 16,000.
+[Lalonde (1986)](https://www.jstor.org/stable/1806062?seq=1) used data from the Panel Survey of Income Dynamics (PSID) and the Current Population Survey (CPS) to investigate whether non-experimental methods would result in similar results to the randomized experiment. He found results ranging from $\$$ 700 to $\$$ 1,600. He concluded that propensity score matching does not produce results similar to those found in experiments.
 
 ## PSM: Dehejia and Wahba (1999)
 
-Dehejia and Wahba (1999) later used propensity score matching to analyze the data.
+[Dehejia and Wahba (1999)](https://www.jstor.org/stable/2669919) later used propensity score matching to analyze the data.They criticized the results of Lalonde(1999) and found evidence in support of propensity score matching.
 
 - Comparison groups selected by Lalonde were very dissimilar to the treated group.
 - By restricting the comparison group to those that were similar to the treated group, they could replicate the original NSW results.
 - Using the CPS data, the range of treatment effect was between $1,559 to $1,681. The experimental results for the sample was approximately $1,800.
-- The covariates available include: age, eduction level, high school degree, marital status, race, ethnicity, and earning sin 1974 and 1975.
+- The covariates available include: age, education level, high school degree, marital status, race, ethnicity, and earning sin 1974 and 1975.
 - Outcome of interest is earnings in 1978.
 
 ## Replication {.smaller .flexbox .vcenter}
 Calculating the Propensity Score
-```{r message=FALSE, warning=FALSE}
+```{r message=FALSE, warning=FALSE, results='asis'}
 library(MatchIt); data(lalonde)
-lalonde.formu <- treat~age + educ + factor(race) + married + nodegree + re74 + re75
-glm1 <- glm(lalonde.formu, family=binomial, data=lalonde)
-stargazer::stargazer(glm1,type="text",single.row = TRUE)
+lalonde.formu <- treat~age + educ + nodegree + re74 + re75
+ps <- glm(lalonde.formu, family=binomial, data=lalonde)
+stargazer::stargazer(ps,type="html",single.row = TRUE)
+```
+## Propensity Score before matching
+```{r message=FALSE, warning=FALSE}
+lalonde$psvalue<-predict(ps,type="response")
+library(Hmisc)
+histbackback(split(lalonde$psvalue, lalonde$treat), main="Propensity score before matching", xlab=c("control",
+"treatment"))
 ```
 
 ## Replication {.smaller}
 ```{r message=FALSE, warning=FALSE, echo=TRUE}
-## Mahalanobis Metric Matching
-m.mahal<-matchit(lalonde.formu,data=lalonde, replace=FALSE,distance="mahalanobis")
-## Get matched Data
-mahal.match<-match.data(m.mahal)
-## PSM nearest neighbor
-##m.nn<-matchit(lalonde.formu, data = lalonde, caliper=0.1, method ="nearest")
 m.nn<-matchit(lalonde.formu, data = lalonde, ratio=1, method ="nearest")
 nn.match<-match.data(m.nn)
 ```
@@ -181,21 +182,30 @@ library(RItools)
 ## Unconditional
 xBalance(lalonde.formu, data = lalonde, report=c("chisquare.test"))
 ## Nearest Neighbor
-xBalance(lalonde.formu, data = as.data.frame(nn.match), report=c("chisquare.test"))
+xBalance(lalonde.formu, data = nn.match, report=c("chisquare.test"))
 ```
-  
+## Jitter plot
+```{r}
+plot(m.nn, type = "jitter")
+```
+
+
+## Overlapping Propensity Scores
+```{r results='asis', message=FALSE, warning=FALSE}
+library(Hmisc)
+histbackback(split(nn.match$psvalue,nn.match$treat),main="Propensity score after matching", xlab=c("control","treatment"))
+```
+
 ## Replication: Results
 ```{r results='asis'}
 reg.1<-lm(re78~treat+age+educ+nodegree+re74+re75+married+factor(race),data=lalonde)
 reg.2<-lm(re78~treat+age+educ+nodegree+re74+re75+married+factor(race),data=nn.match)
-reg.3<-lm(re78~treat+age+educ+nodegree+re74+re75+married+factor(race),data=mahal.match)
-reg.2a<-lm(re78~treat,data=nn.match)
-reg.3a<-lm(re78~treat,data=mahal.match)
+reg.3<-lm(re78~treat,data=nn.match)
 ```
 
 ## Replication: Results {.smaller}
 ```{r results='asis', echo=FALSE}
-stargazer::stargazer(reg.1,reg.2a,reg.2,reg.3a,reg.3,type="text",dep.var.labels = c("OLS","NN 1","NN 2","M 1","M 2"))
+stargazer::stargazer(reg.1,reg.2,reg.3,type="html",dep.var.labels = c("OLS","NN 1","NN 2"))
 ```
 
 ## Replication: Matched Dataset {.smaller}
@@ -203,18 +213,13 @@ stargazer::stargazer(reg.1,reg.2a,reg.2,reg.3a,reg.3,type="text",dep.var.labels 
 matches<-data.frame(m.nn$match.matrix)
 # Separate the data into treatment and control
 group1<-match(row.names(matches),row.names(nn.match))
-group2<-match(matches$X1,row.names(nn.match))
+group2<-match(matches$m.nn.match.matrix,row.names(nn.match))
 yT<-nn.match$re78[group1]
 yC<-nn.match$re78[group2]
 # bind matched cases
 matched.cases<-cbind(matches,yT,yC)
 # Paired T-test
 t.test(matched.cases$yT,matched.cases$yC,paired=TRUE)
-```
-
-## Replication: More on Balancing
-```{r}
-plot(m.nn, type="jitter")
 ```
 
 ## What else can we do with propensity scores?
@@ -230,20 +235,20 @@ For control individuals the weight is $$\frac{1}{1-Pr(treat=1)}$$
 ## Propensity score weights in R
 ```{r eval=FALSE}
 # We will use our estimated pscores
-lalonde$psvaluea<-predict(glm1,type="response")
+lalonde$psvaluea<-predict(ps,type="response")
 lalonde$gweight<-ifelse(lalonde$treat==1,1/lalonde$psvaluea,1/(1-lalonde$psvaluea))
-reg.4<-lm(re78~treat+age+educ+nodegree+re74+re75+married+black+hispan,
+reg.4<-lm(re78~treat+age+educ+nodegree+re74+re75+married+factor(race),
           data=lalonde, weights = gweight)
 
 ```
 
 ## PSM weights {.smaller}
 ```{r results='asis', echo=FALSE}
-lalonde$psvaluea<-predict(glm1,type="response")
+lalonde$psvaluea<-predict(ps,type="response")
 lalonde$gweight<-ifelse(lalonde$treat==1,1/lalonde$psvaluea,1/(1-lalonde$psvaluea))
-reg.4<-lm(re78~treat+age+educ+nodegree+re74+re75+married+black+hispan,
+reg.4<-lm(re78~treat+age+educ+nodegree+re74+re75+married+factor(race),
           data=lalonde, weights = gweight)
-stargazer::stargazer(reg.1,reg.2a,reg.2,reg.3a,reg.3,reg.4,type="html",dep.var.labels = c("OLS","NN 1","NN 2","M 1","M 2","PSM Weights"))
+stargazer::stargazer(reg.1,reg.2,reg.3,reg.4,type="html",dep.var.labels = c("OLS","NN 1","NN 2","PSM Weights"))
 ```
 
 ## Why are our results so off? Poor Balance {.smaller}

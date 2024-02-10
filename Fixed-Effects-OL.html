@@ -29,7 +29,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2024-02-06)
+### 2020-7-4 (updated: 2024-02-08)
 ]
 
 ---
@@ -70,44 +70,6 @@ We want to study government policies that can be used to discourage drunk drivin
 
 ```r
 library("AER")
-```
-
-```
-## Loading required package: car
-```
-
-```
-## Loading required package: carData
-```
-
-```
-## Loading required package: lmtest
-```
-
-```
-## Loading required package: zoo
-```
-
-```
-## 
-## Attaching package: 'zoo'
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     as.Date, as.Date.numeric
-```
-
-```
-## Loading required package: sandwich
-```
-
-```
-## Loading required package: survival
-```
-
-```r
 data("Fatalities")
 fatality.data=Fatalities
 fatality.data$year &lt;- factor(fatality.data$year)
@@ -190,7 +152,7 @@ Quickly, eye ball the data. What is unusual about this demand function?
 
 ---
 ## Graph
-![](Fixed-Effects-OL_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+![](Fixed-Effects-OL_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
 ---
 ### Panel Data
 You observe multiple cities for 2 years each.
@@ -272,7 +234,7 @@ Thus, we have eliminated the key source of omitted variable bias, namely, unobse
 
 ---
 ### Graph without adjusting for fixed effects
-![](Fixed-Effects-OL_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+![](Fixed-Effects-OL_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
 
 ---
 ### Graph with adjusting for fixed effects
@@ -284,7 +246,7 @@ library(tidyverse)
 data1 %&gt;% ggplot(aes(x=difquantity, y=difprice))+geom_point()+geom_smooth(method = "lm", formula = y~x)
 ```
 
-![](Fixed-Effects-OL_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+![](Fixed-Effects-OL_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
 
 ---
 ### Graph with adjusting for fixed effects
@@ -810,7 +772,6 @@ modelsummary(list("Normal"=regress.results.fe.time,"HAC"=regress.results.fe.time
 &lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
 &lt;sup&gt;&lt;/sup&gt; + p &amp;lt; 0.1, * p &amp;lt; 0.05, ** p &amp;lt; 0.01, *** p &amp;lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
 &lt;/table&gt;
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

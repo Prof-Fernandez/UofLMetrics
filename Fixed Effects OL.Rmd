@@ -46,7 +46,7 @@ A driver who is legally drunk is at least 13 times as likely to cause a fatal cr
 
 We want to study government policies that can be used to discourage drunk driving.
 
-```{r}
+```{r setup, warning=FALSE, message=FALSE}
 library("AER")
 data("Fatalities")
 fatality.data=Fatalities
