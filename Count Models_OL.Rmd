@@ -1,0 +1,350 @@
+---
+title: "Limited Dependent Variables"
+subtitle: "Count Models"
+author: "Jose M. Fernandez"
+institute: "University of Louisville"
+date: "2020-7-4 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    css: [default, uol, uol-fonts, "extra.css"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+## Count Models
+
+In these notes, we will discuss several types of count models
+
+- Ordered Probit/Logit
+- Poisson Model
+- Negative Binomial
+
+---
+class: inverse, middle, center
+# Ordered Probit/Logit
+---
+## Oridinal Categorical Variables
+
+Suppose your dependent is categorical in nature and these categories show an ordinal proper (i.e. you can order them)
+
+Examples: Surveys including Likert Scales (strongly agree, agree, neither, disagree, strongly disagree)
+
+Medalling in the olympics (Gold, Silver, Bronze)
+
+Soda size preference (small, medium, large, extra large)
+---
+## Ordered Probit/Logit
+
+In these cases of ordinal categorical variables, we use an ordered probit/logit model.
+
+Notice, these responses, while they can be ordered, the distance between levels is not constant. 
+
+That is, we do not know what increase is necessary to move someone from _strongly disagree_ to just _disagree_.
+---
+## Ordered Probit/Logit Math
+
+The math of the ordered probit/logit is very similar to a simple binary model
+
+There is just one difference, we need to estimate level parameters.
+---
+## Ordered Probit/Logit Math
+
+The math to the ordered probit/logit is very similar to a simple binary model
+
+There is just one difference, we need to estimate level parameters.
+
+Consider three observed outcomes: y = 0,1,2.
+Consider the latent variable model without a constant:
+$$y^{*} = \beta_1 x_1 +...+\beta_k x_k +\epsilon$$
+where $\epsilon \rightarrow N(0,1)$. Define two cut-off points: $\alpha_1 < \alpha_2$
+We do not observe $y^{*}$, but we do observe choices according to the following rule
+
+- y = 0 if $y^{*} < \alpha_1$;
+- y = 1 if $\alpha_1 < y^{*} < \alpha_2$;     
+- y = 2 if $\alpha_2 < y^{*}$
+
+---
+## Analytical Example
+
+y = 0 if inactive, y = 1 if part-time, and y = 2 if full-time
+
+$y* = \beta_e educ +\beta_k kids +\epsilon$, where $\epsilon \rightarrow N (0,1)$
+
+Then
+y = 0 if $\beta_e  educ +\beta_k  kids +\epsilon$ < $\alpha_1$
+
+y = 1 if $\alpha_1 < \beta_e educ +\beta_k kids +\epsilon$ < $\alpha_2$
+
+y = 2 if $\alpha_2 < \beta_e  educ +\beta_k kids +\epsilon$
+
+We could alternatively introduce a constant $\beta_0$ and assume that $\alpha_1$ = 0.
+
+---
+## Log Likelihood Function
+
+$$Log \, L=\sum_{i=1}^{n} \sum_j Z_{ij}[F_{ij}-F_{ij-1}]$$
+
+where $F_{ij}=F(\alpha_j-\beta_e  educ -\beta_k  kids)$ and $Z_{ij}$ is an indicator that equals 1 if person i select option j and zero otherwise.
+
+We choose the values of $\alpha$ and $\beta$ that maximize the value of the log likelihood function.
+
+__However, in the case of models such as ordered probit and ordered logit failure to account for heteroskedasticity can lead to biased parameter estimates in addition to misspecified standard errors__
+
+---
+## Ordered Logit in R
+
+A study looks at factors that influence the decision of whether to apply to graduate school. 
+
+College juniors are asked if they are unlikely, somewhat likely, or very likely to apply to graduate school. 
+
+Hence, our outcome variable has three categories. 
+
+Data on parental educational status, whether the undergraduate institution is public or private, and current GPA is also collected.
+
+---
+## Example: Data
+```{r}
+library(foreign)
+dat <- read.dta("https://stats.idre.ucla.edu/stat/data/ologit.dta")
+head(dat)
+```
+
+---
+## Example: Some Descriptive Stats
+
+```{r}
+## one at a time, table apply, pared, and public
+lapply(dat[, c("apply", "pared", "public")], table)
+```
+
+---
+## Example: Estimation
+```{r}
+library(MASS)
+m <- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE)
+## view a summary of the model
+summary(m)
+```
+
+---
+## Predicting probabailities
+
+Let's say we want to know the probability that someone who's parents are educated is likely very likely to go to graduate school.
+
+We want to know $$Pr(y=2|pared=1, public=0)$$
+
+---
+## Calculating probabilities
+```{r}
+## First let's find the cumulative probability of being less than 2.
+gpa<-as.vector(seq(0,4,.1))
+pared.f<-rep(1,length(gpa))
+public.f<-rep(0,length(gpa))
+fakedata=as.matrix(rbind(pared.f,public.f,gpa))
+p2=exp(m$zeta[2]-t(fakedata)%*%m$coefficients)/(1+exp(m$zeta[2]
+                +t(fakedata)%*%m$coefficients))
+## but we want to know Pr(y=2)=1-Pr(y<2)
+p2=1-p2
+```
+
+---
+## Calculating probabilities
+```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center'}
+## First let's find the cumulative probability of being less than 2.
+library(tidyverse)
+pared.f<-rep(0,length(gpa))
+fakedata=as.matrix(rbind(pared.f,public.f,gpa))
+p22=exp(m$zeta[2]-t(fakedata)%*%m$coefficients)/(1+exp(m$zeta[2]+t(fakedata)%*%m$coefficients))
+## but we want to know Pr(y=2)=1-Pr(y<2)
+p22=1-p22
+g_data<-data.frame(p2, p22, gpa)
+ggplot()+geom_line(data=g_data, aes(y=p22, x=gpa,color="pared=0"))+geom_line(data=g_data, aes( y=p2, x=gpa,color="pared=1"))+
+xlab("Grade Point Average")+ylab("Prob. of Likely going to grad school")+labs(colour="Parents' Education")+theme_light()
+```
+
+---
+class: inverse, center, middle
+# Ordered Probit and Logit in R
+---
+## Marginal Effects
+
+Re-run the example from the notes, but this time using the `oglmx` package
+
+```{r message=FALSE, warning=FALSE}
+library(erer)
+m_probit <- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE, method = "probit")
+m_logit <- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE, method = "logistic")
+m1_probit<-ocME(m_probit,rev.dum = TRUE)
+m1_logit<-ocME(m_logit,rev.dum = TRUE)
+```
+
+---
+## Marginal Effects
+```{r eval=TRUE, echo=FALSE}
+m1_probit
+m1_logit
+```
+
+---
+class: inverse, center, middle
+# Poisson and Negative Binomial Model
+---
+## Count Models
+
+Count data are integer counts of the outcome variable that can include the number zero.
+
+These data present problems for typical linear regression methods because the outcome variable is non-negative, but the regression error is bounded by $-\infty$ and $\infty$.
+
+We cannot simply take a the natural log of the outcome variable because zero's are present.
+
+Also, the integer values are more discrete in nature.
+
+---
+## OLS vs Count Models
+
+These models have a number of advantages over an ordinary linear regression model, including a skew, discrete distribution, and the restriction of predicted values to non-negative numbers. A Poisson model is similar to an ordinary linear regression, with two exceptions. 
+
+1. it assumes that the errors follow a Poisson, not a normal, distribution. 
+2. rather than modeling Y as a linear function of the regression coefficients, it models the natural log of the response variable, ln(Y), as a linear function of the coefficients.
+---
+## Examples of count data
+
+Count data capture the number of occurrences over a fixed time intervals such as:
+
+- Number of Suicides in a state over a year
+- Number of cars served through a fast food drive thru in a day
+- Number of children in a family
+- Number of doctors visits
+- Number of website visitors
+
+---
+## Poisson Distribution
+
+The Poisson density function is $$Pr(Y=y)=\frac{e^{-\lambda}\lambda^y}{y!}$$
+
+where the $E[y|X]=Var[y|X]=\lambda$
+
+For our purposes, we assume $\lambda=exp(X\beta)$
+
+Interpretation of $\beta$ is the percentage change in $\lambda$ for a one unit increase in $X$.
+
+[If you are completely unfamiliar with the Poisson distribution, then have a look at this video.](https://youtube.com/shorts/gSUv-l0HhD8?si=meKq-K8NlCQy-q_Z)
+
+---
+## Properties of the Poisson Distribution
+
+The _equidispersion property_ of the Poisson distribution: Implies $$E[y|X]=Var[y|X]=\lambda$$, which means "the average number of occurrences is equal to the variance of occurrences". This assumption is very often violated.
+
+When this property fails to hold, we state that there is _overdispersion_ in the data. In this case, the negative binomial can be used.
+
+_Overdispersion_ causes the standard errors estimated using the Poisson distribution to be too small. An alternative approach is to estimate heterosckedastic (robust) standard errors. 
+
+Woolridge (1999) had demonstrated that using robust standard errors compensates for the overdispersion problem and often performs better than the negative binomial distribution.
+
+---
+## Negative Binomial Distribution
+
+The Negative Binomail distribution has a less restrictive relationship between the mean and variance of y. $$Var(y)=\lambda+\alpha \lambda^2$$
+
+We can think of $\alpha$ as the _overdispersion parameter_.
+
+---
+## Testing for Overdispersion
+
+Step 1. Estimate the count model using the negative binomial distribution.
+
+Step 2. Test $H_o:\alpha=0$ vs $H_a:\alpha\neq0$
+
+Step 3. Determine which case you are in
+
+  * If $\alpha=0$, then the Poisson model holds
+  * If $\alpha>0$, then we have _overdispersion_ (very common)
+  * If $\alpha<0$, then we have _underdispersion_ (rare)
+
+---
+## Poisson and Negative Binomial in R
+```{r fig.align='center', message=FALSE, warning=FALSE}
+library(MASS); library(AER) #MASS contains the negative binomial model
+data("NMES1988") 
+plot(table(NMES1988$visits),xlab="Physician Office Visits", ylab="Counts")
+```
+
+---
+## Issues with the data
+
+First, notice the shape of Physician office visits. Does this look normally distributed to you?
+
+Should we be concerned with the mass of zero's?
+
+How about those outliers?
+
+__89 visits is equivalent to a doctor's visit every 4 days!__
+
+---
+## Standard Poisson and Negative Binomial Model
+```{r eval=FALSE}
+pformu<-visits~hospital+chronic+insurance+gender+school
+fm_pois <- glm(pformu, data = NMES1988, family = poisson)
+cov.m1 <- vcovHC(fm_pois, type="HC0")
+std.err <- sqrt(diag(cov.m1))
+fm_qpois <- glm(pformu, data = NMES1988, family = quasipoisson) 
+fm_nbin <- glm.nb(pformu, data = NMES1988)  
+texreg::htmlreg(list(fm_pois,fm_pois,fm_qpois,fm_nbin),custom.model.names = c("Poisson","Poisson Robust","Quasi Poisson","Neg. Bin"), override.se = list(NULL,std.err,NULL,NULL), single.row = TRUE, custom.coef.names = c("Intercept","Hospital","Chronic","Insurance Eyes","School","Male","Theta"))
+```
+
+---
+### Standard Poisson and Negative Binomial Model 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+pformu<-visits~hospital+chronic+insurance+gender+school
+fm_pois <- glm(pformu, data = NMES1988, family = poisson)
+cov.m1 <- vcovHC(fm_pois, type="HC0")
+std.err <- sqrt(diag(cov.m1))
+fm_qpois <- glm(pformu, data = NMES1988, family = quasipoisson) 
+fm_nbin <- glm.nb(pformu, data = NMES1988)  
+texreg::htmlreg(list(fm_pois,fm_pois,fm_qpois,fm_nbin),custom.model.names = c("Poisson","Poisson Robust","Quasi Poisson","Neg. Bin"), override.se = list(NULL,std.err,NULL,NULL), single.row = TRUE, custom.coef.names = c("Intercept","Hospital","Chronic","Insurance Eyes","School","Male"))
+```
+
+---
+### Fixed Effects Poisson
+
+```{r eval=FALSE}
+library(pglm)
+library(readstata13)
+library(lmtest)
+library(MASS)
+ships<-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
+ships$lnservice=log(ships$service)
+res <- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
+res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
+```
+
+---
+### Fixed Effects Poisson
+
+```{r echo=FALSE ,warning=FALSE,message=FALSE}
+library(pglm)
+library(readstata13)
+library(lmtest)
+library(MASS)
+ships<-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
+ships$lnservice=log(ships$service)
+res <- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
+res1 <- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
+coeftest(res)
+standard_se<-ginv(-res1$hessian)
+coeftest(res1,standard_se)
+```
+
+---
+## Other Issues with Count Models
+
+- Excessive zeros
+  - Zero-inflated Models: function in R `zeroinfl()`
+  - Hurdle Models: function in R `hurdle()`
+- While many software packages implement standard count models, such as the Poisson and negative binomial models, more elaborate models may require some programming by the researcher.
+- A count data approach does not solve the fundamental evaluation problem: absent a
+randomized controlled experiment, identifying policy effects from observational data can be marred by selection bias, requiring plausibly exogenous variation in the form of a quasi-natural experiment

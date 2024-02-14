@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -14,11 +14,21 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Limited Dependent Variables
+]
+.subtitle[
 ## Demand Estimation
+]
+.author[
 ### Jose M. Fernandez
+]
+.institute[
 ### University of Louisville
-### 2020-7-4 (updated: 2021-02-10)
+]
+.date[
+### 2020-7-4 (updated: 2024-02-13)
+]
 
 ---
 
@@ -26,11 +36,11 @@ class: inverse, center, middle
 # Demand Estimation with aggregate market shares
 ---
 ## Micro versus Market level data
-One of the advantages of having microdata is that you can estimate demand directly from individual consumer choices.
-
-But often times, we do not get to observe individual transaction data. 
+One of the advantages of having microdata is that you can estimate demand directly from individual consumer choices using a _multinomial logit_ model. But often times, we do not get to observe individual transaction data. 
 
 Instead, we observe market level data where we know the market share for a certain product and product characteristics. 
+
+&lt;img src="https://www.zippia.com/wp-content/uploads/2021/12/us-airlines-by-domestic-market-share-2020.jpg" width="65%" style="display: block; margin: auto;" /&gt;
 
 ---
 ## Another problem: price endogeneity?
@@ -39,7 +49,7 @@ Note: in deriving all these examples, an implicit assumption is that the distrib
 
 Case study: Trajtenberg (1989) study of demand for CAT scanners. Disturbing finding: coefficient on price is positive, implying that people prefer more expensive machines!
 
-Possible explanation: quality differentials across products not adequately controlled for. In differentiated product markets, where each product is valued on the basis of its characteristics, brands with highly-desired characteristics (higher quality) may command higher prices. If any of these characteristics are not observed, and hence not controlled for, we can have endogeneity problems. `\(E[p\epsilon] \ne 0\)`
+Possible explanation: quality differentials across products are not adequately controlled for. In differentiated product markets, where each product is valued on the basis of its characteristics, brands with highly-desired characteristics (higher quality) may command higher prices. If any of these characteristics are not observed, and hence not controlled for, we can have endogeneity problems. `\(E[p\epsilon] \ne 0\)`
 
 ---
 ## Estimation with aggregate market shares
@@ -131,42 +141,60 @@ Basically, we reduce the whole problem down to an instrumentals variable problem
 
 
 ```r
-library(AER)
-blpdata&lt;-hdm::BLP$BLP #BLP Data
-blpZ&lt;-hdm::BLP$Z #Instrumental Variables
-blpZ&lt;-as.data.frame(blpZ)
-blp.var.names=c("model name","model id","firm id","cdid",
-                "log price","miles per gallon","miles per dollar",
-                "horse power per weight","air conditioning",
-                "size of the car","market share","outside option share",
-                "log share j - log share 0","time trend")
-ols.1&lt;-lm(y~price+hpwt+space+mpg+air+mpd+factor(model.id), data=blpdata)
-iv.1&lt;-ivreg(y~price+hpwt+space+mpg+air+mpd+factor(model.id)|hpwt+space+mpg
-            +air+mpd+factor(model.id)+blpZ$sum.other.1+blpZ$sum.other.hpwt
-            +blpZ$sum.other.air+blpZ$sum.other.mpd
-            +blpZ$sum.other.space+blpZ$sum.rival.1+blpZ$sum.rival.hpwt
-            +blpZ$sum.rival.air+blpZ$sum.rival.mpd+blpZ$sum.rival.space, data=blpdata)
+library(ivreg)
+library(BLPestimatoR)
+library(tidyverse)
+# Constructing IV's
+# This creates the difference in log shares
+productData_cars &lt;- productData_cars %&gt;% group_by(cdid) %&gt;% mutate(sum.price=sum(price),count=n(),y=log(share)-log(1-sum(share)))
+productData_cars &lt;- productData_cars %&gt;% ungroup() %&gt;% mutate(sum.price.all=sum(price),count_all=n())
+# Creates IV as the avg. price outside of market
+productData_cars &lt;- productData_cars %&gt;% ungroup() %&gt;% mutate(price.iv.=(sum.price.all-sum.price)/(count_all-count))
+productData_cars &lt;- productData_cars %&gt;% group_by(firmid) %&gt;% mutate(sum.price.own=sum(price),count2=n())
+# Creates IV as the avg. price of rivals
+productData_cars &lt;- productData_cars %&gt;% ungroup() %&gt;% mutate(price.iv.2=(sum(price)-sum.price.own)/(count_all-count2))
+
+ols.1&lt;-lm(y~price+air+mpg+space+hpwt, data=productData_cars)
+
+iv.1&lt;-ivreg(y~price+air+mpg+space+hpwt|price.iv.+price.iv.2+air+mpg+space+hpwt,data = productData_cars)
 ```
 ---
 ## Berry 1994 in R: Results 
-&lt;small&gt;
+&lt;font size=2&gt;
 
 &lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;OLS&lt;/td&gt;&lt;td&gt;IV&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;price&lt;/td&gt;&lt;td&gt;-0.085&lt;sup&gt;c&lt;/sup&gt; (0.009)&lt;/td&gt;&lt;td&gt;-0.197&lt;sup&gt;c&lt;/sup&gt; (0.021)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Horse power per wgt&lt;/td&gt;&lt;td&gt;0.065 (0.246)&lt;/td&gt;&lt;td&gt;0.754&lt;sup&gt;c&lt;/sup&gt; (0.285)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;size of car&lt;/td&gt;&lt;td&gt;0.945&lt;sup&gt;c&lt;/sup&gt; (0.197)&lt;/td&gt;&lt;td&gt;0.952&lt;sup&gt;c&lt;/sup&gt; (0.207)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;miles per gallon&lt;/td&gt;&lt;td&gt;0.016 (0.063)&lt;/td&gt;&lt;td&gt;0.004 (0.067)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;air conditioning&lt;/td&gt;&lt;td&gt;0.165&lt;sup&gt;b&lt;/sup&gt; (0.067)&lt;/td&gt;&lt;td&gt;0.457&lt;sup&gt;c&lt;/sup&gt; (0.087)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;miles per dollar&lt;/td&gt;&lt;td&gt;-0.018 (0.040)&lt;/td&gt;&lt;td&gt;0.018 (0.043)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-1.030&lt;sup&gt;b&lt;/sup&gt; (0.419)&lt;/td&gt;&lt;td&gt;-1.734&lt;sup&gt;c&lt;/sup&gt; (0.457)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Price&lt;/td&gt;&lt;td&gt;-0.089&lt;sup&gt;***&lt;/sup&gt; (0.004)&lt;/td&gt;&lt;td&gt;-0.125&lt;sup&gt;***&lt;/sup&gt; (0.006)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Air&lt;/td&gt;&lt;td&gt;0.016 (0.072)&lt;/td&gt;&lt;td&gt;0.402&lt;sup&gt;***&lt;/sup&gt; (0.089)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;miles per gallon&lt;/td&gt;&lt;td&gt;0.501&lt;sup&gt;***&lt;/sup&gt; (0.064)&lt;/td&gt;&lt;td&gt;0.431&lt;sup&gt;***&lt;/sup&gt; (0.066)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;size of car&lt;/td&gt;&lt;td&gt;2.740&lt;sup&gt;***&lt;/sup&gt; (0.149)&lt;/td&gt;&lt;td&gt;2.708&lt;sup&gt;***&lt;/sup&gt; (0.152)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Horsepower&lt;/td&gt;&lt;td&gt;0.526&lt;sup&gt;*&lt;/sup&gt; (0.286)&lt;/td&gt;&lt;td&gt;1.463&lt;sup&gt;***&lt;/sup&gt; (0.316)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-11.352&lt;sup&gt;***&lt;/sup&gt; (0.356)&lt;/td&gt;&lt;td&gt;-11.209&lt;sup&gt;***&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;2,217&lt;/td&gt;&lt;td&gt;2,217&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.874&lt;/td&gt;&lt;td&gt;0.861&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;20.446&lt;sup&gt;c&lt;/sup&gt; (df = 562; 1654)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.393&lt;/td&gt;&lt;td&gt;0.371&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;286.611&lt;sup&gt;***&lt;/sup&gt; (df = 5; 2211)&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
-&lt;/small&gt;
+&lt;/font&gt;
+
+---
+## IV diagnostics
+
+We can check the first stage F-test and the over identification test
+
+```r
+summary(iv.1)$diagnostics
+```
+
+```
+##                  df1  df2  statistic       p-value
+## Weak instruments   2 2210 838.318096 1.186625e-271
+## Wu-Hausman         1 2210  62.020969  5.281155e-15
+## Sargan             1   NA   1.419413  2.335000e-01
+```
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
@@ -214,6 +242,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

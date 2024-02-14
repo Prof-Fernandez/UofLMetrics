@@ -26,7 +26,7 @@ Second, let's look at the formula for the log odds.
 
 Odds is just the ratio of the two probabilities $\frac{Pr(Y=1)}{Pr(Y=0)}$.
 
-log odds is the natural log of this fraction.
+log odds is the natural log of this fraction. $$log \space odds: ln \frac{Pr(Y=1)}{Pr(Y=0)}=ln \frac{s_1}{s_0}= ln(s_1)-ln(s_0)=X\beta$$.
 
 ---
 ### Natural log rules
@@ -43,8 +43,6 @@ In case it has been awhile since you have seen the natural log, here are some ru
 
 ---
 ### Logit with aggregate data
-$$log \space odds: ln \frac{Pr(Y=1)}{Pr(Y=0)}=ln \frac{s_1}{s_0}= ln(s_1)-ln(s_0)=X\beta$$.
-
 The log odds gives us a linear function that we can estimate using OLS.
 
 $$\begin{align} ln Pr(Y=1) &= ln F(X\beta)= ln \frac{exp(X \beta)}{1+exp(X \beta)} \\  &= ln\space exp(X\beta) - ln [1+exp(X \beta)] \\ &= X \beta - ln[1+exp(X \beta)] \end{align}$$
@@ -87,7 +85,8 @@ mylogit3 <- lm(y2 ~ X, mydata_group)
 
 ---
 #### Results
-
+<font size=2>
 ```{r echo=FALSE,message=FALSE,warning=FALSE, results='asis'}
 stargazer::stargazer(mylogit1,mylogit3,type="html")
 ```
+</font>

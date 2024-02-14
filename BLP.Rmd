@@ -17,11 +17,13 @@ class: inverse, center, middle
 # Demand Estimation with aggregate market shares
 ---
 ## Micro versus Market level data
-One of the advantages of having microdata is that you can estimate demand directly from individual consumer choices.
-
-But often times, we do not get to observe individual transaction data. 
+One of the advantages of having microdata is that you can estimate demand directly from individual consumer choices using a _multinomial logit_ model. But often times, we do not get to observe individual transaction data. 
 
 Instead, we observe market level data where we know the market share for a certain product and product characteristics. 
+
+```{r, echo=FALSE, out.width="65%", fig.align='center'}
+knitr::include_graphics("https://www.zippia.com/wp-content/uploads/2021/12/us-airlines-by-domestic-market-share-2020.jpg")
+```
 
 ---
 ## Another problem: price endogeneity?
@@ -30,7 +32,7 @@ Note: in deriving all these examples, an implicit assumption is that the distrib
 
 Case study: Trajtenberg (1989) study of demand for CAT scanners. Disturbing finding: coefficient on price is positive, implying that people prefer more expensive machines!
 
-Possible explanation: quality differentials across products not adequately controlled for. In differentiated product markets, where each product is valued on the basis of its characteristics, brands with highly-desired characteristics (higher quality) may command higher prices. If any of these characteristics are not observed, and hence not controlled for, we can have endogeneity problems. $E[p\epsilon] \ne 0$
+Possible explanation: quality differentials across products are not adequately controlled for. In differentiated product markets, where each product is valued on the basis of its characteristics, brands with highly-desired characteristics (higher quality) may command higher prices. If any of these characteristics are not observed, and hence not controlled for, we can have endogeneity problems. $E[p\epsilon] \ne 0$
 
 ---
 ## Estimation with aggregate market shares
@@ -121,26 +123,37 @@ Basically, we reduce the whole problem down to an instrumentals variable problem
 ## Berry 1994 in R: Data
 
 ```{r warning=FALSE, message=FALSE}
-library(AER)
-blpdata<-hdm::BLP$BLP #BLP Data
-blpZ<-hdm::BLP$Z #Instrumental Variables
-blpZ<-as.data.frame(blpZ)
-blp.var.names=c("model name","model id","firm id","cdid",
-                "log price","miles per gallon","miles per dollar",
-                "horse power per weight","air conditioning",
-                "size of the car","market share","outside option share",
-                "log share j - log share 0","time trend")
-ols.1<-lm(y~price+hpwt+space+mpg+air+mpd+factor(model.id), data=blpdata)
-iv.1<-ivreg(y~price+hpwt+space+mpg+air+mpd+factor(model.id)|hpwt+space+mpg
-            +air+mpd+factor(model.id)+blpZ$sum.other.1+blpZ$sum.other.hpwt
-            +blpZ$sum.other.air+blpZ$sum.other.mpd
-            +blpZ$sum.other.space+blpZ$sum.rival.1+blpZ$sum.rival.hpwt
-            +blpZ$sum.rival.air+blpZ$sum.rival.mpd+blpZ$sum.rival.space, data=blpdata)
+library(ivreg)
+library(BLPestimatoR)
+library(tidyverse)
+# Constructing IV's
+# This creates the difference in log shares
+productData_cars <- productData_cars %>% group_by(cdid) %>% mutate(sum.price=sum(price),count=n(),y=log(share)-log(1-sum(share)))
+productData_cars <- productData_cars %>% ungroup() %>% mutate(sum.price.all=sum(price),count_all=n())
+# Creates IV as the avg. price outside of market
+productData_cars <- productData_cars %>% ungroup() %>% mutate(price.iv.=(sum.price.all-sum.price)/(count_all-count))
+productData_cars <- productData_cars %>% group_by(firmid) %>% mutate(sum.price.own=sum(price),count2=n())
+# Creates IV as the avg. price of rivals
+productData_cars <- productData_cars %>% ungroup() %>% mutate(price.iv.2=(sum(price)-sum.price.own)/(count_all-count2))
+
+ols.1<-lm(y~price+air+mpg+space+hpwt, data=productData_cars)
+
+iv.1<-ivreg(y~price+air+mpg+space+hpwt|price.iv.+price.iv.2+air+mpg+space+hpwt,data = productData_cars)
 ```
 ---
 ## Berry 1994 in R: Results 
-<small>
+<font size=2>
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-stargazer::stargazer(ols.1,iv.1,type="html",covariate.labels=c("price","Horse power per wgt","size of car","miles per gallon","air conditioning","miles per dollar"),omit = "model.id",dep.var.labels.include = FALSE, font.size = "small", single.row = TRUE, colnames = FALSE, style = "aer", model.numbers = FALSE, model.names = FALSE, column.labels = c("OLS","IV"), omit.stat = c("adj.rsq","ser"), star.char = c("a","b","c"))
+stargazer::stargazer(ols.1,iv.1,type="html",covariate.labels=c("Price","Air","miles per gallon","size of car","Horsepower"),omit = "model.id",dep.var.labels.include = FALSE, font.size = "small", single.row = TRUE, colnames = FALSE, style = "aer", model.numbers = FALSE, model.names = FALSE, column.labels = c("OLS","IV"), omit.stat = c("adj.rsq","ser"))
 ```
-</small>
+</font>
+
+---
+## IV diagnostics
+
+We can check the first stage F-test and the over identification test
+```{r}
+summary(iv.1)$diagnostics
+```
+
+

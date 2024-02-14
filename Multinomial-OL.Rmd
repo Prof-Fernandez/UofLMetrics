@@ -25,7 +25,7 @@ class: middle, center, inverse
 .pull-left[
 Marketing and Consumer Behavior Research is all about affecting customer value.[You can read more here](https://hbr.org/2016/09/the-elements-of-value)
 
-Favorite Quote about Marketing: "Marketing is the since of distracting the intelligent mind just long enough to extract money from it" Stephen Leacock, a Canadian humorist and economist. 
+Favorite Quote about Marketing: "Marketing is the science of distracting the intelligent mind just long enough to extract money from it" Stephen Leacock, a Canadian humorist and economist. 
 ]
 
 
@@ -35,27 +35,42 @@ Favorite Quote about Marketing: "Marketing is the since of distracting the intel
 
 ---
 ## Data Types
-
-.pull-left[
-__Revealed preference data__: These are data obtained by observing actual consumer behavior in the market, such as the products they purchase or the prices they pay. This type of data is based on actual choices that consumers make and is generally considered to be more reliable than stated preference data. However, revealed preference data can be difficult to collect and may be subject to confounding factors that make it hard to interpret.
-
-__Stated preference data__: These are data obtained by asking consumers to state their preferences directly, often through surveys or experiments. This type of data is based on hypothetical choices that consumers might make in different scenarios and can be used to explore how consumers value different attributes of a product or service, as well as how they might respond to changes in these attributes. Stated preference data are generally easier and less expensive to collect than revealed preference data, but may be subject to biases and inaccuracies in how respondents perceive and report their preferences.
-]
-
-
-.pull-right[
-![](https://miro.medium.com/v2/resize:fit:640/format:webp/1*80zoxrCIVgRF_YhgPK-CRg.png){width=40% height=40%}
-]
+![](https://miro.medium.com/v2/resize:fit:640/format:webp/1*80zoxrCIVgRF_YhgPK-CRg.png)
 ---
-## Types of stated preference data
+## Stated Preference Data
+
+__Stated preference data__: These are data obtained by asking consumers to state their preferences directly, often through surveys or experiments. This type of data is based on hypothetical choices that consumers might make in different scenarios and can be used to explore how consumers value different attributes of a product or service. Stated preference data are generally easier and less expensive to collect than revealed preference data, but may be subject to biases and inaccuracies in how respondents perceive and report their preferences.
+
+---
+## Revealed preference data
+
+__Revealed preference data__: These are data obtained by observing actual consumer behavior in the market, such as the products they purchase or the prices they pay. This type of data is based on actual choices that consumers make and is generally considered to be more reliable than stated preference data. However, revealed preference data can be difficult to collect and may be subject to confounding factors that make it hard to interpret.]
+
+
+---
+## Multi-choice data
 
 Multi-choice data: This type of choice data involves asking respondents to choose among more than two options. For example, a survey question might ask which of several flavors of ice cream is the respondent’s favorite.
 
-Ranked choice data: This type of choice data involves asking respondents to rank a set of options in order of preference. For example, a survey question might ask respondents to rank their top five choices for factors that are important at work.
+![](https://resources.pollfish.com/wp-content/uploads/2021/04/Screen-Shot-2021-04-02-at-1.40.49-PM.png)
+---
+## Ranked Choice Data
 
-Rating scale data: This type of choice data involves asking respondents to rate a set of options on a numerical scale. For example, a survey question might ask respondents to rate their level of satisfaction with a store on a scale from 1 to 5.
+Ranked choice data: This type of choice data involves asking respondents to rank a set of options in order of preference. For example, a survey question might ask respondents to rank their top five choices for factors that are important at work. Or to be used in election [See a video at this link](https://youtu.be/gq7N2hmX9FI) or [see election data based on Ranked Choice](https://www.rcvresources.org/data-clearinghouse)
 
+![](rc_work.png)
+
+---
+## Rating scale data
+.pull-left[
+Rating scale data: This type of choice data involves asking respondents to rate a set of options on a numerical scale. For example, a survey question might ask respondents to rate their level of satisfaction with a store on a scale from 1 to 5.]
+.pull-right[
+![](https://images.ctfassets.net/mmu68mmhtb17/5NjAIUArXG35AS6fHftWFd/f4d3407f2696591972735479b750fe56/Mental_health_pain_scale.png){width=50%,length=50%}
+]
+---
+## Likert scale data
 Likert scale data: This type of choice data involves asking respondents to rate their level of agreement or disagreement with a statement on a scale, typically ranging from “strongly agree” to “strongly disagree.”
+![](https://chartexpo.com/blog/wp-content/uploads/2022/10/how-to-analyze-likert-scale-data-in-excel.jpg)
 ---
 ## Discrete choice Models
 
@@ -84,6 +99,7 @@ background-image: url("https://boardmember.com/wp-content/uploads/2019/03/AdobeS
 1. In which country to operate
 2. Where to locate a store
 3. Which CEO to hire
+4. Modeling consumer behavior
 ]
 
 ---
@@ -97,19 +113,24 @@ The dependent variable is nominal
 
 2. There is no meaningful ordering to them. 
   - Otherwise we would want to use that information (with an ordered probit or ordered logit)
+
 ---
 ## Multinomial Choice Probabilities
 
 Recall, the logit probability is the case of two choices.
 
 $$P_i=\frac{exp(\beta_{0i}+\beta_{1i}X_i)}{exp(\beta_{0i}+\beta_{1i}X_i)+ exp(\beta_{0k}+\beta_{1k}X_k)}$$
-The probability that y is equal to choice $i$.
+We typically normalize the betas for one of the choice in the case of logit (i.e. $\beta_k=0$)
+
+$$P_i=\frac{exp(\beta_{0i}+\beta_{1i}X_i)}{1+exp(\beta_{0i}+\beta_{1i}X_i)}$$
+---
+## More than two choices
+When we have more than two choices, the denominator changes to reflect all of the possible choices available. Here we have the probabilities for choice $i$ and choice $j$.
 
 $$P_i=\frac{exp(\beta_{0i}+\beta_{1i}X_i)}{\sum_{k=1}^{K} exp(\beta_{0k}+\beta_{1k}X_k)}$$
-The probability that y is equal to choice $j$.
-
 $$P_j=\frac{exp(\beta_{0j}+\beta_{1j}X_j)}{\sum_{k=1}^{K} exp(\beta_{0k}+\beta_{1k}X_k)}$$
 Relative probability choices $$P_i/P_j = \frac{exp(\beta_{0i}+\beta_{1i}X_i)}{exp(\beta_{0j}+\beta_{1j}X_j)}$$
+
 ---
 ## Relative Probabilities
 
@@ -117,9 +138,10 @@ We can only identify relative probabilities for each choice.
 
 Similar to our discussion of dummy variables, we need to model our choices as relative to a base.
 
-We set the base by forcing one of the choices to have $\beta$'s equal to zero.
+Just like we did in the logit case, we must set the base group by forcing one of the choices to have $\beta$'s equal to zero.
 
-If we do this for choice $j$, then the relative probabilities can be expressed as $$P_i/P_j = exp(\beta_{0i}+\beta_{1i}X_i)$$
+If we do this for choices $j$ and $i$, then the probabilities of selecting $j$ becomes $$P_j=\frac{1}{1+\sum_{k\neq j} exp(\beta_{0k}+\beta_{1k}X_k)}$$ $$P_i=\frac{exp(\beta_{0i}+\beta_{1i}X_i)}{1+\sum_{k\neq j} exp(\beta_{0k}+\beta_{1k}X_k)}$$
+
 ---
 ## IIA Property
 
@@ -130,6 +152,7 @@ One way to state the assumption
 * If choice A is preferred to choice B out of the choice set {A,B}, then introducing a third alternative X, thus expanding that choice set to {A,B,X}, must not make B preferable to A. 
 
 * which kind of makes sense.
+
 ---
 ## IIA Property
 
@@ -165,76 +188,59 @@ The IIA axiom does not mix well with perfect substitutes.
 
 The advantage of Multinomial Logit (and Logit for that matter) is that the probabilities have a closed form solution (i.e. a simple equation)
 
-An alternative is to use multinomial probit. 
+An alternative is to use Multinomial Probit. 
 
 Advantage: NO IIA property!
 
 Disadvantage: Computationally intensive once the number of choices is greater than 3.
 ---
-## Multinomial Logit Example
+## Types of Data formats for multinomial logit
 
-A relatively common  R  function that fits multinomial logit models is __multinom__ from package __nnet__. 
+There are often two types of datasets when encountering multinomial logit.
 
-Let us use the dataset _nels_small_ for an example of how __multinom__ works. 
+wide format: You observe only one observation by person. The row contains a dependent variable that is categorical and explanatory variables that could contain characteristics of each choice and characteristics of the chooser.
 
-The variable  _grades_  in this dataset is an index, with best grades represented by lower values of  grade . 
-
-We try to explain the choice of a secondary institution ( _psechoice_ ) only by the high school grade. 
----
-## Categorical Dependent Variable
-
-The variable  _pschoice_  can take one of three values:
-
-Variable | Code
-------------|-------------
-_psechoice_=1 | no college,
-_psechoice_=2 | two year college
-_psechoice_=3 | four year college
----
-## R Code for Multinomial Logit
-<small>
-```{r message=FALSE, warning=FALSE, include=FALSE, results='asis'}
-library(nnet)
-data("nels_small", package="PoEdata")
-nels.multinom <- multinom(psechoice~grades, data=nels_small)
+Example
+```{r echo=TRUE, eval=FALSE}
+data("Fishing", package = "mlogit")
+head(Fishing)
 ```
-```{r message=FALSE, warning=FALSE, results='asis'}
-stargazer::stargazer(nels.multinom, type="html", dep.var.labels.include = FALSE, column.labels = c("2 year college","4 year college"))
+---
+## Types of Data formats for multinomial logit
+Example
+```{r echo=FALSE, eval=TRUE}
+data("Fishing", package = "mlogit")
+head(Fishing)
 ```
-</small>
 ---
-## Interpreting Output
+## Types of Data formats for multinomial logit
 
-The output from the _multinom_ function gives coefficient estimates for each level of the response variable  psechoice , except for the first level, which is the benchmark.
+There are often two types of datasets when encountering multinomial logit.
 
-We treat the dependent choice variables similar to dummy variables. If there are G options, then we can only identify parameters associated with G-1 options.
+long format: You observe a row for each choice and there is an id variable for each chooser. Each row contains a binary variable indicating if the person selected that choice. We also observe the choice's characteristics.
 
-As in the probit and logit model, we can only identify relative differences. 
+Example
+```{r echo=TRUE, eval=FALSE}
+data("TravelMode", package = "AER")
+head(TravelMode)
 
-That is, how much the probability of choosing option A over B increases or decreases
----
-## Making Predictions
-Suppose we wanted to know the probabilities for the median student and for the student in the top 5%. 
-
-```{r}
-medGrades <- median(nels_small$grades)
-fifthPercentileGrades <- quantile(nels_small$grades, .05)
-newdat <- data.frame(grades=c(medGrades, fifthPercentileGrades))
-pred <- predict(nels.multinom, newdat, "probs")
-knitr::kable(pred, digits = 2)
 ```
-
-We can clearly see the high performing student is more likely to attend college.
 ---
-# Conditional Logit
+## Types of Data formats for multinomial logit
+Example
+```{r echo=FALSE, eval=TRUE}
+data("TravelMode", package = "AER")
+head(TravelMode)
+```
 ---
-## Difference between Conditional and Multinomial Logit
+## Multinomial Logit: Three Types of models
 
-Multinomial logit models a choice as a function of the chooser's characteristics, whereas conditional logit models the choice as a function of the choice's characteristics. 
+There are three types of Multinomial Logit Model
 
-It's really that simple! Note that the two can be combined.
+1. Multinomial Logit: modeling choices based off of the person's characteristics.
+2. Conditional Logit: modeling choices based off of the choice's characteristics.
+3. Mixed Logit: modeling choices based off of both person's and choice's characteristics.
 
-Conditional Logit is a special case of Multinomial Logit
 ---
 ## Difference between Conditional and Multinomial Logit
 
@@ -283,7 +289,7 @@ We will use the mlogit package in R
 ```{r echo=TRUE, eval=FALSE}
 library(mlogit)
 data("Fishing", package = "mlogit")
-Fish <- mlogit.data(Fishing, varying = c(2:9), shape = "wide", choice = "mode")
+Fish <- mlogit.data(Fishing, shape="wide", varying=2:9, choice="mode")
 ## a pure "conditional" model
 m1<-mlogit(mode ~ price + catch, data = Fish)
 ## a pure "multinomial model"
@@ -293,11 +299,12 @@ m2<-mlogit(mode ~ 0 | income, data = Fish)
 #summary(multinom(mode ~ income, data = Fishing))
 ## a "mixed" model
 m <- mlogit(mode ~ price+ catch | income, data = Fish)
-stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed"), font.size = "tiny", single.row = TRUE)
+p <- mlogit(mode ~ price+ catch | income, data = Fish, probit=TRUE)
+stargazer::stargazer(m1,m2,m,p,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed","Probit"), font.size = "tiny", single.row = TRUE)
 ```
 ---
 ## Examples of Mixed Logit in R 
-<small>
+<font size=2>
 ```{r eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 library(mlogit)
 data("Fishing", package = "mlogit")
@@ -311,9 +318,24 @@ m2<-mlogit(mode ~ 0 | income, data = Fish)
 #summary(multinom(mode ~ income, data = Fishing))
 ## a "mixed" model
 m <- mlogit(mode ~ price+ catch | income, data = Fish)
-stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed"), font.size = "tiny", single.row = TRUE)
+p <- mlogit(mode ~ price+ catch | income, data = Fish, probit=TRUE)
+stargazer::stargazer(m1,m2,m,p,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed","Probit"), font.size = "tiny", single.row = TRUE)
 ```
-</small>
+</font>
+---
+## Other advance routines
+
+We cannot cover everything in this class. Some relevant models to learn in the future are 
+
+- [Multinomial Logit with unobserved heterogeneity](https://jhelvy.github.io/logitr/articles/basic_usage.html)
+  - 
+- [Nested Logit](https://pdfs.semanticscholar.org/86fd/cf48d0fdf06b9c8efa1bf024a086e0e0b4aa.pdf)
+
+---
+## Other advance routines
+
+- [Nested Logit](https://pdfs.semanticscholar.org/86fd/cf48d0fdf06b9c8efa1bf024a086e0e0b4aa.pdf)
+![](https://www.researchgate.net/publication/27466428/figure/fig1/AS:669517051072521@1536636712910/Example-of-a-Nested-Binary-Logit-Model.png){width=50%,length=50%}
 ---
 ## Summary
 
