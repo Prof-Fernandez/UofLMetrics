@@ -1,0 +1,852 @@
+---
+title: "Time Series Econometrics"
+subtitle: "Prediction Based Models"
+author: "Jose M. Fernandez"
+institute: "University of Louisville"
+date: "2020/12/12 (updated: `r Sys.Date()`)"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+background-image: url(https://memegenerator.net/img/instances/57464026.jpg)
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+---
+# Time Series Econometrics
+
+In this lecture, we will discuss
+
+- MA: Moving Averages
+- AR: Autoregressive Functions
+- ARMA: Time Series including both AR and MA
+- ARIMA: Makes a non-stationary ARMA model stationary
+- Dynamic Causal Models
+
+---
+# What is Time Series Data
+
+Cross-Sectional Data: Observe many units during the same period of time.
+
+Time series Data: Observe only one unit over many periods of time.
+
+The dependent variable is not just affect by contemporaneous values of the explanatory variables, but also past value of the depedent variable.
+
+---
+# Examples of Time Series Data
+
+| Fields           | Example Topics                                   |
+|------------------|--------------------------------------------------|
+| Economics        | GDP, Unemployment, S&P 500, Inflation            |
+| Social Science   | Birth Rates, Death Rates, Population, Migration  |
+| Physical Science | Global Temperatures, pollution levels, rain fall |
+| Medicine         | height, weight, blood pressure, cholesterol      |
+| Business         | Sales, Inventory, Stock Prices, |
+
+---
+class: center, middle, inverse
+
+# Moving Average
+
+---
+# Moving Average
+
+The most basic type of Time Series is a moving average. 
+
+The characteristics of a moving average
+
+- stationary process
+- the value today is dependent upon the overall mean and random shocks
+
+Examples
+
+- Weekly groceries expenditures
+- Monthly Household electricity demands
+---
+# Moving Average Equations
+
+The most basic type of Time Series is a moving average. 
+
+The characteristics of a moving average
+
+- stationary process
+- the value today is dependent upon the overall mean and random shocks
+$$MA(1): y_t=\mu+e_t+\phi_1 e_{t-1}$$
+$$MA(2): y_t=\mu+e_t+\phi_1 e_{t-1}+\phi_2 e_{t-2}$$
+$$MA(j):y_t=\mu+e_t+\sum_{i=1}^j\phi_j e_{t-j}$$
+---
+## Moving Average Example
+
+Suppose you are suppose to bring doughnuts to Friday meetings.
+
+Your boss is crazy and randomly tells you if you brought too many, too few, or just the right amount of doughnuts.
+
+You believe (i.e. your estimate of $\mu$) is that the average amount should be 10.
+
+You adopt the following strategy to minimize the number of times your boss critizes your for the number of doughnuts your bring.
+
+$$\hat{f_t}=\mu+\phi e_{t-1}$$
+where $\hat{f_t}$ is the number of doughnuts your bring at time t. We will let the mean number of doughnuts be $\mu=10$ and your correction factor is $\phi=0.5$ 
+
+Let the actual number of doughnuts your boss expected to be
+$$f_t=\mu+\phi e_{t-1}+e_t$$
+
+Where the errors, $e_{t-j}$ are your bosses deviations from the mean.
+
+---
+## Moving Average Example
+
+| Week | Number of doughnuts your brought | Number of doughnuts expected | Error |
+|------|----------------------------------|------------------------------|-------|
+| 1    | 10                               | 14                           | 4     |
+| 2    |                                  |                              |       |
+| 3    |                                  |                              |       |
+| 4    |                                  |                              |       |
+| 5    |                                  |                              |       |
+---
+## Moving Average Example
+
+| Week | Number of doughnuts your brought | Number of doughnuts expected | Error |
+|------|----------------------------------|------------------------------|-------|
+| 1    | 10                               | 14                           | 4     |
+| 2    | 10+0.5*(4)=12                    | 9                            | -3    |
+| 3    |                |                            |     |
+| 4    |                  |                            |    |
+| 5    |                   |                         |     |
+
+---
+## Moving Average
+| Week | Number of doughnuts your brought | Number of doughnuts expected | Error |
+|------|----------------------------------|------------------------------|-------|
+| 1    | 10                               | 14                           | 4     |
+| 2    | 10+0.5*(4)=12                    | 9                            | -3    |
+| 3    | 10+0.5*(-3) = 8.5                | 8.5                            | 0     |
+| 4    |                  |                            |   |
+| 5    |                    |                           |     |
+
+---
+## Moving Average
+| Week | Number of doughnuts your brought | Number of doughnuts expected | Error |
+|------|----------------------------------|------------------------------|-------|
+| 1    | 10                               | 14                           | 4     |
+| 2    | 10+0.5*(4)=12                    | 9                            | -3    |
+| 3    | 10+0.5*(-3) = 8.5                | 8.5                            | 0     |
+| 4    | 10+0.5*(0) = 10                  | 8                            | -2    |
+| 5    |                |                           |      |
+
+---
+## Moving Average
+| Week | Number of doughnuts your brought | Number of doughnuts expected | Error |
+|------|----------------------------------|------------------------------|-------|
+| 1    | 10                               | 14                           | 4     |
+| 2    | 10+0.5*(4)=12                    | 9                            | -3    |
+| 3    | 10+0.5*(-3) = 8.5                | 8.5                            | 0     |
+| 4    | 10+0.5*(0) = 10                  | 8                            | -2    |
+| 5    | 10+0.5(-2) = 9                   | 10                           | 1     |
+
+---
+## Moving Average
+#### What about an MA(2)?
+| Week | Number of doughnuts your brought | Number of doughnuts expected | Error |
+|------|----------------------------------|------------------------------|-------|
+| 1    | 10                               | 14                           | 4     |
+| 2    | 10+0.5*(4)=12                    | 9                            | -3    |
+| 3    | 10+0.5*(-3) +0.5(4) = 10.5       | 8.5                          | -2    |
+| 4    | 10+0.5(-2)+0.5(-3) = 7.5         | 8                            | 0.5   |
+| 5    | 10+0.5*(0.5)+0.5(-2) = 9.25      | 10                           | 0.75  |
+---
+## Moving Average Properties
+Rather than using past values of the forecast variable in a regression, a moving average model uses past forecast errors in a regression-like model.
+$$MA(j):y_t=\mu+\phi_1 e_{t-1}+\phi_2 e_{t-2}+...\phi_j e_{t-j}$$
+
+__Moving averages are assumed to be stationary.__
+
+---
+## Moving average properties
+
+For example, $|\phi|<1$, if not then a value in the past has the same or even greater influence than the value today. This does not make logical sense. 
+
+__MA(j) implies $COV(y_t,y_{t-j})\neq0$, but $COV(y_t,y_{t-j-1})=0$__
+
+Consider an MA(1) and remember the errors are independent.
+$COV(y_t,y_{t-1})=COV(\phi e_{t-1}+e_t,\phi e_{t-2}+e_{t-1})=COV(\phi e_{t-1},e_{t-1})=\phi \sigma^2$
+
+Notice, how the same error appears in both terms, $e_{t-1}$.
+
+$COV(y_t,y_{t-2})=COV(\phi e_{t-1}+e_t,\phi e_{t-3}+e_{t-2})=0$
+
+In the equation above, notice how none of the error terms overlap.
+
+Moving averages are sometimes referred to as _memory less_ because of this property.
+---
+## MA example in R
+```{r eval=FALSE}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(ggfortify)
+library(zoo)
+Food <- read_csv("https://www.ers.usda.gov/webdocs/DataFiles/100189/StateAndCategory.csv")
+KY<-Food %>% filter(State=="Kentucky",Category=="Alcohol", Variable=="Unit sales") %>% select(Date,Value)
+KY_time <- read.zoo(KY) 
+autoplot.zoo(KY_time) + xlab("Week") + ylab("Alcohol Units") +
+    ggtitle("Weekly Statewide Alcohol Sales")
+```
+---
+## MA example in R
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(ggfortify)
+library(zoo)
+Food <- read_csv("https://www.ers.usda.gov/webdocs/DataFiles/100189/StateAndCategory.csv")
+KY<-Food %>% filter(State=="Kentucky",Category=="Alcohol", Variable=="Unit sales") %>% select(Date,Value)
+KY_time <- read.zoo(KY) 
+autoplot.zoo(KY_time) + xlab("Week") + ylab("Alcohol Units") +
+    ggtitle("Weekly Statewide Alcohol Sales")
+```
+
+---
+class: center, middle, inverse
+
+# Autoregressive Function
+---
+## Autoregressive Function
+
+An autoregressive function is one where a shock in the distant past can still have an effect today. 
+
+The simplest autoregressive function is an AR(1)
+$$y_t=\rho y_{t-1}+e_t$$
+
+Where $\rho$ tells us how persistent past shocks are to the present value.
+
+We can think of an AR process as a moving average, but with infinite lags. That is, an AR has full memory.
+
+$$y_t=\rho y_{t-1}+e_t=\rho*(\rho*y_{t-2}+e_{t-1})+e_t$$
+$$y_t=\rho*(\rho*(y_{t-3}+e_{t-2})+e_{t-1})+e_t=\rho^2 y_{t-3}+\rho^2 e_{t-2}+\rho e_{t-1}+e_t$$
+$$y_t=y_0+\sum_{i=1}^{t-1}{\rho^{t-i}e_{t-i}}$$
+
+---
+## Crazy Boss and AR process
+Let's revisit the crazy boss, but now you have an AR(1) process instead of an MA(1). Here we will let $\rho=0.5$.
+
+| Week | Number of doughnuts your brought               | Number of doughnuts expected | Error |
+|------|------------------------------------------------|------------------------------|-------|
+| 1    | 10                                             | 14                           | 4     |
+| 2    | 10+0.5*(4)=12                                  | 9                            | -3    |
+| 3    | 10+0.5*(-3) +0.25(4) = 9.5                     | 8.5                          | -1    |
+| 4    | 10+0.5(-1)+0.25(-3)+.125(4) = 9.25             | 8                            | -1.25 |
+| 5    | 10+0.5*(-1.25)+0.25(-1)+0.125(-3)+.0625(4) = 9 | 10                           | 1     |
+
+Notice, the early big shock kept us higher than we otherwise would have been with the moving average. 
+
+---
+## Stationarity with AR
+
+A big issue with autoregessive function is the need for stationary.
+
+An AR(1) is
+- explosive if $\rho >1$
+- a random walk if $\rho = 1$
+- stationary if $\rho <1$
+
+Short-cut method: If $\rho<1$, then $$Var(y)=Var(\rho y)+Var(e)=\rho^2Var(y)+Var(e)$$
+If we solve for Var(y), then $$Var(y)=\frac{Var(e)}{1-\rho^2}$$
+
+---
+## Stationarity with AR
+__Side note: We need to know the math of a geometric sum__
+
+If $\beta<1$, then the $\sum_{i=0}^\infty \beta^i = \frac{1}{1-\beta}$
+
+Remember, we can write an AR(1) as $MA(\infty)$
+$$y_t=y_0+\sum_{i=1}^{t-1}{\rho^{t-i}e_{t-i}}$$
+$$Var(y_t)=Var(y_0)+\sum_{i=1}^{t-1}{\rho^{2*(t-i)}Var(e_{t-i})}$$
+
+In this case, $\beta = \rho^2$ so the $Var(y_t)=\frac{\sigma_e^2}{1-\rho^2}$.
+
+Notice, if $\rho<|1|$, then $Var(y_t)$ is finite, but if $\rho \geq |1|$, the variance is explosive.
+
+---
+## What is an AR(q)?
+
+If we think the dependent variable is dependent on more lags, then we write the relationship as $$y_t = \rho_1 y_{t-1}+\rho_2 y_{t-2} ...\rho_q y_{t-q}$$
+
+Collectively, we would still need all of these additional rows in combination to satisfy the stationarity constraint. The condition becomes increasingly complex as q increases. 
+
+For example, if q=1, we know the constraint is $-1<\rho_1<1$ is enough, but if q =2, the constraint becomes
+
+- $-1<\rho_2<1$
+- $\rho_1+\rho_2<1$
+- $\rho_2-\rho_1<1$
+
+For example, if $\rho_1=\rho_2=0.7$, the time series is explosive.
+---
+class: center, middle, inverse
+
+# Random Walk
+---
+## Random walks
+
+A random walk is a unique case because the size of the variance is increasing in time. 
+
+We cannot use simple OLS to determine if we have a random because the t-statistic will not be defined.
+
+Remember, we assume a finite variance so that we can use OLS.
+
+---
+## Solution: Dickey-Fuller Test
+
+Let's assume we have a random walk. If so then the true model is $$y_t=y_{t-1}+e_t$$ against the alternative hypothesis that the true model is $$y_t=\rho y_{t-1}+e_t$$
+
+In this test, we take a first difference of the dependent variable, $\Delta y_t=y_t-y_{t-1}$. We run the following regression, $$\Delta y_t = \alpha \Delta y_{t-1}+\Delta e_t$$
+
+If we have a random walk, then we will fail to reject the null hypothesis that $\alpha=0 \rightarrow \rho=1$. If we reject the null hypothesis, then we saying alpha is less than 0.
+
+---
+## Let's apply this test to data
+
+```{r echo=TRUE, eval=FALSE}
+N <- 500
+a <- 1
+l <- 0.01
+rho <- 0.7
+
+set.seed(246810)
+v <- ts(rnorm(N,0,1))
+
+y <- ts(rep(0,N))
+for (t in 2:N){
+  y[t]<- rho*y[t-1]+v[t]
+}
+plot(y,type='l', ylab="rho*y[t-1]+v[t]")
+abline(h=0)
+```
+
+---
+## Let's apply this test to data
+
+```{r echo=FALSE, eval=TRUE}
+N <- 500
+a <- 1
+l <- 0.01
+rho <- 0.7
+
+set.seed(246810)
+v <- ts(rnorm(N,0,1))
+
+y <- ts(rep(0,N))
+for (t in 2:N){
+  y[t]<- rho*y[t-1]+v[t]
+}
+plot(y,type='l', ylab="rho*y[t-1]+v[t]")
+abline(h=0)
+```
+
+---
+## Let's create a random walk
+
+```{r echo=TRUE, eval=FALSE}
+N <- 500
+a <- 1
+l <- 0.01
+rho <- 0.7
+
+set.seed(246810)
+v <- ts(rnorm(N,0,1))
+
+y1 <- ts(rep(0,N))
+for (t in 2:N){
+  y1[t]<- y1[t-1]+v[t]
+}
+plot(y1,type='l', ylab="y1[t-1]+v[t]")
+abline(h=0)
+```
+
+---
+## Let's create a random walk
+
+```{r echo=FALSE, eval=TRUE}
+N <- 500
+a <- 1
+l <- 0.01
+rho <- 0.7
+
+set.seed(246810)
+v <- ts(rnorm(N,0,1))
+
+y1 <- ts(rep(0,N))
+for (t in 2:N){
+  y1[t]<- y1[t-1]+v[t]
+}
+plot(y1,type='l', ylab="y1[t-1]+v[t]")
+abline(h=0)
+```
+
+---
+## Dickey-Fuller Test
+```{r warning=FALSE, eval=FALSE,message=FALSE, results='asis'}
+library(knitr)
+library(tseries)
+library(dynlm)
+reg1<-dynlm(y~L(y))
+reg2<-dynlm(y1~L(y1))
+y2 <- diff(y,differences = 1)
+y3 <- diff(y1,differences = 1)
+reg3<-dynlm(y2~L(y2))
+reg4<-dynlm(y3~L(y3))
+stargazer::stargazer(reg1,reg2,reg3,reg4,type = "html")
+```
+---
+## Dickey-Fuller Test
+<font size=2>
+```{r warning=FALSE, eval=TRUE, echo=FALSE,message=FALSE, results='asis'}
+library(knitr)
+library(tseries)
+library(dynlm)
+reg1<-dynlm(y~L(y))
+reg2<-dynlm(y1~L(y1))
+y2 <- diff(y,differences = 1)
+y3 <- diff(y1,differences = 1)
+reg3<-dynlm(y2~L(y2))
+reg4<-dynlm(y3~L(y3))
+stargazer::stargazer(reg1,reg2,reg3,reg4,type = "html")
+```
+</font>
+
+---
+## Dickey-Fuller Test
+```{r warning=FALSE, message=FALSE}
+
+adf.test(y)
+adf.test(y1)
+```
+---
+class: center, middle, inverse
+
+# Determining the number of lags
+---
+### How do I determined the number or lags?
+
+How do I know if I have an MA process or an AR process?
+
+How do I know the number of lags I have to use for each?
+
+__Assuming we have a stationary process__, we answer these questions using the autocorrelation function (ACF) and the partial autocorrelation function (PACF).
+
+If the ACF immediately drops off after a few lags, then the time series is an MA.
+
+If the ACF does not drop off, but the PACF does, then it is an AR process. 
+---
+## ACF and PACF of an AR process
+![](AR1.png)
+---
+## ACF and PACF of a MA process
+
+![](MA1.png)
+---
+## ACF and PACF of a MA process
+
+![](arma1.png)
+---
+## Let's simulate an MA(2)
+
+```{r echo=TRUE, eval=TRUE}
+acfma2=ARMAacf(ma=c(0.5,0.3), lag.max=10)
+lags=0:10
+xc=arima.sim(n=150, list(ma=c(0.5, 0.3)))
+x=xc+10
+```
+
+---
+## Let's simulate an MA(2)
+
+```{r echo=FALSE, eval=TRUE}
+plot(x, type="b", main = "Simulated MA(2) Series")
+acf(x, xlim=c(1,10), main="ACF for simulated MA(2) Data")
+pacf(x, xlim=c(1,10), main="ACF for simulated MA(2) Data")
+```
+
+---
+## Let's simulate an MA(2)
+
+```{r echo=FALSE, eval=TRUE}
+acf(x, xlim=c(1,10), main="ACF for simulated MA(2) Data")
+```
+
+---
+## Let's simulate an MA(2)
+
+```{r echo=FALSE, eval=TRUE}
+pacf(x, xlim=c(1,10), main="PACF for simulated MA(2) Data")
+```
+
+---
+## Let's simulate an MA(2)
+
+```{r echo=TRUE, eval=TRUE}
+acfma2=ARMAacf(ar=c(0.5,0.3), lag.max=10)
+lags=0:10
+xc=arima.sim(n=150, list(ar=c(0.5, 0.3)))
+x=xc+10
+```
+
+---
+## Let's simulate an AR(2)
+
+```{r echo=FALSE, eval=TRUE}
+plot(x, type="b", main = "Simulated AR(2) Series")
+```
+
+---
+## Let's simulate an AR(2)
+
+```{r echo=FALSE, eval=TRUE}
+acf(x, xlim=c(1,10), main="ACF for simulated AR(2) Data")
+```
+
+---
+## Let's simulate an AR(2)
+
+```{r echo=FALSE, eval=TRUE}
+pacf(x, xlim=c(1,10), main="PACF for simulated AR(2) Data")
+```
+
+---
+## What about an ARMA(2,1)
+```{r}
+xc=arima.sim(n=150, list(ar=c(0.5, 0.3),ma = 0.2))
+x=xc+10
+```
+
+---
+## Let's simulate an ARMA(2,1)
+
+```{r echo=FALSE, eval=TRUE}
+plot(x, type="b", main = "Simulated ARMA(2,1) Series")
+```
+
+---
+## Let's simulate an ARMA(2,1)
+
+```{r echo=FALSE, eval=TRUE}
+acf(x, xlim=c(1,10), main="ACF for simulated ARMA(2,1) Data")
+```
+
+---
+## Let's simulate an ARMA(2,1)
+
+```{r echo=FALSE, eval=TRUE}
+pacf(x, xlim=c(1,10), main="PACF for simulated ARMA(2,1) Data")
+```
+
+---
+## Now what should I do?
+
+There is no sharp drop off in the ACF, so it is difficult to say we have a moving average.
+
+There is a sharp drop off in the PACF, so it would seem to indicate we have at least an AR(1)
+
+```{r}
+test_fit1<-arima(x, order = c(1,0,0))
+```
+
+---
+```{r}
+acf(test_fit1$residuals)
+```
+
+---
+```{r}
+pacf(test_fit1$residuals)
+```
+
+---
+In these residuals, we see the MA(1) process clearly. Let's repeat the exercise
+
+```{r}
+test_fit1<-arima(x, order = c(1,0,1))
+```
+---
+```{r}
+acf(test_fit1$residuals)
+```
+
+---
+```{r}
+pacf(test_fit1$residuals)
+```
+
+
+---
+## But what if I want to cheat
+
+Once we have mixed models, you will have to do a lot of guess and check work to find the true type of model.
+
+Luckily, R is to the rescue with the `auto.arima` function. However, I should warn you it is not perfect.
+
+```{r warning=FALSE, message=FALSE}
+library(forecast)
+auto.arima(x, stationary = TRUE)
+```
+
+__Moral: Cheater don't always win. This is harder than it looks and it already looks hard.__
+---
+class: center, middle, inverse
+
+# Dynamic Models
+
+---
+## How is this relevant to the first half of the class?
+
+In the first half of the class, we concentrated on contemporaneous effects. That is, if there was a change in X today, then Y was affected today.
+
+- But, what if there was a delayed effect?
+- What if past values of our explanatory variables matter?
+- What if past values of our dependent variable matter?
+
+These are all examples of dynamic model
+
+$$y_t=\alpha y_{t-1} +\beta_0+\beta_1 X_t+\beta_2 X_{t-1}$$
+
+---
+### Sometimes it is all in the errors
+
+The simplest case of a dynamic model is when your errors are correlated over time.
+
+This example is very common especially in panel data.
+
+For example, let's say you want to study someone's BMI overtime. BMI doesn't tend to change dramatically from period to period, but it is correlated overtime.
+
+$$BMI_{it}=\beta_0+\beta_1 Income_{it} + beta_2 Educ_{it}+\epsilon_{it}$$
+$$\epsilon_{it}=\theta_i+\alpha_t+e_{it}$$
+While it may be clear that someone else's BMI does not directly affect your BMI, BMI over time within a person is correlated.
+
+---
+## Fixed effects can't save you
+
+You are smarter than the average bear. You included time and year fixed effects. But the time fixed effect applies to everyone in the same way.
+
+What if $e_{it}$ is correlated over time such that $$e_{it}=\rho e_{it-1}+v_{it}$$
+
+This type of error structure is referred to as autocorrelation.
+
+A simple way to deal with autocorrelation is to use HAC robust standard error vcovHAC() which is found in the sandwitch package.
+
+---
+## Feasible GLS
+
+A more direct approach is to do the follow.
+
+Step 1: Estimate the model ignoring the autocorrelation
+Step 2: Get the residuals from Step 1 and estimate $\rho$ in $$e_{it}=\rho e_{it-1}+v_{it}$$
+Step 3: use the GLS function and provide your estimate of $\rho$ so that the covariance matrix use the right weights when finding the $\beta$'s.
+
+---
+## Feasible GLS Example
+```{r results='asis', warning=FALSE, message=FALSE}
+library(car)
+```
+- year, 1931–1968.
+- tfr, the total fertility rate, births per 1000 women.
+- partic, women’s labor-force participation rate, per 1000.
+- degrees, women’s post-secondary degree rate, per 10,000.
+- fconvict, women’s indictable-offense conviction rate, per 100,000.
+- ftheft, women’s theft conviction rate, per 100,000.
+- mconvict, men’s indictable-offense conviction rate, per 100,000.
+- mtheft, men’s theft conviction rate, per 100,000.
+
+We will estimate the regression of fconvict on tfr, partic, degrees, and mconvict.
+
+---
+```{r}
+plot(fconvict ~ year, type="n",data=Hartnagel,
+ylab="Convictions per 100,000 Women")
+grid(lty=1)
+with(Hartnagel, points(year, fconvict, type="o", pch=16))
+mod.ols <- lm(fconvict ~ tfr + partic + degrees + mconvict, data=Hartnagel)
+```
+
+---
+```{r}
+plot(Hartnagel$year, residuals(mod.ols), type="o", pch=16,
+xlab="Year", ylab="OLS Residuals")
+abline(h=0, lty=2)
+
+```
+
+---
+```{r}
+acf(residuals(mod.ols))
+
+```
+
+---
+```{r}
+acf(residuals(mod.ols), type="partial")
+
+```
+
+---
+## FGLS
+
+From the ACF and PACF it looks like an AR(2) process
+```{r}
+library("nlme")
+mod.gls <- gls(fconvict ~ tfr + partic + degrees + mconvict,
+data=Hartnagel, correlation=corARMA(p=2), method="ML")
+
+```
+
+---
+```{r results='asis', echo=FALSE}
+stargazer::stargazer(mod.ols,mod.gls, type = "html")
+```
+---
+# Estimation of Dynamic Causal Effects with Strictly Exogeneous Regressors
+
+Suppose, we believe the effects of our explanatory variables are independent of the error and dynamic.
+
+The dependent variable, $Y_t$, is affected by both the value of the explanatory variables today, $X_t$, and the explanatory variables from previous periods, $X_{t-1}$.
+
+We can estimate this model given the following assumptions
+
+- $X_t$ is an exogenous variable (i.e. $E[u_t|X_t, X_{t-1}, X{t-2}, ... ]=0$)
+- $Y_t$ and $X_t$ are stationary processes.
+- $(Y_t,X_t)$ and $(Y_{t-j},X_{t-j})$ become independent as j becomes large
+- large outliers are unlikely
+- there is no perferct multicolinearity
+
+super exogeneity is when $E[u_t|..., X_{t+2},X_{t+1}, X_t, X_{t-1}, X{t-2}, ... ]=0$)
+That is X is independent both in the past, present, and future.
+
+---
+## Distributive Lag Model
+The model
+
+$$Y_t = \beta_0 + \beta_1 X_t + \beta_2 X_{t-1}+u_{t}$$
+so a change in X is modeled to effect Y contemporaneously via $\beta_1$ and in the next period via $\beta_2$. The error term $u_t$ is assumed to follow an AR(1) process, $$u_t = \rho u_{t-1}+v_{t}$$
+where $v_t$ is serially uncorrelated.
+
+After some algebra, you can show the above equation becomes
+$$Y_t = \alpha_0 + \delta_0 X_t + \delta_1 X_{t-1}+\delta_2 X_{t-2}+v_{t}$$
+where $\beta_1=\delta_0$ and $\beta_2=\delta_1+\rho \delta_0$
+
+---
+# How to recover the coefficients
+
+```{r}
+library(lmtest)
+library(sandwich)
+set.seed(1)
+
+# simulate a time series with serially correlated errors
+obs <- 501
+eps <- arima.sim(n = obs-1 , model = list(ar = 0.5))
+X <- arima.sim(n = obs, model = list(ar = 0.25))
+Y <- 0.1 * X[-1] + 0.25 * X[-obs] + eps
+X <- ts(X[-1])
+
+# estimate the distributed lag model
+dlm <- dynlm(Y ~ X + L(X))
+```
+
+---
+## Let's check the residuals
+```{r}
+acf(residuals(dlm))
+```
+
+---
+## Let's correct the s.e.
+
+```{r}
+coeftest(dlm, vcov = NeweyWest, prewhite = F, adjust = T)
+```
+
+---
+# Let's Estimate the true model
+
+```{r}
+# estimate the ADL(2,1) representation of the distributed lag model
+adl21_dynamic <- dynlm(Y ~ L(Y) + X + L(X, 1:2))
+summary(adl21_dynamic)
+```
+---
+### Let's Check the residuals
+
+```{r}
+# plot the sample autocorrelaltions of residuals
+acf(adl21_dynamic$residuals)
+```
+
+---
+### Recover the betas
+```{r}
+# compute estimated dynamic effects using coefficient restrictions
+# in the ADL(2,1) representation
+t <- adl21_dynamic$coefficients
+
+c("hat_beta_1" = t[3],
+  "hat_beta_2" = t[4] + t[3] * t[2])
+```
+
+---
+### Vector autoregressive functions
+
+Some times your X variable explains your Y variable and your Y variable explains your X variable.
+
+$$Y_t = \beta_1 Y_{t-1}+\beta_2 X_{t-1}+u_t$$
+$$X_t = \theta_1 X_{t-1}+\theta_2 Y_{t-1}+v_t$$
+
+What is interesting about these models is that X has both a direct and an indirect effect on Y. It affects Y directly through $\beta_2$, but it also affects it indirectly through a pathway of $X_{t-2}\rightarrow Y_{t-1} \rightarrow X_{t-1} \rightarrow Y_{t}$
+
+---
+## Case Study: Do Entreprenurs Reduce Unemployment?
+
+We are told repeatedly that small business create jobs, but do they?
+![](https://cdn.advocacy.sba.gov/wp-content/uploads/2017/09/26113950/Small-business-job-creation-feature-image1.png)
+
+---
+## Proprietorship and unemployment in the United States
+
+The paper studies if people are pushed into self employment due to high unemployment rates or pulled into self employment due to a strong economy (i.e. low unemployment)?
+
+Further, the paper considers the dynamic effects of unemployment on the growth of proprietors and the long run effects of proprietors on unemployment.
+
+---
+## Data 
+
+We apply a panel vector autoregressive model to unemployment and proprietorship data from the U.S. states for the years 1976 to 2009 to examine if these effects are apparent in the data. 
+
+- We take state level data on the number of people who file a schedule C tax return. These are used for sole proprietors. 
+- We take state level unemployment rates. 
+
+$$U_t = \beta_0 U_{t-1}+\beta_1 U_{t-2}+\beta_2 U_{t-3} + \beta_3 P_{t-1}+\beta_4 P_{t-2}+\beta_5 P_{t-3}+e_t$$
+$$P_t = \theta_0 U_{t-1}+\theta_1 U_{t-2}+\theta_2 U_{t-3} + \theta_3 P_{t-1}+\theta_4 P_{t-2}+\theta_5 P_{t-3}+e_t$$
+---
+## Impulse Response Function
+
+![](https://ars.els-cdn.com/content/image/1-s2.0-S0883902613000189-gr2.jpg)
+
+---
+## Table of results
+| Lag (years) | Effect of a 1% increase in proprietorship on unemployment |                   | Effect of a 1% increase in unemployment on proprietorship |                   |
+|-------------|-----------------------------------------------------------|-------------------|-----------------------------------------------------------|-------------------|
+|             | Direct effect                                             | Cumulative effect | Direct effect                                             | Cumulative effect |
+| 1           | − 0.017%                                                  | − 0.017%          | 0.108%                                                    | 0.108%            |
+| 2           | − 0.015%                                                  | − 0.032%          | 0.065%                                                    | 0.173%            |
+| 3           | − 0.001%                                                  | − 0.033%          | 0.004%                                                    | 0.177%            |
+| 4           | 0.000%                                                    | − 0.033%          | − 0.001%                                                  | 0.176%            |
+| 5           | 0.000%                                                    | − 0.033%          | 0.001%                                                    | 0.178%            |
+| Asymptotic  |                                                           | − 0.033%          | 0.004%                                                    | 0.178%            |
+
+Source: Gohmann, Stephan F., and Jose M. Fernandez. "Proprietorship and unemployment in the United States." Journal of Business Venturing 29.2 (2014): 289-309.

@@ -1,6 +1,6 @@
 ---
-title: "Survival Analysis"
-subtitle: "An Introduction"
+title: "Advanced Analytics Tools"
+subtitle: "Survival Analysis"
 author: "Jose M. Fernandez"
 institute: "University of Louisville"
 date: "2020-7-4 (updated: `r Sys.Date()`)"
@@ -272,9 +272,9 @@ plot(f1, xlab = "Days", ylab = "Overall survival probability")
 
 ## Estimating survival time
 
-One quantity often of interest in a survival analysis is the probability of surviving a certain number $(x)$ of years.
+The surivival model helps us find the probability of surviving up until a certain number $(x)$ of years.
 
-For example, to estimate the probability of surviving to 5 years, use `summary` with the `times` argument:
+For example, to estimate the probability of surviving to year 5, use `summary` with the `times` argument:
 
 ```{r}
 summary(f1, times = 5*365)
@@ -315,7 +315,6 @@ round(summary(f1)$table["median"]/365, 1)
 We see the median survival time is `r round(summary(f1)$table["median"]/365, 1)` years. The lower and upper bounds of the 95% confidence interval are also displayed.
 
 ---
-
 ## Median survival is often estimated incorrectly
 
 What happens if you use a "naive" estimate? 
@@ -377,13 +376,12 @@ survminer::ggsurvplot(
 ```
 
 ---
-
+## Kaplan-Meier plot by group
 - Blood type B patients have the lowest overall survival probability.
 - The risk table below the plot shows us the number of patients at risk at certain time points, which can give an idea of how much information is being used to calculate the estimates at each time
 - Male patients have the lowest overall survival probability.
 
 ---
-
 ## $x$-year survival probability by group 
 
 As before, we can get an estimate of, for example, 1-year survival by using `summary` with the `times` argument in our `survival::survfit` object:
@@ -406,6 +404,121 @@ survival::survdiff(Surv(futime, delta) ~ sex, data = transplant)
 ```
 
 And we see that the p-value is .2, indicating no significant difference in overall survival according to gender.
+---
+class: center, middle, inverse
+# Competiting  Risk Model
+
+---
+## Competiting Risk Model
+
+Sometimes people are subject to multiple risk at the same time. 
+
+An employee could stay with the firm or leave the firm voluntarily or get fired. 
+
+An employee that leaves the firm voluntarily is potentially very different than an employee who is fired. 
+
+![](fired.png)
+---
+## Competting Risk
+
+Example 1: The problem with competing risk is that if a person is fired, we will never see if they would have left the firm for a better job.
+
+Example 2: Likewise, if a person leaves a firm for a different job, then we do not know if they would have ever been fired. 
+
+- In Example 1: the person who is fired is censored to leaving for a better job.
+- In Example 2: the person who leaves for a different job is censored to being fired.
+- In both examples, the person still with the firm is censored to either being fired or leaving to another job.
+
+---
+## Competiting Risk in R
+
+In this situation, if you are interested in firing, then censor both people who stay with the firm and those that leave for a better job.
+
+If you are interested in who stays with the firm, then censor both those that stay or get fired.
+
+If you are interested in if anyone leaves the firm, then only censor those that stay with the firm. 
+
+---
+## Example in R
+
+We have data on people who have been diagnosed with melanoma. These patients could continue to survive, die due to melanoma, or die due to a different cause.
+
+```{r}
+# install.packages("MASS")
+data(Melanoma, package = "MASS")
+```
+We will use the `Melanoma` data from the {MASS} package to illustrate these concepts. It contains variables:
+
+- `time` survival time in days, possibly censored.
+- `status` 1 died from melanoma, 2 alive, 3 dead from other causes.
+- `sex` 1 = male, 0 = female.
+- `age` age in years.
+- `year` of operation.
+- `thickness` tumor thickness in mm.
+- `ulcer` 1 = presence, 0 = absence.
+
+---
+## R code
+```{r eval=FALSE}
+library(ggsurvfit)
+library(tidycmprsk)
+Melanoma <- 
+  Melanoma %>% 
+  mutate(
+    status = as.factor(recode(status, `2` = 0, `1` = 1, `3` = 2))
+  )
+
+cuminc(Surv(time, status) ~ 1, data = Melanoma) %>% 
+  ggcuminc() + 
+  labs(
+    x = "Days"
+  ) + 
+  add_confidence_interval() +
+  add_risktable()
+```
+---
+## R code
+```{r eval=TRUE, echo=FALSE}
+library(ggsurvfit)
+library(tidycmprsk)
+Melanoma <- 
+  Melanoma %>% 
+  mutate(
+    status = as.factor(recode(status, `2` = 0, `1` = 1, `3` = 2))
+  )
+
+cuminc(Surv(time, status) ~ 1, data = Melanoma) %>% 
+  ggcuminc() + 
+  labs(
+    x = "Days"
+  ) + 
+  add_confidence_interval() +
+  add_risktable()
+```
+---
+## R code
+```{r eval=FALSE}
+## This code produces the non-parametric competiting risk model
+
+cuminc(Surv(time, status) ~ 1, data = Melanoma) %>% 
+  ggcuminc(outcome = c("1", "2")) +
+  ylim(c(0, 1)) + 
+  labs(
+    x = "Days"
+  )
+```
+---
+## R code
+```{r eval=TRUE, echo=FALSE}
+## This code produces the non-parametric competiting risk model
+
+cuminc(Surv(time, status) ~ 1, data = Melanoma) %>% 
+  ggcuminc(outcome = c("1", "2")) +
+  ylim(c(0, 1)) + 
+  labs(
+    x = "Days"
+  )
+```
 ---
 class: center, middle, inverse
 # Regression
@@ -444,7 +557,10 @@ broom::tidy(survival::coxph(survival::Surv(futime, delta) ~ factor(abo),
 The quantity of interest from a Cox regression model is a **hazard ratio (HR)**.
 
 If you have a regression parameter $\beta$ (from column `estimate` in our `survival::coxph`) then HR = $\exp(\beta)$.
-
+```{r echo=FALSE}
+broom::tidy(survival::coxph(survival::Surv(futime, delta) ~ factor(abo), 
+                            data = transplant))
+```
 For example, from our example we obtain the regression parameter $\beta_1=0.195$ for AB vs B blood type, so we have HR = $\exp(\beta_1)=1.21$. 
 
 A HR < 1 indicates reduced hazard of death whereas a HR > 1 indicates an increased hazard of death.
@@ -467,14 +583,12 @@ So we would say that a person with AB blood type has 1.21 times increased hazard
 
 ```{r}
 # First let's import the data 
-q = read.csv('https://3jd8gl2iires146kaw2hgqy9-wpengine.netdna-ssl.com/wp-content/uploads/2018/01/turnover.csv', header = TRUE, sep = ",", na.strings = c("",NA))
+q = read.csv('turnover2.csv', header = TRUE, sep = ",", na.strings = c("",NA))
 ```
 
 Our case uses data of 1785 employees.
 
----
-
-## Variables:
+__Variables__
 
 $exp$ - length of employment in the company
 
@@ -487,15 +601,22 @@ $pipeline$ - source of recruitment
 Please note that the data is already prepared for survival analysis. Moreover, length of employment is counted in months up to two decimal places, according to the following formula: (date fire - date hire) / (365.25 / 12).
 
 ---
-
 ## Cox Model
-<tiny>
-```{r results='asis', echo=FALSE}
-w = coxph(Surv(exp, event) ~ 1 , data = q)
+
+```{r eval=FALSE, echo=TRUE}
 w1 = coxph(Surv(exp, event) ~ . , data = q)
-stargazer::stargazer(w1, type = "html", single.row = TRUE, star.char = c("a","b","c"), font.size = "tiny")
+library(modelsummary)
+modelsummary(list("Cox" = w1), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE)
 ```
-</tiny>
+
+---
+## Cox Model
+
+```{r echo=FALSE}
+w1 = coxph(Surv(exp, event) ~ . , data = q)
+library(modelsummary)
+modelsummary(list("Cox"= w1), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE) 
+```
 
 ---
 ##Accelerated failure-time models
@@ -541,23 +662,24 @@ The _survial_ package allows us to estimate all of these models. We will use the
 ```{r message=FALSE, warning=FALSE, eval=FALSE}
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE, star.char = c("a","b","c"))
+modelsummary(list("Cox"=w1,"Weibul"=w2,"Exp."=w3), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE)
 ```
-
+__Cox Reg estimates hazard rates. Weibul estimates survival rates.__
 ---
 ## Weibul Model in R
-<small>
-```{r message=FALSE, warning=FALSE, echo=FALSE, results='asis'}
+<font size=2>
+```{r message=FALSE, warning=FALSE, echo=FALSE}
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="html",style = "qje",single.row = TRUE)
+modelsummary(list("Cox"=w1,"Weibul"=w2,"Exp."=w3), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE)
 ```
-</small>
+</font>
+
 ---
 ## Do we need accelerated time?
 The exponential model assumes a constant effect of time. 
 
-We can perform a likelihood ratio test between the exponential and Weibul model to see if AFT is neccessary.
+We can perform a likelihood ratio test between the exponential and Weibul model to see if AFT is necessary.
 
 ```{r message=FALSE, warning=FALSE}
 library(lmtest)
@@ -576,4 +698,6 @@ Although there is little difference in the parameter estimates, the likelihood r
 
 ---
 ## This is only the beginning
-![](survivalgif1.png)
+```{r fig.retina=1, echo=FALSE, out.width="65%", out.height="65%", fig.align='center'}
+knitr::include_graphics("survivalgif1.png")
+```

@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Survival Analysis</title>
+    <title>Advanced Analytics Tools</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.14/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="extra.css" type="text/css" />
   </head>
   <body>
@@ -15,10 +17,10 @@
 class: center, middle, inverse, title-slide
 
 .title[
-# Survival Analysis
+# Advanced Analytics Tools
 ]
 .subtitle[
-## An Introduction
+## Survival Analysis
 ]
 .author[
 ### Jose M. Fernandez
@@ -27,7 +29,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2022-06-17)
+### 2020-7-4 (updated: 2024-03-03)
 ]
 
 ---
@@ -285,9 +287,9 @@ plot(f1, xlab = "Days", ylab = "Overall survival probability")
 
 ## Estimating survival time
 
-One quantity often of interest in a survival analysis is the probability of surviving a certain number `\((x)\)` of years.
+The surivival model helps us find the probability of surviving up until a certain number `\((x)\)` of years.
 
-For example, to estimate the probability of surviving to 5 years, use `summary` with the `times` argument:
+For example, to estimate the probability of surviving to year 5, use `summary` with the `times` argument:
 
 
 ```r
@@ -346,7 +348,6 @@ round(summary(f1)$table["median"]/365, 1)
 We see the median survival time is 3.9 years. The lower and upper bounds of the 95% confidence interval are also displayed.
 
 ---
-
 ## Median survival is often estimated incorrectly
 
 What happens if you use a "naive" estimate? 
@@ -403,13 +404,12 @@ survminer::ggsurvplot(
 &lt;img src="survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-13-1.png" width="80%" /&gt;
 
 ---
-
+## Kaplan-Meier plot by group
 - Blood type B patients have the lowest overall survival probability.
 - The risk table below the plot shows us the number of patients at risk at certain time points, which can give an idea of how much information is being used to calculate the estimates at each time
 - Male patients have the lowest overall survival probability.
 
 ---
-
 ## `\(x\)`-year survival probability by group 
 
 As before, we can get an estimate of, for example, 1-year survival by using `summary` with the `times` argument in our `survival::survfit` object:
@@ -463,6 +463,104 @@ survival::survdiff(Surv(futime, delta) ~ sex, data = transplant)
 And we see that the p-value is .2, indicating no significant difference in overall survival according to gender.
 ---
 class: center, middle, inverse
+# Competiting  Risk Model
+
+---
+## Competiting Risk Model
+
+Sometimes people are subject to multiple risk at the same time. 
+
+An employee could stay with the firm or leave the firm voluntarily or get fired. 
+
+An employee that leaves the firm voluntarily is potentially very different than an employee who is fired. 
+
+![](fired.png)
+---
+## Competting Risk
+
+Example 1: The problem with competing risk is that if a person is fired, we will never see if they would have left the firm for a better job.
+
+Example 2: Likewise, if a person leaves a firm for a different job, then we do not know if they would have ever been fired. 
+
+- In Example 1: the person who is fired is censored to leaving for a better job.
+- In Example 2: the person who leaves for a different job is censored to being fired.
+- In both examples, the person still with the firm is censored to either being fired or leaving to another job.
+
+---
+## Competiting Risk in R
+
+In this situation, if you are interested in firing, then censor both people who stay with the firm and those that leave for a better job.
+
+If you are interested in who stays with the firm, then censor both those that stay or get fired.
+
+If you are interested in if anyone leaves the firm, then only censor those that stay with the firm. 
+
+---
+## Example in R
+
+We have data on people who have been diagnosed with melanoma. These patients could continue to survive, die due to melanoma, or die due to a different cause.
+
+
+```r
+# install.packages("MASS")
+data(Melanoma, package = "MASS")
+```
+We will use the `Melanoma` data from the {MASS} package to illustrate these concepts. It contains variables:
+
+- `time` survival time in days, possibly censored.
+- `status` 1 died from melanoma, 2 alive, 3 dead from other causes.
+- `sex` 1 = male, 0 = female.
+- `age` age in years.
+- `year` of operation.
+- `thickness` tumor thickness in mm.
+- `ulcer` 1 = presence, 0 = absence.
+
+---
+## R code
+
+```r
+library(ggsurvfit)
+library(tidycmprsk)
+Melanoma &lt;- 
+  Melanoma %&gt;% 
+  mutate(
+    status = as.factor(recode(status, `2` = 0, `1` = 1, `3` = 2))
+  )
+
+cuminc(Surv(time, status) ~ 1, data = Melanoma) %&gt;% 
+  ggcuminc() + 
+  labs(
+    x = "Days"
+  ) + 
+  add_confidence_interval() +
+  add_risktable()
+```
+---
+## R code
+
+```
+## Plotting outcome "1".
+```
+
+![](survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+---
+## R code
+
+```r
+## This code produces the non-parametric competiting risk model
+
+cuminc(Surv(time, status) ~ 1, data = Melanoma) %&gt;% 
+  ggcuminc(outcome = c("1", "2")) +
+  ylim(c(0, 1)) + 
+  labs(
+    x = "Days"
+  )
+```
+---
+## R code
+![](survival_analysis_in_r_tutorial_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+---
+class: center, middle, inverse
 # Regression
 ---
 
@@ -511,6 +609,14 @@ The quantity of interest from a Cox regression model is a **hazard ratio (HR)**.
 
 If you have a regression parameter `\(\beta\)` (from column `estimate` in our `survival::coxph`) then HR = `\(\exp(\beta)\)`.
 
+```
+## # A tibble: 3 × 5
+##   term          estimate std.error statistic p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+## 1 factor(abo)B    0.183      0.386    0.474    0.636
+## 2 factor(abo)AB   0.195      0.618    0.316    0.752
+## 3 factor(abo)O   -0.0110     0.284   -0.0388   0.969
+```
 For example, from our example we obtain the regression parameter `\(\beta_1=0.195\)` for AB vs B blood type, so we have HR = `\(\exp(\beta_1)=1.21\)`. 
 
 A HR &lt; 1 indicates reduced hazard of death whereas a HR &gt; 1 indicates an increased hazard of death.
@@ -534,14 +640,12 @@ So we would say that a person with AB blood type has 1.21 times increased hazard
 
 ```r
 # First let's import the data 
-q = read.csv('https://3jd8gl2iires146kaw2hgqy9-wpengine.netdna-ssl.com/wp-content/uploads/2018/01/turnover.csv', header = TRUE, sep = ",", na.strings = c("",NA))
+q = read.csv('turnover2.csv', header = TRUE, sep = ",", na.strings = c("",NA))
 ```
 
 Our case uses data of 1785 employees.
 
----
-
-## Variables:
+__Variables__
 
 `\(exp\)` - length of employment in the company
 
@@ -554,31 +658,76 @@ Our case uses data of 1785 employees.
 Please note that the data is already prepared for survival analysis. Moreover, length of employment is counted in months up to two decimal places, according to the following formula: (date fire - date hire) / (365.25 / 12).
 
 ---
-
 ## Cox Model
-&lt;tiny&gt;
 
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="1" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;exp&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfirst&lt;/td&gt;&lt;td&gt;-0.089 (0.164)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfourth&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;c&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchsecond&lt;/td&gt;&lt;td&gt;-0.424&lt;sup&gt;c&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchthird&lt;/td&gt;&lt;td&gt;-0.466&lt;sup&gt;b&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineea&lt;/td&gt;&lt;td&gt;-0.214 (0.267)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinejs&lt;/td&gt;&lt;td&gt;0.503&lt;sup&gt;b&lt;/sup&gt; (0.201)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineref&lt;/td&gt;&lt;td&gt;0.322 (0.214)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinesm&lt;/td&gt;&lt;td&gt;0.361 (0.258)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.037&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Max. Possible R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;1.000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-6,767.031&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Wald Test&lt;/td&gt;&lt;td&gt;63.260&lt;sup&gt;c&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;LR Test&lt;/td&gt;&lt;td&gt;67.275&lt;sup&gt;c&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Score (Logrank) Test&lt;/td&gt;&lt;td&gt;64.850&lt;sup&gt;c&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+
+```r
+w1 = coxph(Surv(exp, event) ~ . , data = q)
+library(modelsummary)
+modelsummary(list("Cox" = w1), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE)
+```
+
+---
+## Cox Model
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Cox &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; First Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.089 (0.164) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fourth Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.529** (0.176) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Second Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.424** (0.164) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Third Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.466* (0.210) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pipeline: EEA &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.214 (0.267) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pipeline: JS &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.503* (0.201) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pipeline: Referral &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.322 (0.214) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt; Pipeline: Social Media &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; 0.361 (0.258) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1785 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 13550.1 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 13594.0 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RMSE &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.75 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
 &lt;/table&gt;
-&lt;/tiny&gt;
 
 ---
 ##Accelerated failure-time models
@@ -625,38 +774,115 @@ The _survial_ package allows us to estimate all of these models. We will use the
 ```r
 w2 = survreg(Surv(exp, event) ~ . , data = q, dist = "weibul")
 w3 = survreg(Surv(exp, event) ~ . , data = q, dist = "exponential")
-stargazer::stargazer(w2,w3,type="text",style = "qje",single.row = TRUE, star.char = c("a","b","c"))
+modelsummary(list("Cox"=w1,"Weibul"=w2,"Exp."=w3), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE)
 ```
-
+__Cox Reg estimates hazard rates. Weibul estimates survival rates.__
 ---
 ## Weibul Model in R
-&lt;small&gt;
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;exp&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Weibull&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;exponential&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfirst&lt;/td&gt;&lt;td&gt;0.142 (0.147)&lt;/td&gt;&lt;td&gt;0.119 (0.164)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchfourth&lt;/td&gt;&lt;td&gt;0.494&lt;sup&gt;***&lt;/sup&gt; (0.157)&lt;/td&gt;&lt;td&gt;0.524&lt;sup&gt;***&lt;/sup&gt; (0.176)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchsecond&lt;/td&gt;&lt;td&gt;0.433&lt;sup&gt;***&lt;/sup&gt; (0.146)&lt;/td&gt;&lt;td&gt;0.441&lt;sup&gt;***&lt;/sup&gt; (0.163)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;branchthird&lt;/td&gt;&lt;td&gt;0.434&lt;sup&gt;**&lt;/sup&gt; (0.189)&lt;/td&gt;&lt;td&gt;0.469&lt;sup&gt;**&lt;/sup&gt; (0.210)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineea&lt;/td&gt;&lt;td&gt;0.228 (0.239)&lt;/td&gt;&lt;td&gt;0.239 (0.267)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinejs&lt;/td&gt;&lt;td&gt;-0.529&lt;sup&gt;***&lt;/sup&gt; (0.180)&lt;/td&gt;&lt;td&gt;-0.537&lt;sup&gt;***&lt;/sup&gt; (0.200)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelineref&lt;/td&gt;&lt;td&gt;-0.383&lt;sup&gt;**&lt;/sup&gt; (0.192)&lt;/td&gt;&lt;td&gt;-0.372&lt;sup&gt;*&lt;/sup&gt; (0.213)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;pipelinesm&lt;/td&gt;&lt;td&gt;-0.376 (0.232)&lt;/td&gt;&lt;td&gt;-0.386 (0.258)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;1.831&lt;sup&gt;***&lt;/sup&gt; (0.220)&lt;/td&gt;&lt;td&gt;1.860&lt;sup&gt;***&lt;/sup&gt; (0.245)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;N&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;td&gt;1,785&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-2,712.426&lt;/td&gt;&lt;td&gt;-2,721.241&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;chi&lt;sup&gt;2&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;td&gt;74.713&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;69.134&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;***&lt;/sup&gt;Significant at the 1 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;**&lt;/sup&gt;Significant at the 5 percent level.&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;Significant at the 10 percent level.&lt;/td&gt;&lt;/tr&gt;
+&lt;font size=2&gt;
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Cox &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Weibul &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Exp. &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; First Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.089 (0.164) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.142 (0.147) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.119 (0.164) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Fourth Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.529** (0.176) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.494** (0.157) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.524** (0.176) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Second Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.424** (0.164) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.433** (0.146) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.441** (0.163) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Third Branch &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.466* (0.210) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.434* (0.189) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.469* (0.210) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pipeline: EEA &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.214 (0.267) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.228 (0.239) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.239 (0.267) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pipeline: JS &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.503* (0.201) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.529** (0.180) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.537** (0.200) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pipeline: Referral &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.322 (0.214) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.383* (0.192) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.372+ (0.213) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Pipeline: Social Media &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.361 (0.258) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.376 (0.232) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −0.386 (0.258) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.831*** (0.220) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1.860*** (0.245) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt; Log(scale) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; −0.110*** (0.025) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1785 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1785 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1785 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 13550.1 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5444.9 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5460.5 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 13594.0 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5499.7 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5509.9 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RMSE &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.75 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.78 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 3.98 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
 &lt;/table&gt;
-&lt;/small&gt;
+&lt;/font&gt;
+
 ---
 ## Do we need accelerated time?
 The exponential model assumes a constant effect of time. 
 
-We can perform a likelihood ratio test between the exponential and Weibul model to see if AFT is neccessary.
+We can perform a likelihood ratio test between the exponential and Weibul model to see if AFT is necessary.
 
 
 ```r
@@ -688,7 +914,7 @@ Although there is little difference in the parameter estimates, the likelihood r
 
 ---
 ## This is only the beginning
-![](survivalgif1.png)
+&lt;img src="survivalgif1.png" width="65%" height="65%" style="display: block; margin: auto;" /&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
