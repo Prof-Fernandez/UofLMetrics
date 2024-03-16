@@ -8,6 +8,8 @@
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
+    <script src="libs/kePrint-0.0.1/kePrint.js"></script>
+    <link href="libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="extra.css" type="text/css" />
   </head>
   <body>
@@ -27,7 +29,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2024-02-13)
+### 2020-7-4 (updated: 2024-02-14)
 ]
 
 ---
@@ -41,6 +43,8 @@ In these notes, we will discuss several types of count models
 - Poisson Model
 - Negative Binomial
 
+![](count_funny.jpg)
+
 ---
 class: inverse, middle, center
 # Ordered Probit/Logit
@@ -48,26 +52,27 @@ class: inverse, middle, center
 ## Oridinal Categorical Variables
 
 Suppose your dependent is categorical in nature and these categories show an ordinal proper (i.e. you can order them)
+Examples: 
 
-Examples: Surveys including Likert Scales (strongly agree, agree, neither, disagree, strongly disagree)
+- Surveys including Likert Scales (strongly agree, agree, neither, disagree, strongly disagree)
+- Medalling in the olympics (Gold, Silver, Bronze)
+- Soda size preference (small, medium, large, extra large)
 
-Medalling in the olympics (Gold, Silver, Bronze)
-
-Soda size preference (small, medium, large, extra large)
+![](https://library.sportingnews.com/styles/twitter_card_120x120/s3/2022-01/Beijing-Olympic-medals-013122-Getty-FTR.jpg)
 ---
 ## Ordered Probit/Logit
+We use Ordered Probit (or Logit) model with ordinal dependent variables.
 
-In these cases of ordinal categorical variables, we use an ordered probit/logit model.
-
-Notice, these responses, while they can be ordered, the distance between levels is not constant. 
+Notice, these responses, while they are ordered, the distance between levels is not constant. 
 
 That is, we do not know what increase is necessary to move someone from _strongly disagree_ to just _disagree_.
+![](https://www.viewpointfeedback.com/wp-content/uploads/2021/06/Likert-Scale-Survey-Questions-and-Guide-1.jpg.webp)
 ---
 ## Ordered Probit/Logit Math
 
 The math of the ordered probit/logit is very similar to a simple binary model
-
 There is just one difference, we need to estimate level parameters.
+![](https://statstest.b-cdn.net/wp-content/uploads/2020/05/Ordinal-Logistic-Regression.jpg)
 ---
 ## Ordered Probit/Logit Math
 
@@ -173,6 +178,13 @@ lapply(dat[, c("apply", "pared", "public")], table)
 
 ```r
 library(MASS)
+```
+
+```
+## Warning: package 'MASS' was built under R version 4.3.2
+```
+
+```r
 m &lt;- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE)
 ## view a summary of the model
 summary(m)
@@ -358,6 +370,7 @@ __89 visits is equivalent to a doctor's visit every 4 days!__
 ---
 ## Standard Poisson and Negative Binomial Model
 
+
 ```r
 pformu&lt;-visits~hospital+chronic+insurance+gender+school
 fm_pois &lt;- glm(pformu, data = NMES1988, family = poisson)
@@ -370,7 +383,7 @@ texreg::htmlreg(list(fm_pois,fm_pois,fm_qpois,fm_nbin),custom.model.names = c("P
 
 ---
 ### Standard Poisson and Negative Binomial Model 
-
+&lt;font size=2&gt;
 &lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
 &lt;caption&gt;Statistical models&lt;/caption&gt;
 &lt;thead&gt;
@@ -467,55 +480,126 @@ texreg::htmlreg(list(fm_pois,fm_pois,fm_qpois,fm_nbin),custom.model.names = c("P
 &lt;/tr&gt;
 &lt;/tfoot&gt;
 &lt;/table&gt;
-
+&lt;/font&gt;
 ---
 ### Fixed Effects Poisson
+
+This example deals with international trade, which is a setup that usually requires performing estimations with many fixed-effects. We estimate a very simple gravity model in which we are interested in finding out the negative effect of geographic distance on trade. The sample data consists of European trade extracted from Eurostat. 
+
+The dependent variable will be the level of trade between two countries, `Euros`, while the independent variable is the geographic distance between the two countries. We want to use a fixed effect model because there are lots of reasons for why trade between two countries may be different given the same distance: culture, language, and laws are just a few items that could lead to a difference.
 
 
 ```r
-library(pglm)
-library(readstata13)
-library(lmtest)
-library(MASS)
-ships&lt;-readstata13::read.dta13("http://www.stata-press.com/data/r13/ships.dta")
-ships$lnservice=log(ships$service)
-res &lt;- glm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships)
-res1 &lt;- pglm(accident ~ op_75_79+co_65_69+co_70_74+co_75_79+lnservice,family = poisson, data = ships, effect = "individual", model="within", index = "ship")
+library(fixest)
+library(modelsummary)
+data(trade)
+gravity_ols = fepois(Euros ~ log(dist_km), trade)
+gravity_pois = fepois(Euros ~ log(dist_km) | Origin + Destination + Product + Year, trade)
+modelsummary::modelsummary(list("Poisson"=gravity_ols,"Poisson FE"=gravity_pois), coef_rename = coef_rename, stars = TRUE)
 ```
 
 ---
 ### Fixed Effects Poisson
-
-
-```
-## 
-## z test of coefficients:
-## 
-##             Estimate Std. Error  z value  Pr(&gt;|z|)    
-## (Intercept) -5.22294    0.48261 -10.8224 &lt; 2.2e-16 ***
-## op_75_79     0.35465    0.11685   3.0351  0.002404 ** 
-## co_65_69     0.67352    0.15029   4.4814 7.417e-06 ***
-## co_70_74     0.79669    0.17019   4.6811 2.853e-06 ***
-## co_75_79     0.39785    0.23375   1.7020  0.088746 .  
-## lnservice    0.83107    0.04602  18.0591 &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
-```
-## 
-## z test of coefficients:
-## 
-##           Estimate Std. Error z value  Pr(&gt;|z|)    
-## op_75_79   0.37026    0.11815  3.1339  0.001725 ** 
-## co_65_69   0.66254    0.15364  4.3124 1.615e-05 ***
-## co_70_74   0.75974    0.17766  4.2763 1.900e-05 ***
-## co_75_79   0.36974    0.24584  1.5040  0.132589    
-## lnservice  0.90271    0.10180  8.8672 &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
+&lt;font size=2&gt;
+&lt;table style="NAborder-bottom: 0; width: auto !important; margin-left: auto; margin-right: auto;" class="table"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt;   &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Poisson &lt;/th&gt;
+   &lt;th style="text-align:center;"&gt; Poisson FE &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; (Intercept) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 24.709*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; (0.000) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; log(Dist Km) &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.029*** &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; −1.528*** &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;box-shadow: 0px 1.5px"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.000) &lt;/td&gt;
+   &lt;td style="text-align:center;box-shadow: 0px 1.5px"&gt; (0.116) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Num.Obs. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 38325 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 38325 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.185 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.764 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 Adj. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.185 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.764 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 Within &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.307 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; R2 Within Adj. &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 0.307 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; AIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5e+12 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1e+12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; BIC &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 5e+12 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 1e+12 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; RMSE &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 137019370.29 &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; 87497626.36 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Std.Errors &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; IID &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; by: Origin &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FE: Product &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; X &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FE: Year &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; X &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FE: Origin &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; X &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FE: Destination &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt;  &lt;/td&gt;
+   &lt;td style="text-align:center;"&gt; X &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;tfoot&gt;&lt;tr&gt;&lt;td style="padding: 0; " colspan="100%"&gt;
+&lt;sup&gt;&lt;/sup&gt; + p &amp;lt; 0.1, * p &amp;lt; 0.05, ** p &amp;lt; 0.01, *** p &amp;lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+&lt;/table&gt;
+&lt;/font&gt;
 ---
 ## Other Issues with Count Models
 

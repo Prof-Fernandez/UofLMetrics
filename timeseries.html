@@ -4,7 +4,7 @@
     <title>Advanced Analytic Tools</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.26/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2024-02-22)
+### 2020-7-4 (updated: 2024-03-15)
 ]
 
 ---
@@ -108,7 +108,7 @@ There are three basic criterion for a series to be classified as stationary seri
 
 You cannot build a statistical time series model if it isn't stationary.
 
-In cases where the stationary criterion are violated, the first requisite becomes to stationarize the time series and then try stochastic models to predict this time series. 
+In cases where the stationary criterion are violated, the first requirement is to make the time series stationary. Then we can fit different types of stochastic models to predict this time series. 
 
 We will learn a few methods to make a time series stationary
 
@@ -149,7 +149,7 @@ We can then adjust the equation for the time period `\(t-1\)`, which gives us `\
 `$$X(t)=X(t-1)+Er(t)=X(t-2)+Er(t)+Er(t-1)$$`
 If we recursively fit in all the `\(Xs\)`, we end up with the following equation :
 
-`$$X(t) = X(0) + Sum(Er(1),Er(2),Er(3).....Er(t))$$`
+`$$X(t) = X(0) + \sum_{k=1}^{k=t}(Er(k))$$`
 The equation tells us that our guess of where you are today at time `\(t\)` is dependent on where you started `\(X(0)\)` and some random steps. 
  
 ---
@@ -159,7 +159,7 @@ Describing the equation as a series of errors makes it easier for us to calculat
 
 The Expected Value of the series is
 
-`$$E[X(t)] = E[X(0)] + Sum(E[Er(1)],E[Er(2)],E[Er(3)].....E[Er(t)])$$`
+`$$E[X(t)] = E[X(0)] + \sum_{k=1}^{k=t}(E[Er(k)])$$`
 We know that Expectation of any Error will be zero as it is random.
 
 Hence we get `\(E[X(t)] = E[X(0)] = Constant\)`.
@@ -174,7 +174,7 @@ If `\(a\)` and `\(b\)` are independent, then `\(COV(a,b)=0\)`.
 
 We know the regression errors are independent so we can write,
 
-`$$Var[X(t)] = Var[X(0)] + Sum(Var[Er(1)],Var[Er(2)],Var[Er(3)].....Var[Er(t)])$$`
+`$$Var[X(t)] = Var[X(0)] + \sum(Var[Er(1)],Var[Er(2)],Var[Er(3)].....Var[Er(t)])$$`
 `$$Var[X(t)] = t * Var(Error) = \text{Time dependent}.$$`
 
 Hence, we infer that the random walk is not a stationary process as it has a time variant variance. 

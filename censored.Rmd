@@ -26,6 +26,9 @@ For example, you may be interested in household income. You run to the American 
 
 These variables are missing due to exogenous reasons.
 ---
+![](https://www.researchgate.net/profile/Cheryl-Wachenheim/publication/23514232/figure/tbl1/AS:667777467686916@1536221963529/2-Income-levels-of-survey-participants.png)
+We can use the midpoint for the in between values, but not the top or bottom categories.
+---
 ## Censored Data
 
 A second type of censored data is when the data are missing for endogenous reasons.
@@ -33,8 +36,16 @@ A second type of censored data is when the data are missing for endogenous reaso
 For example, a person's wage information is missing because they are not in the labor force. However, this does not mean that if we could magically put them in the labor force that their wage would be zero.
 
 Simply, the person's __reservation wage__ is higher than the wage offers they are receiving.
+---
+![](https://libertystreeteconomics.newyorkfed.org/wp-content/uploads/sites/2/2022/12/LSE_2022_SCE-labor_kosar_ch1.png)
+---
+## Censored Data
 
 A different example, consider you want to know the effect of High School GPA on College GPA. You will only observe a college GPA for people who get into college. Likewise, if you sample college students, then you will observe college GPA, but you will only observe the high school GPA of individuals who entered college.
+
+AVG HS GPA given you went to college is 2.71. 
+
+AVG HS GPA given you did not go to college is 2.04.
 ---
 ## Truncated Data
 
@@ -46,11 +57,11 @@ In this case, if both the dependent and independent variables are censored due t
 
 Therefore, we need three different types of models to deal with _exogenous_ missing data and _endogenous_ missing data.
 
-Tobit - exogenously censored dependent variable.
+Tobit - __exogenously__ censored dependent variable.
 
-Truncated Regression - exogenous censoring of both dependent and independent variables.
+Truncated Regression - __exogenous__ censoring of both dependent and independent variables.
 
-Sample Selection Model (Heckman Model) - endogenously censored dependent variable
+Sample Selection Model (Heckman Model) - __endogenously__ censored dependent variable
 ---
 ## Tobit
 
@@ -68,11 +79,11 @@ If we are willing to assume $u \rightarrow N(0,\sigma^2)$, then we can use the T
 
 The probability density of Y will resemble that of a normal distribution.
 $$f(y)=\left\{\begin{matrix}
-\frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma}) & y^*<c \\ 
-1-\Phi(\frac{c-X_i'beta}{\sigma}) & y^*>c
+\frac{1}{\sigma}\phi(\frac{y_i-X_i\beta}{\sigma}) & y^*<c \\ 
+1-\Phi(\frac{c-X_i\beta}{\sigma}) & y^*>c
 \end{matrix}\right.$$
 
-Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c>y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c<y} 1-\Phi(\frac{c-X_i'beta}{\sigma})$$
+Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c>y} \frac{1}{\sigma}\phi(\frac{y_i-X_i\beta}{\sigma})+\sum_{c<y} 1-\Phi(\frac{c-X_i\beta}{\sigma})$$
 ---
 ## Bottom Coding
 
@@ -84,16 +95,17 @@ c & y^*<c
 \end{matrix}\right.$$
 The likelihood function changes to capture this difference in bottom coding
 Log Likelihood Function $$LL(\beta,\sigma)=\sum_{c<y} \frac{1}{\sigma}\phi(\frac{y_i-X_i'beta}{\sigma})+\sum_{c>y} \Phi(\frac{c-X_i'beta}{\sigma})$$
-
+---
+![](https://live.staticflickr.com/6227/6289592741_d2bd3ca766_z.jpg)
 ---
 ## The Expected Value of the Tobit model
 Let's assume your y variable is bottom coded at zero. This means we only observe Y if Y>0.
 
 The unconditional expected value is of Y is
-$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
+$$E[Y_i]=\Phi(\frac{x_i \beta}{\sigma})(x_i \beta+\sigma *\lambda) \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$
 If we condition on Y>0, then the expected value simplifies to 
 
-$$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta)/\sigma}{\Phi(x_i \beta/\sigma)}$$
+$$E[Y_i|Y_i>0,x]=x_i \beta+\sigma *\lambda \\ \lambda = \frac{\phi(x_i \beta/\sigma)}{\Phi(x_i \beta/\sigma)}$$
 The $\lambda$ term is the Inverse Mills Ratio.
 
 ---
@@ -177,7 +189,9 @@ $$\begin{align*}f(X|X>c) &= \frac{f(x)}{Pr(X>c)}=\frac{f(x)}{1-F(c)} \\ \\&= \fr
 The mean and variance are given by 
 $$\begin{align*}E[X|X>c] &= \mu+\sigma \lambda(\frac{c-\mu}{\sigma}) \\ var(X|X>c) &= \sigma^2(1-\delta(\frac{c-\mu}{\sigma})) \end{align*}$$
 
-where $\lambda(x)=\frac{phi(x)}{1-Phi(x)}$ = Inverse Mills Ratio and $\delta(x)=\lambda(x)(\lambda(x)-x),\,0<\delta(x)<1$
+where $\lambda(z)=\frac{\phi(z)}{1-\Phi(z)}$ = Inverse Mills Ratio 
+
+and $\delta(z)=\lambda(z)(\lambda(z)-z),\,0<\delta(z)<1$
 
 
 ---
@@ -263,18 +277,26 @@ ggplot(data_1, aes(x=Y, fill=groups)) +
 class: center, middle, inverse
 # Endogenous Censoring
 ---
-## Examples of Endogenous Censoring
+## Types of Sampling Bias
 - Non-response Bias
+- Survivorship Bias
+- Attrition Bias
+- Self-Selection Bias
+- Undercoverage Bias
+- Exclusion Bias
+- Convenience Sampling
+- Cherry picking
+
+---
+## Non-response Bias
 ![](https://images.prismic.io/sketchplanations/f2fdb7cb-f126-4897-ad78-4fd11c743172_SP+723+-+Sampling+bias.png?auto=format&ixlib=react-9.0.3&h=1887.6833845104059&w=1600&q=35&dpr=3)
 
 ---
-## Examples of Endogenous Censoring
-- Survivorship/Attrition Bias
+## Survivorship Bias
 ![](https://images.prismic.io/sketchplanations/ce000ac3-b8f1-4612-8c86-28f5d65442f7_SP+674+-+Survivorship+bias.png?auto=format&ixlib=react-9.0.3&h=1887.557603686636&w=1600&q=35&dpr=3)
 
 ---
-## Examples of Endogenous Censoring
-- Survivorship/Attrition Bias
+## Attrition Bias
 ![](https://images.prismic.io/sketchplanations/c24b9624-d973-4bf4-9c29-b248005ab56e_78697608699.jpg?auto=format&ixlib=react-9.0.3&h=1888.2591093117408&w=1600&q=35&dpr=3)
 
 ---
@@ -336,12 +358,12 @@ set.seed(123456)
 N = 10000
 educ = sample(1:16, N, replace = TRUE)
 age  = sample(18:64, N, replace = TRUE)
-covmat = matrix(c(.46^2, .25*.46, .25*.46, 1), ncol = 2)
+covmat = matrix(c(.46^2*4, .5*.46*2, .5*.46*2, 1), ncol = 2)
 errors = mvtnorm::rmvnorm(N, sigma = covmat)
 z = rnorm(N)
 e = errors[, 1]
 v = errors[, 2]
-wearnl = 4.49 + .08 * educ + .012 * age + e
+wearnl = 4.49 + .08 * educ + .12 * age + e
 d_star = -1.5 + 0.15 * educ + 0.01 * age + 0.15 * z + v
 
 observed_index  = d_star > 0
@@ -353,6 +375,7 @@ lm_all = lm(wearnl ~ educ + age, data=d)
 lm_obs = lm(wearnl ~ educ + age, data=d[observed_index,])
 # Sample Selection model
 selection_2step = selection(observed_index ~ educ + age + z, wearnl ~ educ + age, method = '2step')
+stargazer::stargazer(lm_all,lm_obs,selection_2step, type = "html", font.size = "tiny", single.row = TRUE, star.char = c("c","b","a"), style = "qje", model.numbers = FALSE, omit.stat = c("rsq","f","adj.rsq","ser"))
 ```
 ---
 ## Simulation Example
@@ -364,12 +387,12 @@ set.seed(123456)
 N = 10000
 educ = sample(1:16, N, replace = TRUE)
 age  = sample(18:64, N, replace = TRUE)
-covmat = matrix(c(.46^2, .25*.46, .25*.46, 1), ncol = 2)
+covmat = matrix(c(.46^2*4, .5*.46*2, .5*.46*2, 1), ncol = 2)
 errors = mvtnorm::rmvnorm(N, sigma = covmat)
 z = rnorm(N)
 e = errors[, 1]
 v = errors[, 2]
-wearnl = 4.49 + .08 * educ + .012 * age + e
+wearnl = 4.49 + .08 * educ + .12 * age + e
 d_star = -1.5 + 0.15 * educ + 0.01 * age + 0.15 * z + v
 
 observed_index  = d_star > 0
