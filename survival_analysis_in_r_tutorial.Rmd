@@ -478,7 +478,7 @@ cuminc(Surv(time, status) ~ 1, data = Melanoma) %>%
 ```
 ---
 ## R code
-```{r eval=TRUE, echo=FALSE}
+```{r eval=TRUE, echo=FALSE, warning=FALSE, message=FALSE}
 library(ggsurvfit)
 library(tidycmprsk)
 Melanoma <- 
@@ -603,7 +603,7 @@ Please note that the data is already prepared for survival analysis. Moreover, l
 ---
 ## Cox Model
 
-```{r eval=FALSE, echo=TRUE}
+```{r eval=FALSE, echo=TRUE, message=FALSE, warning=FALSE}
 w1 = coxph(Surv(exp, event) ~ . , data = q)
 library(modelsummary)
 modelsummary(list("Cox" = w1), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE)
@@ -612,7 +612,7 @@ modelsummary(list("Cox" = w1), estimate = "{estimate}{stars} ({std.error})",   s
 ---
 ## Cox Model
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 w1 = coxph(Surv(exp, event) ~ . , data = q)
 library(modelsummary)
 modelsummary(list("Cox"= w1), estimate = "{estimate}{stars} ({std.error})",   statistic = NULL, coef_rename = c(branchfirst="First Branch",branchsecond="Second Branch",branchthird="Third Branch",branchfourth="Fourth Branch",pipelineea="Pipeline: EEA",pipelinejs="Pipeline: JS",pipelineref="Pipeline: Referral",pipelinesm="Pipeline: Social Media"), stars = TRUE) 
