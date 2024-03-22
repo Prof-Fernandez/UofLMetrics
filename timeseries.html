@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2024-03-15)
+### 2020-7-4 (updated: 2024-03-22)
 ]
 
 ---
@@ -63,12 +63,36 @@ One such method, which deals with time based data is Time Series Modeling.
 - Most of business houses work on time series data to analyze sales number for the next year, website traffic, competition position and much more. 
 
 - However, it is also one of the areas, which many analysts do not understand.
+---
+# What is Time Series Data
+
+Cross-Sectional Data: Observe many units during the same period of time.
+
+Time series Data: Observe only one unit over many periods of time.
+
+The dependent variable is not just affect by contemporaneous values of the explanatory variables, but also past value of the depedent variable.
+
+---
+# Examples of Time Series Data
+
+| Fields           | Example Topics                                   |
+|------------------|--------------------------------------------------|
+| Economics        | GDP, Unemployment, S&amp;P 500, Inflation            |
+| Social Science   | Birth Rates, Death Rates, Population, Migration  |
+| Physical Science | Global Temperatures, pollution levels, rain fall |
+| Medicine         | height, weight, blood pressure, cholesterol      |
+| Business         | Sales, Inventory, Stock Prices, |
 
 ---
 ## Table of Contents
+
+In this lecture, we will discuss
+
 - Basics – Time Series Modeling
 - Exploration of Time Series Data in R
-- Introduction to ARMA Time Series Modeling
+- MA: Moving Averages
+- AR: Autoregressive Functions
+- ARMA: Time Series including both AR and MA
 - Framework and Application of ARIMA Time Series Modeling
 - Time to get started!
  
@@ -112,6 +136,153 @@ In cases where the stationary criterion are violated, the first requirement is t
 
 We will learn a few methods to make a time series stationary
 
+---
+class: center, middle, inverse
+
+# Moving Average
+
+---
+# Moving Average
+
+The most basic type of Time Series is a moving average. 
+
+The characteristics of a moving average
+
+- stationary process
+- the value today is dependent upon the overall mean and random shocks
+
+Examples
+
+- Weekly groceries expenditures
+- Monthly Household electricity demands
+---
+# Moving Average Equations
+
+The most basic type of Time Series is a moving average. 
+
+The characteristics of a moving average
+
+- stationary process
+- the value today is dependent upon the overall mean and random shocks
+`$$MA(1): y_t=\mu+e_t+\phi_1 e_{t-1}$$`
+`$$MA(2): y_t=\mu+e_t+\phi_1 e_{t-1}+\phi_2 e_{t-2}$$`
+`$$MA(j):y_t=\mu+e_t+\sum_{i=1}^j\phi_j e_{t-j}$$`
+---
+## Moving Average Properties
+Rather than using past values of the forecast variable in a regression, a moving average model uses past forecast errors in a regression-like model.
+`$$MA(j):y_t=\mu+\phi_1 e_{t-1}+\phi_2 e_{t-2}+...\phi_j e_{t-j}$$`
+
+__Moving averages are assumed to be stationary.__
+
+---
+## Moving average properties
+
+For example, `\(|\phi|&lt;1\)`, if not then a value in the past has the same or even greater influence than the value today. This does not make logical sense. 
+
+__MA(j) implies `\(COV(y_t,y_{t-j})\neq0\)`, but `\(COV(y_t,y_{t-j-1})=0\)`__
+
+Consider an MA(1) and remember the errors are independent.
+`\(COV(y_t,y_{t-1})=COV(\phi e_{t-1}+e_t,\phi e_{t-2}+e_{t-1})=COV(\phi e_{t-1},e_{t-1})=\phi \sigma^2\)`
+
+Notice, how the same error appears in both terms, `\(e_{t-1}\)`.
+
+`\(COV(y_t,y_{t-2})=COV(\phi e_{t-1}+e_t,\phi e_{t-3}+e_{t-2})=0\)`
+
+In the equation above, notice how none of the error terms overlap.
+
+Moving averages are sometimes referred to as _memory less_ because of this property.
+---
+## MA example in R
+
+```r
+library(readr)
+library(tidyverse)
+library(ggplot2)
+library(ggfortify)
+library(zoo)
+Food &lt;- read_csv("https://www.ers.usda.gov/webdocs/DataFiles/100189/StateAndCategory.csv")
+KY&lt;-Food %&gt;% filter(State=="Kentucky",Category=="Alcohol", Variable=="Unit sales") %&gt;% select(Date,Value)
+KY_time &lt;- read.zoo(KY) 
+autoplot.zoo(KY_time) + xlab("Week") + ylab("Alcohol Units") +
+    ggtitle("Weekly Statewide Alcohol Sales")
+```
+---
+## MA example in R
+![](timeseries_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+class: center, middle, inverse
+
+# Autoregressive Function
+---
+## Autoregressive Function
+
+An autoregressive function is one where a shock in the distant past can still have an effect today. 
+
+The simplest autoregressive function is an AR(1)
+`$$y_t=\rho y_{t-1}+e_t$$`
+
+Where `\(\rho\)` tells us how persistent past shocks are to the present value.
+
+We can think of an AR process as a moving average, but with infinite lags. That is, an AR has full memory.
+
+`$$y_t=\rho y_{t-1}+e_t=\rho*(\rho*y_{t-2}+e_{t-1})+e_t$$`
+`$$y_t=\rho*(\rho*(y_{t-3}+e_{t-2})+e_{t-1})+e_t=\rho^2 y_{t-3}+\rho^2 e_{t-2}+\rho e_{t-1}+e_t$$`
+`$$y_t=y_0+\sum_{i=1}^{t-1}{\rho^{t-i}e_{t-i}}$$`
+
+---
+## Stationarity with AR
+
+A big issue with autoregessive function is the need for stationary.
+
+An AR(1) is
+- explosive if `\(\rho &gt;1\)`
+- a random walk if `\(\rho = 1\)`
+- stationary if `\(\rho &lt;1\)`
+
+Short-cut method: If `\(\rho&lt;1\)`, then `$$Var(y)=Var(\rho y)+Var(e)=\rho^2Var(y)+Var(e)$$`
+If we solve for Var(y), then `$$Var(y)=\frac{Var(e)}{1-\rho^2}$$`
+
+---
+## Stationarity with AR
+__Side note: We need to know the math of a geometric sum__
+
+If `\(\beta&lt;1\)`, then the `\(\sum_{i=0}^\infty \beta^i = \frac{1}{1-\beta}\)`
+
+Remember, we can write an AR(1) as `\(MA(\infty)\)`
+`$$y_t=y_0+\sum_{i=1}^{t-1}{\rho^{t-i}e_{t-i}}$$`
+`$$Var(y_t)=Var(y_0)+\sum_{i=1}^{t-1}{\rho^{2*(t-i)}Var(e_{t-i})}$$`
+
+In this case, `\(\beta = \rho^2\)` so the `\(Var(y_t)=\frac{\sigma_e^2}{1-\rho^2}\)`.
+
+Notice, if `\(\rho&lt;|1|\)`, then `\(Var(y_t)\)` is finite, but if `\(\rho \geq |1|\)`, the variance is explosive.
+
+---
+## What is an AR(q)?
+
+If we think the dependent variable is dependent on more lags, then we write the relationship as `$$y_t = \rho_1 y_{t-1}+\rho_2 y_{t-2} ...\rho_q y_{t-q}$$`
+
+Collectively, we would still need all of these additional rows in combination to satisfy the stationarity constraint. The condition becomes increasingly complex as q increases. 
+
+For example, if q=1, we know the constraint is `\(-1&lt;\rho_1&lt;1\)` is enough, but if q =2, the constraint becomes
+
+- `\(-1&lt;\rho_2&lt;1\)`
+- `\(\rho_1+\rho_2&lt;1\)`
+- `\(\rho_2-\rho_1&lt;1\)`
+
+For example, if `\(\rho_1=\rho_2=0.7\)`, the time series is explosive.
+---
+class: center, middle, inverse
+
+# Random Walk
+---
+## Random walks
+
+A random walk is a unique case because the size of the variance is increasing in time. 
+
+We cannot use simple OLS to determine if we have a random because the t-statistic will not be defined.
+
+Remember, we assume a finite variance so that we can use OLS.
  
 ---
 ## Random Walk
@@ -201,13 +372,13 @@ Now, we will vary the value of `\(\rho\)` to see if we can make the series stati
 ### `\(\huge{\rho = 0}\)`
 Let’s start with a perfectly stationary series with `\(\rho = 0\)`. Here is the plot for the time series :
 
-![](timeseries_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
 
 ---
 ### `\(\huge{\rho = 0.5}\)`
 Increase the value of `\(\rho\)` to 0.5 gives us following graph :
 
-![](timeseries_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
 
 
 You might notice that our cycles have become broader but essentially there does not seem to be a serious violation of stationary assumptions. 
@@ -216,7 +387,7 @@ You might notice that our cycles have become broader but essentially there does 
 ### `\(\huge{\rho = 0.9}\)`
 Let’s now take a more extreme case of `\(\rho\)` = 0.9
 
-![](timeseries_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
 
 We still see that the X returns back from extreme values to zero after some intervals. This series also is not violating non-stationarity significantly. 
 
@@ -224,7 +395,7 @@ We still see that the X returns back from extreme values to zero after some inte
 ### `\(\huge{\rho = 1}\)`
 Now, let’s take a look at the random walk with `\(\rho = 1\)`.
 
-![](timeseries_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
 
 This obviously is an violation to stationary conditions. 
 
@@ -333,7 +504,7 @@ plot(AirPassengers)
 abline(reg=lm(AirPassengers~time(AirPassengers)))
 ```
 
-![](timeseries_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 
 ```r
 # This will fit in a line
@@ -375,7 +546,7 @@ cycle(AirPassengers)
 plot(aggregate(AirPassengers,FUN=mean), ylab="Passengers")
 ```
 
-![](timeseries_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
 ```r
 #This will aggregate the cycles and display a year on year trend
@@ -389,7 +560,7 @@ plot(aggregate(AirPassengers,FUN=mean), ylab="Passengers")
 boxplot(AirPassengers~cycle(AirPassengers))
 ```
 
-![](timeseries_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 
 ```r
 #Box plot across months will give us a sense on seasonal effect
@@ -546,6 +717,190 @@ The blue line above shows significantly different values than zero. Clearly, the
 Clearly, the graph above has a cut off on ACF curve after 2nd lag which means this is mostly a MA(2) process.
 
 ---
+---
+class: center, middle, inverse
+
+# Determining the number of lags
+---
+### How do I determined the number or lags?
+
+How do I know if I have an MA process or an AR process?
+
+How do I know the number of lags I have to use for each?
+
+__Assuming we have a stationary process__, we answer these questions using the autocorrelation function (ACF) and the partial autocorrelation function (PACF).
+
+If the ACF immediately drops off after a few lags, then the time series is an MA.
+
+If the ACF does not drop off, but the PACF does, then it is an AR process. 
+---
+## ACF and PACF of an AR process
+![](AR1.png)
+---
+## ACF and PACF of a MA process
+
+![](MA1.png)
+---
+## ACF and PACF of a MA process
+
+![](arma1.png)
+---
+## Let's simulate an MA(2)
+
+
+```r
+acfma2=ARMAacf(ma=c(0.5,0.3), lag.max=10)
+lags=0:10
+xc=arima.sim(n=150, list(ma=c(0.5, 0.3)))
+x=xc+10
+```
+
+---
+## Let's simulate an MA(2)
+
+![](timeseries_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;![](timeseries_files/figure-html/unnamed-chunk-14-2.png)&lt;!-- --&gt;![](timeseries_files/figure-html/unnamed-chunk-14-3.png)&lt;!-- --&gt;
+
+---
+## Let's simulate an MA(2)
+
+![](timeseries_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+---
+## Let's simulate an MA(2)
+
+![](timeseries_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+## Let's simulate an MA(2)
+
+
+```r
+acfma2=ARMAacf(ar=c(0.5,0.3), lag.max=10)
+lags=0:10
+xc=arima.sim(n=150, list(ar=c(0.5, 0.3)))
+x=xc+10
+```
+
+---
+## Let's simulate an AR(2)
+
+![](timeseries_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+
+---
+## Let's simulate an AR(2)
+
+![](timeseries_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+
+---
+## Let's simulate an AR(2)
+
+![](timeseries_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+
+---
+## What about an ARMA(2,1)
+
+```r
+xc=arima.sim(n=150, list(ar=c(0.5, 0.3),ma = 0.2))
+x=xc+10
+```
+
+---
+## Let's simulate an ARMA(2,1)
+
+![](timeseries_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+
+---
+## Let's simulate an ARMA(2,1)
+
+![](timeseries_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+---
+## Let's simulate an ARMA(2,1)
+
+![](timeseries_files/figure-html/unnamed-chunk-24-1.png)&lt;!-- --&gt;
+
+---
+## Now what should I do?
+
+There is no sharp drop off in the ACF, so it is difficult to say we have a moving average.
+
+There is a sharp drop off in the PACF, so it would seem to indicate we have at least an AR(1)
+
+
+```r
+test_fit1&lt;-arima(x, order = c(1,0,0))
+```
+
+---
+
+```r
+acf(test_fit1$residuals)
+```
+
+![](timeseries_files/figure-html/unnamed-chunk-26-1.png)&lt;!-- --&gt;
+
+---
+
+```r
+pacf(test_fit1$residuals)
+```
+
+![](timeseries_files/figure-html/unnamed-chunk-27-1.png)&lt;!-- --&gt;
+
+---
+In these residuals, we see the MA(1) process clearly. Let's repeat the exercise
+
+
+```r
+test_fit1&lt;-arima(x, order = c(1,0,1))
+```
+---
+
+```r
+acf(test_fit1$residuals)
+```
+
+![](timeseries_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+
+---
+
+```r
+pacf(test_fit1$residuals)
+```
+
+![](timeseries_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
+
+
+---
+## But what if I want to cheat
+
+Once we have mixed models, you will have to do a lot of guess and check work to find the true type of model.
+
+Luckily, R is to the rescue with the `auto.arima` function. However, I should warn you it is not perfect.
+
+
+```r
+library(forecast)
+auto.arima(x, stationary = TRUE)
+```
+
+```
+## Series: x 
+## ARIMA(1,0,1) with non-zero mean 
+## 
+## Coefficients:
+##          ar1      ma1     mean
+##       0.8746  -0.2291  10.1784
+## s.e.  0.0464   0.0942   0.4566
+## 
+## sigma^2 = 0.9195:  log likelihood = -205.56
+## AIC=419.12   AICc=419.39   BIC=431.16
+```
+
+__Moral: Cheater don't always win. This is harder than it looks and it already looks hard.__
+---
+
+---
 ### 4. Framework and Application of ARIMA Time Series Modeling
 A quick revision, Till here we’ve learnt basics of time series modeling, time series in R and ARMA modeling. Now is the time to join these pieces and make an interesting story.
 
@@ -642,7 +997,7 @@ Below we plot the number of passengers by years. Make some observation.
 plot(AirPassengers)
 ```
 
-&lt;img src="timeseries_files/figure-html/unnamed-chunk-11-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="timeseries_files/figure-html/unnamed-chunk-32-1.png" style="display: block; margin: auto;" /&gt;
 
 ---
 ### Here are my observations :
@@ -684,7 +1039,7 @@ Next step is to find the right parameters to be used in the ARIMA model. We alre
 acf(log(AirPassengers))
 ```
 
-![](timeseries_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+![](timeseries_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
 
  
 ---
@@ -716,7 +1071,7 @@ pred &lt;- predict(fit, n.ahead = 10*12)
 ts.plot(AirPassengers,2.718^pred$pred, log = "y", lty = c(1,3))
 ```
 
-&lt;img src="timeseries_files/figure-html/unnamed-chunk-14-1.png" style="display: block; margin: auto;" /&gt;
+&lt;img src="timeseries_files/figure-html/unnamed-chunk-35-1.png" style="display: block; margin: auto;" /&gt;
  
 ---
 ### Projects
