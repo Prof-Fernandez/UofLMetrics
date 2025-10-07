@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.25/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -27,7 +27,7 @@ class: center, middle, inverse, title-slide
 ### University of Louisville
 ]
 .date[
-### 2020-7-4 (updated: 2024-02-12)
+### 2020-7-4 (updated: 2025-10-07)
 ]
 
 ---
@@ -208,7 +208,7 @@ _psechoice_=3 | four year college
 &lt;small&gt;
 
 
-```r
+``` r
 stargazer::stargazer(nels.multinom, type="html", dep.var.labels.include = FALSE, column.labels = c("2 year college","4 year college"))
 ```
 
@@ -242,7 +242,7 @@ That is, how much the probability of choosing option A over B increases or decre
 Suppose we wanted to know the probabilities for the median student and for the student in the top 5%. 
 
 
-```r
+``` r
 medGrades &lt;- median(nels_small$grades)
 fifthPercentileGrades &lt;- quantile(nels_small$grades, .05)
 newdat &lt;- data.frame(grades=c(medGrades, fifthPercentileGrades))
@@ -314,7 +314,7 @@ If you allow for random coefficients (unobserved heterogeneity also known as ran
 We will use the mlogit package in R
 
 
-```r
+``` r
 library(mlogit)
 data("Fishing", package = "mlogit")
 Fish &lt;- mlogit.data(Fishing, varying = c(2:9), shape = "wide", choice = "mode")
@@ -327,7 +327,8 @@ m2&lt;-mlogit(mode ~ 0 | income, data = Fish)
 #summary(multinom(mode ~ income, data = Fishing))
 ## a "mixed" model
 m &lt;- mlogit(mode ~ price+ catch | income, data = Fish)
-stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed"), font.size = "tiny", single.row = TRUE)
+#stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed"), font.size = "tiny", single.row = TRUE)
+modelsummary::modelsummary(list("Conditional"=m1,"Multinomial"=m2,"Mixed"=m), stars = TRUE)
 ```
 ---
 ## Examples of Mixed Logit in R 
@@ -351,6 +352,188 @@ stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column
 &lt;tr&gt;&lt;td style="text-align:left"&gt;LR Test&lt;/td&gt;&lt;td&gt;533.878&lt;sup&gt;***&lt;/sup&gt; (df = 5)&lt;/td&gt;&lt;td&gt;41.145&lt;sup&gt;***&lt;/sup&gt; (df = 6)&lt;/td&gt;&lt;td&gt;565.171&lt;sup&gt;***&lt;/sup&gt; (df = 8)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="4" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="3" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
+
+```{=html}
+&lt;!-- preamble start --&gt;
+
+    &lt;script src="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.js"&gt;&lt;/script&gt;
+
+    &lt;script&gt;
+      // Create table-specific functions using external factory
+      const tableFns_2ehubfr8wwbgk4to863b = TinyTable.createTableFunctions("tinytable_2ehubfr8wwbgk4to863b");
+      // tinytable span after
+      window.addEventListener('load', function () {
+          var cellsToStyle = [
+            // tinytable style arrays after
+          { positions: [ { i: '1', j: 2 }, { i: '2', j: 2 }, { i: '3', j: 2 }, { i: '4', j: 2 }, { i: '5', j: 2 }, { i: '6', j: 2 }, { i: '7', j: 2 }, { i: '8', j: 2 }, { i: '9', j: 2 }, { i: '10', j: 2 }, { i: '11', j: 2 }, { i: '12', j: 2 }, { i: '13', j: 2 }, { i: '14', j: 2 }, { i: '15', j: 2 }, { i: '17', j: 2 }, { i: '18', j: 2 }, { i: '19', j: 2 }, { i: '1', j: 3 }, { i: '2', j: 3 }, { i: '3', j: 3 }, { i: '4', j: 3 }, { i: '5', j: 3 }, { i: '6', j: 3 }, { i: '7', j: 3 }, { i: '8', j: 3 }, { i: '9', j: 3 }, { i: '10', j: 3 }, { i: '11', j: 3 }, { i: '12', j: 3 }, { i: '13', j: 3 }, { i: '14', j: 3 }, { i: '15', j: 3 }, { i: '17', j: 3 }, { i: '18', j: 3 }, { i: '19', j: 3 }, { i: '1', j: 4 }, { i: '2', j: 4 }, { i: '3', j: 4 }, { i: '4', j: 4 }, { i: '5', j: 4 }, { i: '6', j: 4 }, { i: '7', j: 4 }, { i: '8', j: 4 }, { i: '9', j: 4 }, { i: '10', j: 4 }, { i: '11', j: 4 }, { i: '12', j: 4 }, { i: '13', j: 4 }, { i: '14', j: 4 }, { i: '15', j: 4 }, { i: '17', j: 4 }, { i: '18', j: 4 }, { i: '19', j: 4 } ], css_id: 'tinytable_css_um9h1gyibsmz76oxolmm',}, 
+          { positions: [ { i: '1', j: 1 }, { i: '2', j: 1 }, { i: '3', j: 1 }, { i: '4', j: 1 }, { i: '5', j: 1 }, { i: '6', j: 1 }, { i: '7', j: 1 }, { i: '8', j: 1 }, { i: '9', j: 1 }, { i: '10', j: 1 }, { i: '11', j: 1 }, { i: '12', j: 1 }, { i: '13', j: 1 }, { i: '14', j: 1 }, { i: '15', j: 1 }, { i: '17', j: 1 }, { i: '18', j: 1 }, { i: '19', j: 1 } ], css_id: 'tinytable_css_rhdvljm7accqbj95w4cu',}, 
+          { positions: [ { i: '20', j: 2 }, { i: '20', j: 3 }, { i: '20', j: 4 } ], css_id: 'tinytable_css_guy0oogz8jha7oaz4wwv',}, 
+          { positions: [ { i: '20', j: 1 } ], css_id: 'tinytable_css_37vcv62a7jjmqecx2loo',}, 
+          { positions: [ { i: '16', j: 2 }, { i: '16', j: 3 }, { i: '16', j: 4 } ], css_id: 'tinytable_css_0ty1ighxox76amajsdnu',}, 
+          { positions: [ { i: '16', j: 1 } ], css_id: 'tinytable_css_hzw6kgjfe0ujybjebc1z',}, 
+          { positions: [ { i: '0', j: 2 }, { i: '0', j: 3 }, { i: '0', j: 4 } ], css_id: 'tinytable_css_hpklesjgo0cho02h5sub',}, 
+          { positions: [ { i: '0', j: 1 } ], css_id: 'tinytable_css_nw4fg47mksykbcs50518',}, 
+          ];
+
+          // Loop over the arrays to style the cells
+          cellsToStyle.forEach(function (group) {
+              group.positions.forEach(function (cell) {
+                  tableFns_2ehubfr8wwbgk4to863b.styleCell(cell.i, cell.j, group.css_id);
+              });
+          });
+      });
+    &lt;/script&gt;
+
+    &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/vincentarelbundock/tinytable@main/inst/tinytable.css"&gt;
+    &lt;style&gt;
+    /* tinytable css entries after */
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_um9h1gyibsmz76oxolmm, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_um9h1gyibsmz76oxolmm { text-align: center }
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_rhdvljm7accqbj95w4cu, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_rhdvljm7accqbj95w4cu { text-align: left }
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_guy0oogz8jha7oaz4wwv, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_guy0oogz8jha7oaz4wwv {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_37vcv62a7jjmqecx2loo, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_37vcv62a7jjmqecx2loo {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.1em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_0ty1ighxox76amajsdnu, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_0ty1ighxox76amajsdnu {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_hzw6kgjfe0ujybjebc1z, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_hzw6kgjfe0ujybjebc1z {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 0; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_hpklesjgo0cho02h5sub, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_hpklesjgo0cho02h5sub {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: center }
+    #tinytable_2ehubfr8wwbgk4to863b td.tinytable_css_nw4fg47mksykbcs50518, #tinytable_2ehubfr8wwbgk4to863b th.tinytable_css_nw4fg47mksykbcs50518 {  position: relative; --border-bottom: 1; --border-left: 0; --border-right: 0; --border-top: 1; --line-color-bottom: black; --line-color-left: black; --line-color-right: black; --line-color-top: black; --line-width-bottom: 0.05em; --line-width-left: 0.1em; --line-width-right: 0.1em; --line-width-top: 0.1em; --trim-bottom-left: 0%; --trim-bottom-right: 0%; --trim-left-bottom: 0%; --trim-left-top: 0%; --trim-right-bottom: 0%; --trim-right-top: 0%; --trim-top-left: 0%; --trim-top-right: 0%; ; text-align: left }
+    &lt;/style&gt;
+    &lt;div class="container"&gt;
+      &lt;table class="tinytable" id="tinytable_2ehubfr8wwbgk4to863b" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing='true'&gt;
+        
+        &lt;thead&gt;
+              &lt;tr&gt;
+                &lt;th scope="col" data-row="0" data-col="1"&gt; &lt;/th&gt;
+                &lt;th scope="col" data-row="0" data-col="2"&gt;Conditional&lt;/th&gt;
+                &lt;th scope="col" data-row="0" data-col="3"&gt;Multinomial&lt;/th&gt;
+                &lt;th scope="col" data-row="0" data-col="4"&gt;Mixed&lt;/th&gt;
+              &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tfoot&gt;&lt;tr&gt;&lt;td colspan='4'&gt;+ p &lt; 0.1, * p &lt; 0.05, ** p &lt; 0.01, *** p &lt; 0.001&lt;/td&gt;&lt;/tr&gt;&lt;/tfoot&gt;
+        &lt;tbody&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="1" data-col="1"&gt;(Intercept) × boat&lt;/td&gt;
+                  &lt;td data-row="1" data-col="2"&gt;0.871***&lt;/td&gt;
+                  &lt;td data-row="1" data-col="3"&gt;0.739***&lt;/td&gt;
+                  &lt;td data-row="1" data-col="4"&gt;0.527*&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="2" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="2" data-col="2"&gt;(0.114)&lt;/td&gt;
+                  &lt;td data-row="2" data-col="3"&gt;(0.197)&lt;/td&gt;
+                  &lt;td data-row="2" data-col="4"&gt;(0.223)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="3" data-col="1"&gt;(Intercept) × charter&lt;/td&gt;
+                  &lt;td data-row="3" data-col="2"&gt;1.499***&lt;/td&gt;
+                  &lt;td data-row="3" data-col="3"&gt;1.341***&lt;/td&gt;
+                  &lt;td data-row="3" data-col="4"&gt;1.694***&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="4" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="4" data-col="2"&gt;(0.133)&lt;/td&gt;
+                  &lt;td data-row="4" data-col="3"&gt;(0.195)&lt;/td&gt;
+                  &lt;td data-row="4" data-col="4"&gt;(0.224)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="5" data-col="1"&gt;(Intercept) × pier&lt;/td&gt;
+                  &lt;td data-row="5" data-col="2"&gt;0.307**&lt;/td&gt;
+                  &lt;td data-row="5" data-col="3"&gt;0.814***&lt;/td&gt;
+                  &lt;td data-row="5" data-col="4"&gt;0.778***&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="6" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="6" data-col="2"&gt;(0.115)&lt;/td&gt;
+                  &lt;td data-row="6" data-col="3"&gt;(0.229)&lt;/td&gt;
+                  &lt;td data-row="6" data-col="4"&gt;(0.220)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="7" data-col="1"&gt;price&lt;/td&gt;
+                  &lt;td data-row="7" data-col="2"&gt;-0.025***&lt;/td&gt;
+                  &lt;td data-row="7" data-col="3"&gt;&lt;/td&gt;
+                  &lt;td data-row="7" data-col="4"&gt;-0.025***&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="8" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="8" data-col="2"&gt;(0.002)&lt;/td&gt;
+                  &lt;td data-row="8" data-col="3"&gt;&lt;/td&gt;
+                  &lt;td data-row="8" data-col="4"&gt;(0.002)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="9" data-col="1"&gt;catch&lt;/td&gt;
+                  &lt;td data-row="9" data-col="2"&gt;0.377***&lt;/td&gt;
+                  &lt;td data-row="9" data-col="3"&gt;&lt;/td&gt;
+                  &lt;td data-row="9" data-col="4"&gt;0.358**&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="10" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="10" data-col="2"&gt;(0.110)&lt;/td&gt;
+                  &lt;td data-row="10" data-col="3"&gt;&lt;/td&gt;
+                  &lt;td data-row="10" data-col="4"&gt;(0.110)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="11" data-col="1"&gt;income × boat&lt;/td&gt;
+                  &lt;td data-row="11" data-col="2"&gt;&lt;/td&gt;
+                  &lt;td data-row="11" data-col="3"&gt;0.000*&lt;/td&gt;
+                  &lt;td data-row="11" data-col="4"&gt;0.000+&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="12" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="12" data-col="2"&gt;&lt;/td&gt;
+                  &lt;td data-row="12" data-col="3"&gt;(0.000)&lt;/td&gt;
+                  &lt;td data-row="12" data-col="4"&gt;(0.000)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="13" data-col="1"&gt;income × charter&lt;/td&gt;
+                  &lt;td data-row="13" data-col="2"&gt;&lt;/td&gt;
+                  &lt;td data-row="13" data-col="3"&gt;-0.000&lt;/td&gt;
+                  &lt;td data-row="13" data-col="4"&gt;-0.000&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="14" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="14" data-col="2"&gt;&lt;/td&gt;
+                  &lt;td data-row="14" data-col="3"&gt;(0.000)&lt;/td&gt;
+                  &lt;td data-row="14" data-col="4"&gt;(0.000)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="15" data-col="1"&gt;income × pier&lt;/td&gt;
+                  &lt;td data-row="15" data-col="2"&gt;&lt;/td&gt;
+                  &lt;td data-row="15" data-col="3"&gt;-0.000**&lt;/td&gt;
+                  &lt;td data-row="15" data-col="4"&gt;-0.000*&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="16" data-col="1"&gt;&lt;/td&gt;
+                  &lt;td data-row="16" data-col="2"&gt;&lt;/td&gt;
+                  &lt;td data-row="16" data-col="3"&gt;(0.000)&lt;/td&gt;
+                  &lt;td data-row="16" data-col="4"&gt;(0.000)&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="17" data-col="1"&gt;Num.Obs.&lt;/td&gt;
+                  &lt;td data-row="17" data-col="2"&gt;4728&lt;/td&gt;
+                  &lt;td data-row="17" data-col="3"&gt;4728&lt;/td&gt;
+                  &lt;td data-row="17" data-col="4"&gt;4728&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="18" data-col="1"&gt;AIC&lt;/td&gt;
+                  &lt;td data-row="18" data-col="2"&gt;2471.6&lt;/td&gt;
+                  &lt;td data-row="18" data-col="3"&gt;2966.3&lt;/td&gt;
+                  &lt;td data-row="18" data-col="4"&gt;2446.3&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="19" data-col="1"&gt;RMSE&lt;/td&gt;
+                  &lt;td data-row="19" data-col="2"&gt;0.62&lt;/td&gt;
+                  &lt;td data-row="19" data-col="3"&gt;0.69&lt;/td&gt;
+                  &lt;td data-row="19" data-col="4"&gt;0.62&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                  &lt;td data-row="20" data-col="1"&gt;mcfadden's r2&lt;/td&gt;
+                  &lt;td data-row="20" data-col="2"&gt;0.17822995057079&lt;/td&gt;
+                  &lt;td data-row="20" data-col="3"&gt;0.0137357460634492&lt;/td&gt;
+                  &lt;td data-row="20" data-col="4"&gt;0.188676626917495&lt;/td&gt;
+                &lt;/tr&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+&lt;!-- hack to avoid NA insertion in last line --&gt;
+```
 &lt;/small&gt;
 ---
 ## Summary
@@ -366,9 +549,9 @@ stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"countIncrementalSlides": false
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));

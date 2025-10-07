@@ -4,7 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
-    <script src="libs/header-attrs-2.6/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -14,871 +14,30 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Limited Dependent Variables
-## Linear Probability, Probit, Logit
+]
+.subtitle[
+## Share Regression
+]
+.author[
 ### Jose M. Fernandez
+]
+.institute[
 ### University of Louisville
-### 2020-7-4 (updated: 2021-03-02)
-
----
-
-## Introduction (1)
-
-* Previously, we learned how to use binary variables as regressors (independent variables)
-* But in some cases we might be interested in learning how entity characteristics influence a binary dependent variable
-* For example, we might be interested in studying whether there is racial discrimination in the provision of loans
-    * We are interested in comparing individuals who are identify with different races, but are otherwise identical
-    * It is not sufficient to compare average loan denial rates
-&lt;img src="https://www.creighton.edu/fileadmin/user/PublicRelations/newsroom/images/Slider_333x300/Color-of-law_300.jpg" width="50%" style="display: block; margin: auto;" /&gt;
-
-
----
-## Introduction (2)
-
-We will consider two forms of regression to analyze such situations
-
-1.  __Linear Probability Models__, using OLS to do multiple regression analysis with a binary dependent variable
-2.  __Nonlinear Regression Models__, that might be a better fit of such binary models
-
----
-### The Math of Latent Dependent Variables
-
-In economics, we believe people choose to do things that makes them better off. That is, they __maximize utility__. 
-
-Suppose you could go out to eat (option 1) or cook at home (option 2).
-
-Each option gives you different utility.
-- `\(u_1=X_1\beta+e_1\)` is the utility you get from eating out
-- `\(u_2=X_2\beta+e_2\)` is the utility you get from cooking at home
-
-Let `\(y*\)` represent a person's net utility, `\(y*=u_1-u_2\)`. We do not get to observe `\(y*\)`.
-
-Instead, we observe `\(y=1\)` if `\(y*&gt;0\)` and `\(y=0\)` otherwise.
-- `\(y=1\)` implies you went out to each.
-- `\(y=0\)` implies you cooked at home.
-
----
-### The Math of Latent Dependent Variables
-
-We want to know the probability you go out to eat, `\(Prob(y=1)\)`
-
-To calculate probability, we need to use a pdf and cdf
-- pdf = probability density function (gives the shape of the distribution)
-- cdf = cumulative density function 
-
-The blue line below is the pdf. We use the cdf to calculate probability that the z score is between `\(z_1\)` and `\(z_2\)` (the shaded region in yellow.)
-
-&lt;img src="https://stat88.org/textbook/images/notebooks/Chapter_08/02_Standard_Normal_Curve_10_0.png" style="display: block; margin: auto;" /&gt;
-
-
----
-## The Math of Latent Dependent Variables
-
-`$$y* = X \beta+ \epsilon$$`
-Now assume `\(F\)` is the cumulative density function of `\(\epsilon\)`
-`$$\begin{align*} Prob(y=1) &amp;= Prob(y*&gt;0) \\
-&amp;= Prob(X \beta + \epsilon&gt;0) \\
-&amp;= Prob(\epsilon&gt;-X \beta ) \\
-&amp;= 1-Prob(\epsilon&lt;-X \beta ) \\
-&amp;= 1-F(-X \beta ) \end{align*}$$`
-
-If F is symmetric about 0,
-`$$\begin{align*} Prob(y=1) &amp;= 1-F(\epsilon&lt;-X \beta ) \\
-&amp;= F(X \beta ) \end{align*}$$`
----
-### The entire lecture in a nutshell
-
-- If we do not assume a distribution for the error terms and use __OLS__ to estimate Y
-  - `\(Prob(y=1)=F(X \beta)=X \beta\)` the equation is linear
-- If we assume the errors are normally distributed, then we use __Probit__ to estimate Y
-  - `\(Prob(y=1)=F(X \beta)=\Phi(X \beta)\)` the equation is nonlinear.
-- If we assume the errors are logistic, then we use __Logit__ to estimate Y
-  - `\(Prob(y=1)=F(X \beta)=\Lambda(X \beta)\)` the equation is nonlinear.
-
----
-### Let's try it
-One Rstudio
-
-```r
-# We will make some fake data
-XA &lt;- rnorm(1000)*5+20
-XB &lt;- rnorm(1000)*5+10
-eA &lt;- rnorm(1000)*5
-eB &lt;- rnorm(1000)*5
-B &lt;- 0.7
-y_star &lt;- (XA-XB)*B + eA - eB
-y &lt;- ifelse(y_star&gt;0,1,0)
-mean(y)
-```
-
-```
-## [1] 0.788
-```
-
----
-### Let's try it
-.pull-left[
-
-```r
-#Let's run a regression using both y_star and y
-X = XA - XB # we can only identify relative effects
-reg1 &lt;-lm(y_star ~ X)
-reg2 &lt;- lm(y ~ X)
-stargazer::stargazer(reg1,reg2, type = "html")
-```
 ]
-.pull-right[
-&lt;small&gt;
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;y_star&lt;/td&gt;&lt;td&gt;y&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;X&lt;/td&gt;&lt;td&gt;0.665&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.023&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.030)&lt;/td&gt;&lt;td&gt;(0.002)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;0.245&lt;/td&gt;&lt;td&gt;0.567&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.364)&lt;/td&gt;&lt;td&gt;(0.020)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;1,000&lt;/td&gt;&lt;td&gt;1,000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.326&lt;/td&gt;&lt;td&gt;0.156&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.325&lt;/td&gt;&lt;td&gt;0.155&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error (df = 998)&lt;/td&gt;&lt;td&gt;6.793&lt;/td&gt;&lt;td&gt;0.376&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic (df = 1; 998)&lt;/td&gt;&lt;td&gt;482.617&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;184.167&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/small&gt;
+.date[
+### 2020-7-4 (updated: 2025-10-07)
 ]
----
-### Predict Y
-
-```r
-y_hat &lt;- predict(reg2,as.data.frame(X))
-plot(X,y_hat)
-```
-
-&lt;img src="limitedDep2_files/figure-html/unnamed-chunk-6-1.png" width="50%" style="display: block; margin: auto;" /&gt;
-
-The predicted mean of y is 0.788, the max is 1.3215412, and the min is 0.2581041
-
----
-## Examples of Binary Dependent Variables
-
-- The provision of a mortgage loan
-- The decision to smoke/not smoke
-- The decision to go to college or not
-- If a country receives foreign aid or not
-
----
-## Racial Discrimination Mortgage Loans
-
-- In this chapter we are interested in studying whether there is racial discrimination in the provision of mortgage loans.
-- Data compiled by researchers at the Boston Fed under the Home Mortgage Disclosure Act (HMDA)
-- The dependent variable of this example is a binary variable equal
-    - 1 if an individual is denied
-    - 0 otherwise
-
----
-## Effect of Payment-to-Income Ration
-
-![](LV_1.png)
-
-Using a subset of the data on mortgages `\(n=127\)`
-
----
-## Interpreting the OLS Regression (1)
-
-- Looking at the plot we see that when `\(P/I~ratio = 0.3\)`, the predicted value `\(\widehat{deny} = 0.2\)`.
-- What does it mean to predict a binary variable with a continuous value?
-- Using a probability linear model, we interpret this as predicting that someone with such a P/I ratio would be denied a loan with a probability of 20%.
-
-- __The coefficients in the linear model tell us the marginal effect on the probability of getting denied a loan__
-
----
-## The Linear Probability Model
-
-The linear probability model is
-
-`$$Y_i = \beta_0 + \beta_1 X_{1i} + \dots + \beta_k X_{ki} + u_i$$`
-
-and therefore
-
-`$$Pr(Y = 1|X_1,\dots, X_k) = \beta_0 + \beta_1 X_{1} + \dots + \beta_k X_{k}$$`
-
-- `\(\beta_1\)` is the change in the probability that `\(Y=1\)` associated with a unit change in `\(X_1\)`.
-
----
-## R Squared in a LPM
-
-- A model with a continuous dependent variable one can imagine the possibility of getting `\(R^2 = 1\)`, when all the data lines up on the regression line.
-- This would be __impossible__ if we had a binary dependent variable, unless the __explanatory variables (X's)__ are also all binary.
-- Therefore, `\(R^2\)` from a LPM regression does not have a useful interpretation.
-
----
-## Application to the Boston HMDA Data
-
-
-```r
-library(car)
-library("AER")
-data(HMDA)
-fm1 &lt;- lm(I(as.numeric(deny) - 1) ~ pirat, data = HMDA)
-
-coeftest(fm1, vcov.=vcovHAC(fm1))
-```
-
-```
-## 
-## t test of coefficients:
-## 
-##              Estimate Std. Error t value  Pr(&gt;|t|)    
-## (Intercept) -0.079910   0.032287 -2.4750   0.01339 *  
-## pirat        0.603535   0.102917  5.8643 5.138e-09 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
----
-## Application to the Boston HMDA Data
-
-Note, once we control for an African American Family (afam), the likelihood of denial due to the PI ratio decreases. Further, we see a positive and significant effect on the __afam__ variable
-
-
-```r
-fm2 &lt;- lm(I(as.numeric(deny) - 1) ~ pirat + afam, data = HMDA)
-
-coeftest(fm2, vcov.=vcovHAC(fm2))
-```
-
-```
-## 
-## t test of coefficients:
-## 
-##              Estimate Std. Error t value  Pr(&gt;|t|)    
-## (Intercept) -0.090514   0.029433 -3.0753  0.002127 ** 
-## pirat        0.559195   0.091569  6.1068 1.184e-09 ***
-## afamyes      0.177428   0.037471  4.7351 2.318e-06 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
-
----
-class: center, middle, inverse
-# Probit and Logit
-
----
-## Introduction to Non-Linear Probability Model
-
-- Since the fit in a linear probability model could be nonsensical, we consider two alternative nonlinear regression models
-- Since cumulative probability distribution functions (CDFs) produce functions from 0 to 1, we use them to model `\(Pr(Y=1|X_1,\dots,X_k)\)`
-- We use two types of nonlinear models
-    
-    1.  __Probit regressions__, which uses the CDF of the standard normal
-    2.  __Logit regression__, uses a "logistic" CDF
-
----
-class: middle, inverse, center
-# Probit
-
----
-## Probit Regression
-
-The Probit regression model with a single regressor is
-
-`$$Pr(Y=1|X) = \Phi(\beta_0 + \beta_1 X)$$`
-
-where `\(\Phi\)` is the CDF of the standard normal distribution. 
-
-Probit uses a linear line to capture the Z-score, `\(Z = \beta_0 + \beta_1 X\)`
-
-The CDF is nonlinear (remember what a normal distribution looks like), but the Z score is linear.
-
----
-### The normal CDF is non-linear
-
-If `$$y = \beta_0 + \beta_1 X + e,$$` 
-
-then we know that if we increase X by one unit that the change in y will equal `\(\beta_1\)`,
-
-`\(\delta y / \delta X = \beta_1\)`
-
-But the same is not true for either probit or logit.
-
-__Why is this important?__
-
-If you are moving from z = 2.0 to z = 3.0, then the change in probability is big, but from z = 3.0 to 4.0 is a much smaller change in probability even though the change in z is the same!!
 
 ---
 
-```r
-# create a list of z values from -3 to 3 increasing by .1
-z &lt;- seq(-3,3, by = .1)
-# We want to calculate the change in probability for a .1 change in z
-z1 &lt;- z[1:length(z)-1]
-z2 &lt;- z[2:length(z)]
-y &lt;- pnorm(z2)-pnorm(z1)
-plot(z1,y)
-```
 
-&lt;img src="limitedDep2_files/figure-html/unnamed-chunk-9-1.png" width="75%" style="display: block; margin: auto;" /&gt;
-
-
----
-## Graphic Representation of the problem.
-&lt;img src="https://www.dummies.com/wp-content/uploads/415062.image3.jpg" width="150%" /&gt;
----
-## Example
-
-- Consider the mortgage example, regression loan denial on the P/I ratio
-- Suppose that `\(\beta_0 = -2\)` and `\(\beta_1 = 3\)`
-- What is the probability of being denied a loan is `\(P/I~ratio = 0.4\)`?
-
-`$$\begin{align*} \Phi(\beta_0 + \beta_1 P/I~ratio) &amp;= \Phi(-2 + 3\times P/I~ratio)\\ &amp;= \Phi(-0.8) \\ &amp;= Pr(Z \leq -0.8) = 21.2\% \end{align*}$$`where `\(Z \sim N(0,1)\)`
-
----
-## Interpreting the Coefficient (1)
-
-`$$Pr(Y=1|X) = \Phi(\underbrace{\beta_0 + \beta_1 X}_{z})$$`
-
-- `\(\beta_1\)` is the change in the `\(z\)`-value associated with a unit change in `\(X\)`.
-- If `\(\beta_1 &gt; 0\)`, an increase in `\(X\)` would lead to an increase in the `\(z\)`-value and in turn the probability of `\(Y=1\)`
-- If `\(\beta_1 &lt; 0\)`, an increase in `\(X\)` would lead to a decrease in the `\(z\)`-value and in turn the probability of `\(Y=1\)`
-- While, the effect of `\(X\)` on the `\(z\)`-value is linear, its effect on `\(Pr(Y=1)\)` is nonlinear
-
----
-## Probit Model Graph
-
-![](LV_2.png)
-
----
-## Multiple Regressor Probit
-
-`$$Pr(Y=1|X_1, X_2) = \Phi(\beta_0 + \beta_1 X_1 + \beta_2 X_2)$$`
-
-- Once again the parameters `\(\beta_1\)` and `\(\beta_2\)` represent the linear effect of a unit change in `\(X_1\)` and `\(X_2\)`, respectively, on the `\(z\)`-value.
-- For example, suppose `\(\beta_0 = -1.6\)`, `\(\beta_1 = 2\)`, and `\(\beta_2 = 0.5\)`. If `\(X_1 = 0.4\)` and `\(X_2 = 1\)`, the probability that `\(Y=1\)` would be `\(\Phi(-0.3) = 38\%\)`.
-
----
-## General Probit Model
-
-`$$\begin{equation*} Pr(Y=1|X_1, X_2,\dots, X_k) = \\ \\ \Phi(\underbrace{\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k}_z) \end{equation*}$$`To calculate the effect of a change in a regressor (e.g. from `\(X_1\)` to `\(X_1 + \Delta X_1\)`) on the `\(Pr(Y=1|X_1,\dots,X_k)\)`, subtract `$$\Phi(\beta_0 + \beta_1 X_1 + \beta_2 X_2 + \dots + \beta_k X_k)$$`from `$$\Phi(\beta_0 + \beta_1 (X_1 + \Delta X_1) + \beta_2 X_2 + \dots + \beta_k X_k)$$`
-
----
-## Application to Mortgage Data (1)
-
-
-```r
-fm3 &lt;- glm(deny ~ pirat, family = binomial(link = "probit"), data = HMDA)
-summary(fm3)
-```
-
-```
-## 
-## Call:
-## glm(formula = deny ~ pirat, family = binomial(link = "probit"), 
-##     data = HMDA)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.4140  -0.5281  -0.4750  -0.3900   2.8159  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -2.1941     0.1378 -15.927  &lt; 2e-16 ***
-## pirat         2.9679     0.3858   7.694 1.43e-14 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 1744.2  on 2379  degrees of freedom
-## Residual deviance: 1663.6  on 2378  degrees of freedom
-## AIC: 1667.6
-## 
-## Number of Fisher Scoring iterations: 6
-```
-
----
-## Application to Mortgage Data (2)
-
-
-```r
-fm4 &lt;- glm(deny ~ pirat + afam, family = binomial(link = "probit"), data = HMDA)
-summary(fm4)
-```
-
-```
-## 
-## Call:
-## glm(formula = deny ~ pirat + afam, family = binomial(link = "probit"), 
-##     data = HMDA)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.1208  -0.4762  -0.4251  -0.3550   2.8799  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept) -2.25879    0.13669 -16.525  &lt; 2e-16 ***
-## pirat        2.74178    0.38047   7.206 5.75e-13 ***
-## afamyes      0.70816    0.08335   8.496  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 1744.2  on 2379  degrees of freedom
-## Residual deviance: 1594.3  on 2377  degrees of freedom
-## AIC: 1600.3
-## 
-## Number of Fisher Scoring iterations: 5
-```
----
-class: middle, inverse, center
-# Logit
-
----
-## Logit Regression
-
-`$$\begin{equation*} Pr(Y = 1|X_1, \dots, X_k) =\\ F(\beta_0 + \beta_1 X_1 + \dots + \beta_k X_k) =\\ \frac{1}{1+\exp(\beta_0 + \beta_1 X_1 + \dots + \beta_k X_k)} \end{equation*}$$`
-
-It is similar to the probit model, except that we use the CDF for a standard logistic distribution, instead of the CDF for a standard normal.
-
----
-## Probit vs Logit Regression Models
-
-![](LV_3.png)
-
----
-## Application to Mortgage Data (3)
-
-
-```r
-fm5 &lt;- glm(deny ~ pirat + afam, family = binomial(link = "logit"), data = HMDA)
-summary(fm5)
-```
-
-```
-## 
-## Call:
-## glm(formula = deny ~ pirat + afam, family = binomial(link = "logit"), 
-##     data = HMDA)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.3709  -0.4732  -0.4219  -0.3556   2.8038  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  -4.1256     0.2684 -15.370  &lt; 2e-16 ***
-## pirat         5.3704     0.7283   7.374 1.66e-13 ***
-## afamyes       1.2728     0.1462   8.706  &lt; 2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 1744.2  on 2379  degrees of freedom
-## Residual deviance: 1591.4  on 2377  degrees of freedom
-## AIC: 1597.4
-## 
-## Number of Fisher Scoring iterations: 5
-```
-
----
-class: center, middle, inverse
-# Marginal Effects
-
----
-## Marginal Effects (1)
-
-While it is straightforward to perform hypothesis testing on the `\(\beta\)`'s of a non-linear model, the interpretation of these coefficients are difficult. 
-
-Instead, we have a preference for marginal effects.
-
----
-## Marginal Effects (2)
-
-To find the marginal effects, we would need to take the derivative of the probability function and then find the expected value of the derivative. 
-
-To perform this task by hand is very difficult. Instead, we will use a package called mfx
-
----
-## Application to Mortgage Data (4)
-
-
-```r
-suppressMessages(library("mfx"))
-fm6 &lt;- probitmfx(deny ~ pirat, data = HMDA)
-fm7 &lt;- probitmfx(deny ~ pirat + afam, data = HMDA)
-fm8 &lt;- logitmfx(deny ~ pirat + afam,  data = HMDA)
-texreg::htmlreg(list(fm3,fm6,fm2,fm7,fm8), custom.model.names = c("Probit","ME Probit","LPM","ME Probit", "ME Logit"),center = TRUE, caption = "", custom.note = "ME = Marginal Effect, LPM = linear probability model", omit.coef = c("aic","bic"))
-```
-
----
-## Application to Mortgage Data (4)
-&lt;small&gt;
-&lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;Probit&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;ME Probit&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;LPM&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;ME Probit&lt;/th&gt;
-&lt;th style="padding-left: 5px;padding-right: 5px;"&gt;ME Logit&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.19&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.09&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.14)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.02)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;pirat&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.97&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.57&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.56&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.50&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.49&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.39)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.07)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.06)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.07)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.07)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;afamyes&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.17&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.17&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.02)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.02)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(0.02)&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-top: 1px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;AIC&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1667.58&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1667.58&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1600.27&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1597.39&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;BIC&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1679.13&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1679.13&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1617.60&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1614.71&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Log Likelihood&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-831.79&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-831.79&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-797.14&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-795.70&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Deviance&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1663.58&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1663.58&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1594.27&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;1591.39&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Num. obs.&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2380&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2380&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2380&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2380&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2380&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.08&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr style="border-bottom: 2px solid #000000;"&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;Adj. R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.08&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;tfoot&gt;
-&lt;tr&gt;
-&lt;td style="font-size: 0.8em;" colspan="6"&gt;ME = Marginal Effect, LPM = linear probability model&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tfoot&gt;
-&lt;/table&gt;
-&lt;/small&gt;
----
-## Advantages and Disadvantages
-
-Model Type | Advantages | Disadvantages
------------|------------|--------------
-LPM | Can use fixed effects and easy to interpret | Can predict outside 0 and 1
-Probit | Prob. bounded between 0 and 1. | You can't use fixed effects and suffers from incidental parameter problem. Coefficients are also hard to interpret.
-Logit | Prob. bounded between 0 and 1. Can use one-way fixed effects (conditional logit) | Suffers Incidental parameter problem. Coefficients are hard to interpret.
-
----
-## Limited Dependent Variables
-
-Any time you have a non-continuous dependent variable, y, you will face some estimation challenges.
-
-Some Examples
-
-- The dependent variable is a dummy variable
-  - This represents a simply yes/no choice
-  - Did you buy the good?
-  - Did you accept the job?
-  - Did you get married?
-  - Did you get divorced?
-  - Did you move?
-  - Did you vote?
-  - Did you get a flu shot?
-
----
-## Limited Dependent Variables
-
-We can estimate the likelihood of making one of these choices using
-- LPM: Linear Probability Model
-- Probit: Non-linear Model which assumes a normally distributed error
-- Logit: Non-linear Model which assumes a logistic distributed error.
----
-## More than one choice
-
-Sometimes, we can represent multiple choices
-
-Examples,
-
-- Full-Time Employment, Part-time Employment, Unemployed, out of the labor force
-- College Major
-- Occupational Choice
-- Type of cereal
-
-__We use Multinomial Logit or Probit__ (Future Class)
-
----
-## Discrete Counts
-
-Sometimes, we have discrete amounts of an item
-
-- Number of kids
-- Number of shoes
-- Number of suicides
-- Number of businesses
-
-These are examples of count variables
-__Models used are Poisson and Negative Binomial__ (Future class)
-
----
-## Limited Dependent Variables and Choice Theory
-
-The one key insight of limited dependent variables is how well it fits in with Choice Theory.
-
-Suppose you have two products, A and B. Which one will you buy first?
-
-Choice Theory says you buy the good that gives you the most utility. 
-
-If `\(U_A &gt; U_B\)` you buy A else you buy B.
-
----
-## Limited Dependent Variables and Choice Theory
-We can define these utility functions as linear where `\(X_A\)` contains the observed characteristics of good A and `\(X_B\)` the observed characteristics of good B. 
-
-`\(U_A = X_A\beta+e_A\)` is your utility for good A
-
-`\(U_B = X_B\beta+e_B\)` is your utility for good B
-
-The error terms `\(e_A\)` and `\(e_B\)` represent the unobserved characteristics for the products that the statistician cannot observed, but the consumer can. 
-
----
-### Limited Dependent Variables and Choice Theory
-
-The product error terms are random variables. Therefore, we cannot know definitely if `\(U_A &gt; U_B\)`, but we can say what is the probability the consumer will choose product A over product B.
-
-We do this by first defining a latent variable, `\(y^*\)`. This latent variable is unobserved, but the choice Y is observed.
-
-If `\(y^* &gt; 0\)`, then Y = 1 else Y = 0.
----
-### Limited Dependent Variables and Choice Theory
-We know that the consumer choose product A if `\(U_A &gt; U_B\)`. 
-
-This is the same as saying `\(y^*=U_A - U_B &gt; 0\)`
-
-So `\(y^* = (X_A-X_B)\beta+e_A-e_B\)`
-
-Similar to dummy variables, we cannot estimate the __absolute effect__ when comparing two products. We can only estimate the __relative effect.__
-
-Just as in the dummy variable case, we will need to set the utility of one of the goods to zero. 
-
----
-### Probabilty
-
-What is the probability the consumer buys good A?
-
-First, let Y = 1 if the consumer buys good A. Also, let `\(X = X_A-X_B\)`.
-
-`$$Pr(Y=1)=Pr(y^*&gt;0)=Pr(X\beta+e_A-e_B&gt;0)$$`
-
-Remember, X is just data that we observed. 
-
-`\(\beta\)` is the parameter we are interested in. 
-
-But the difference in the error terms is a random variable.
----
-### LPM
-
-If we treat the difference of the error terms to have a mean zero and a constant variance, then we can run OLS on the equation. `$$Y = X\beta+e_A-e_B$$`
-
-The coefficients would tells us by how many percentage points would the probability increase or decrease.
-
-_Sidebar: There is a difference between percent change and percentage point change. For example, if you move from 1% to 2% this is one percentage point change, but a 100% percent change._
-
----
-## Benefits and Problems of LPM
-
-The benefit of this model is that you can apply all of the least squares techniques you have learned. 
-- OLS 
-- Fixed Effects 
-- IV
-
-The disadvantage is that it can predict probabilities greater than 1 and less than zero. 
-
-&lt;img src="https://www.dummies.com/wp-content/uploads/415055.image2.jpg" width="50%" style="display: block; margin: auto;" /&gt;
-
----
-## Benefits and Problems of LPM
-The error of LPM
-
-&lt;img src="https://www.dummies.com/wp-content/uploads/415053.image0.jpg" width="50%" style="display: block; margin: auto;" /&gt;
-
-You will also have heteroscedastic errors in all cases.
-
-&lt;img src="https://www.dummies.com/wp-content/uploads/415054.image1.jpg" width="80%" /&gt;
-
-__You MUST always use robust standard errors in LPM models.__
----
-### Probabilty
-
-Instead, if we assume the difference in the error terms is distributed `\(f(x)\)` where `\(F(x)\)` is the cumulative probability function, then
-
-`$$Pr(Y=1)=Pr(y^*&gt;0)=Pr(X\beta+e_A-e_B&gt;0)$$`
-`$$Pr(Y=1)=Pr(X\beta+e_A-e_B&gt;0)=Pr(e_A-e_B &gt; -X\beta)$$`
-`$$Pr(Y=1)=Pr(e_A-e_B &gt; -X\beta)= 1 - Pr(-X\beta &gt; e_A-e_B)$$`
-
-`$$Pr(Y=1)= 1 - Pr(-X\beta &gt; e_A-e_B)= 1 - F(-X\beta)$$`
-If we further assume that `\(F(x)\)` is symmetric (think of the normal distribution), then `$$1 - F(-X\beta)=F(X\beta)$$`
-So the probability that a consumer chooses to buy product A is `\(Pr(Y=1|X)=F(X\beta)\)` and the probability they choose product B is `\(Pr(Y=0|X)=1-F(X\beta)\)`
-
----
-## How do we estimate this function?
-
-We will use a new estimation method to called __Maximum Likelihood__ to estimate the `\(\beta's\)`.
-
-Suppose that we have three consumers.
-
-- Consumer 1 buys product A.
-- Consumer 2 buys product B.
-- Consumer 3 buys product A.
-
-What is the probability of observing this sequence?
-
-If the consumers are making choices independently, then it is just the multiplication of their individual probabilities
-
-`$$L = Pr(Y=1|X)*Pr(Y=0|X)*Pr(Y=1|X)$$`
----
-## How do we estimate this function?
-We write this same equation using the CDF function instead.
-`$$L = F(X\beta)*[1-F(X\beta)]*F(X\beta))$$`
-
-We estimate `\(\beta\)` by searching for the value of `\(\beta\)` that maximizes `\(L\)`.
-
-If we had `\(n\)` consumers, then `\(L\)` would generalize to
-`$$L=\Pi_i^n F(X_i\beta)^{Y_i}*[1-F(X_i\beta)]^{1-Y_i}$$`
-
-When the error terms, `\(e_A\)` and `\(e_B\)`, are distributed normal, then the differences between the error terms, `\(e_A-e_B\)` is also normally distributed. We can then use the normal cumulative density function for `\(F(x)\)`
-`$$F(X\beta)=\Phi(\frac{X\beta}{\sigma})=\Phi(X\beta)$$`
-
----
-## Probit
-When the error terms are distributed normal the cumulative density function for `\(F(x)\)`
-`$$F(X\beta)=\Phi(\frac{X\beta}{\sigma})=\Phi(X\beta)$$`
-
-We cannot separately identify the standard deviation `\(\sigma\)` from `\(\beta\)` so we assume `\(\sigma\)` is equal to one. 
-
-For example, the computer cannot tell the difference between `\(\beta=2\)` and `\(\sigma=1\)` versus `\(\beta=4\)` and `\(\sigma=2\)`.
-
----
-## Logit
-
-When the error terms are distributed Type I extreme value, then the differences in the error terms is logistic.
-
-The logistic distribution is probably new to you. It has a computation advantage over the assumption of normally distributed errors. The CDF for the normal distribution has __NO CLOSED FORM SOLUTION__.
-
-The logistic cdf has a very simple closed form solution.
-`$$F(X\beta)=\frac{exp(X\beta)}{1+exp(X\beta)}$$`
-
-Similar to Probit, we have to assume the standard deviation is equal to one to identify `\(\beta\)`.
-
----
-## Advantages of Probit and Logits vs LPM
-
-Both Probit and Logit are bounded between 0 and 1.
-
-LPM can give negative probabilities and probabilities greater than 1.
-
-Both Probit and Logit do not have issues with heteroscedacity because of the functional form. 
-
-LPM can only have heteroscedastic errors.
-
-You can use fixed effects with Logit (and sort of with Probit), but the estimation is more complex than in the LPM case.
-
----
-### Disadvantage of Probit/Logit
-A disadvantage of Probit/Logit is that parameters are difficult to interpret. We need to use marginal effects (derivative) to make any sense in these non-linear models.
-
-We cannot easily incorporate fixed effects
-
-__Rule of Thumb__: if the average probability of an event is far from the tails, then using LPM is just as good as using Logit or Probit and the interpretation is easier.
-
----
 ### Logit with aggregate data
 
-Logit has a nice property in that it can be used with aggregate data too. 
+Logit has a nice mathematical property that allows us to estimate the model using both individual level and aggregate data. Recall, the logit probability is represented by 
 
-`$$Pr(Y=1|X)=\frac{exp(X\beta)}{1+exp(X\beta)}$$`
+`$$Pr(Y=1|X)=F(X\beta)=\frac{exp(X\beta)}{1+exp(X\beta)}$$`
 
 Suppose you do not observe Y, but you do observed the fraction of people for where Y=1. Let's call this fraction, s.
 
@@ -909,7 +68,7 @@ The log odds gives us a linear function that we can estimate using OLS.
 
 `$$\begin{align} ln Pr(Y=1) &amp;= ln F(X\beta)= ln \frac{exp(X \beta)}{1+exp(X \beta)} \\  &amp;= ln\space exp(X\beta) - ln [1+exp(X \beta)] \\ &amp;= X \beta - ln[1+exp(X \beta)] \end{align}$$`
 `$$\begin{align} ln Pr(Y=0) &amp;= ln [1-F(X\beta)]= ln \frac{1}{1+exp(X \beta)} \\  &amp;= ln\space 1 - ln [1+exp(X \beta)] \\ &amp;=  - ln[1+exp(X \beta)] \end{align}$$`
-Using these two equations we find `$$ln Pr(Y=1)-ln Pr(Y=0)=X\beta$$`
+Using these two equations we find `$$ln Pr(Y=1)-ln Pr(Y=0)=X\beta \\ ln(s_1)-ln(s_0)=X\beta$$`
 ---
 ### An Example
 
@@ -925,7 +84,7 @@ We would still need to find an instrumental variable for price.
 ---
 ### Let's Try it
 
-```r
+``` r
 # Let's create individual level data for a logit
 X &lt;- rnorm(100000)*5+10
 e1 &lt;- rnorm(100000)*10
@@ -940,10 +99,10 @@ mean(y)
 ```
 
 ```
-## [1] 0.74659
+## [1] 0.74456
 ```
 
-```r
+``` r
 mydata &lt;- data.frame(y,X,x2)
 mylogit1 &lt;- glm(y ~ X, family = "binomial", data = mydata)
 mydata_group&lt;-aggregate(mydata[, 1:2],list(mydata$x2), mean)
@@ -962,28 +121,28 @@ mylogit3 &lt;- lm(y2 ~ X, mydata_group)
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;y&lt;/td&gt;&lt;td&gt;y2&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;logistic&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;OLS&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;X&lt;/td&gt;&lt;td&gt;0.121&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.120&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.002)&lt;/td&gt;&lt;td&gt;(0.015)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;X&lt;/td&gt;&lt;td&gt;0.119&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.091&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.002)&lt;/td&gt;&lt;td&gt;(0.014)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-0.045&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;-0.109&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.016)&lt;/td&gt;&lt;td&gt;(0.147)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;-0.038&lt;sup&gt;**&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;0.168&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(0.016)&lt;/td&gt;&lt;td&gt;(0.143)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Observations&lt;/td&gt;&lt;td&gt;100,000&lt;/td&gt;&lt;td&gt;1,000&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.063&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.062&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-53,433.320&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;106,870.600&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.230 (df = 998)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;66.946&lt;sup&gt;***&lt;/sup&gt; (df = 1; 998)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.040&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Adjusted R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.039&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Log Likelihood&lt;/td&gt;&lt;td&gt;-53,789.950&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;107,583.900&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Residual Std. Error&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.221 (df = 998)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;F Statistic&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;41.179&lt;sup&gt;***&lt;/sup&gt; (df = 1; 998)&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"countIncrementalSlides": false
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
@@ -1024,6 +183,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

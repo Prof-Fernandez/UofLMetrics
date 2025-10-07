@@ -15,7 +15,7 @@ output:
 ---
 ## Introduction (1)
 
-* Previously, we learned how to use binary variables as regressors (independent variables)
+* Previously, we learned how to use binary variables as explanatory variables (dummy/indicator variables)
 * But in some cases we might be interested in learning how entity characteristics influence a binary dependent variable
 * For example, we might be interested in studying whether there is racial discrimination in the provision of loans
     * We are interested in comparing individuals who are identify with different races, but are otherwise identical
@@ -26,8 +26,8 @@ output:
 
 We will consider two forms of regression to analyze such situations
 
-1.  __Linear Probability Models__, using OLS to do multiple regression analysis with a binary dependent variable
-2.  __Nonlinear Regression Models__, that might be a better fit of such binary models
+1.  __Linear Probability Models__, using linear regression with a binary dependent variable
+2.  __Nonlinear Regression Models__, that might be a better fit of such binary models (Logit/Probit)
 
 ---
 ## The Math of Latent Dependent Variables
@@ -37,8 +37,8 @@ In economics, we believe people choose to do things that makes them better off. 
 Suppose you could go out to eat (option 1) or cook at home (option 2).
 
 Each option gives you different utility.
-- $u_1=X_1\beta+e_1$ is the utility you get from eating out
-- $u_2=X_2\beta+e_2$ is the utility you get from eating out
+- $u_1=X\beta_{out}+e_1$ is the utility you get from eating out
+- $u_2=X\beta_{home}+e_2$ is the utility you get from eating at home
 
 Let $y*$ represent a person's net utility, $u_1-u_2$. We do not get to observe $y*$.
 
@@ -108,7 +108,7 @@ The linear probability model is
 
 $$Y_i = \beta_0 + \beta_1 X_{1i} + \dots + \beta_k X_{ki} + u_i$$
 
-and therefore
+and therefore, the mean of $Y$ can be interpreted as a probability.
 
 $$Pr(Y = 1|X_1,\dots, X_k) = \beta_0 + \beta_1 X_{1} + \dots + \beta_k X_{k}$$
 
@@ -117,8 +117,8 @@ $$Pr(Y = 1|X_1,\dots, X_k) = \beta_0 + \beta_1 X_{1} + \dots + \beta_k X_{k}$$
 ---
 ## R Squared in a LPM
 
-- A model with a continuous dependent variable one can imagine the possibility of getting $R^2 = 1$, when all the data lines up on the regression line.
-- This would be impossible if we had a binary dependent variable, unless the regressors are also all binary.
+- If you have a model with a continuous dependent variable, then you can imagine the possibility of getting $R^2 = 1$, when all the data lines up on the regression line.
+- This would be impossible if we had a binary dependent variable, unless the explanatory variables are also all binary.
 - Therefore, $R^2$ from a LPM regression does not have a useful interpretation.
 
 ---
@@ -154,7 +154,9 @@ class: center, middle, inverse
 - We use two types of nonlinear models
     
     1.  __Probit regressions__, which uses the CDF of the standard normal
-    2.  __Logit regression__, uses a "logistic" CDF
+    2.  __Logistic regression__, uses a "logistic" CDF
+    
+Fun Fact: Logistic regression is not a regression. Both Logit and Probit are estimated using maximum likelihood, not regression.
 
 ---
 class: middle, inverse, center
@@ -303,6 +305,6 @@ texreg::htmlreg(list(fm3,fm6,fm2,fm7), custom.model.names = c("Probit","Marginal
 
 Model Type | Advantages | Disadvantages
 -----------|------------|--------------
-LPM | Can use fixed effects and easy to interpret | Can predict outside 0 and 1
+LPM | Can use fixed effects and easy to interpret | Can predict outside 0 and 1. Heteroscedasticity is always present.
 Probit | Prob. bounded between 0 and 1. | You can't use fixed effects and suffers from incidental parameter problem. Coefficients are also hard to interpret.
 Logit | Prob. bounded between 0 and 1. Can use one-way fixed effects (conditional logit) | Suffers Incidental parameter problem. Coefficients are hard to interpret.

@@ -293,7 +293,8 @@ m2<-mlogit(mode ~ 0 | income, data = Fish)
 #summary(multinom(mode ~ income, data = Fishing))
 ## a "mixed" model
 m <- mlogit(mode ~ price+ catch | income, data = Fish)
-stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed"), font.size = "tiny", single.row = TRUE)
+#stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed"), font.size = "tiny", single.row = TRUE)
+modelsummary::modelsummary(list("Conditional"=m1,"Multinomial"=m2,"Mixed"=m), stars = TRUE)
 ```
 ---
 ## Examples of Mixed Logit in R 
@@ -312,6 +313,7 @@ m2<-mlogit(mode ~ 0 | income, data = Fish)
 ## a "mixed" model
 m <- mlogit(mode ~ price+ catch | income, data = Fish)
 stargazer::stargazer(m1,m2,m,type="html", dep.var.labels.include = FALSE ,column.labels = c("Conditional","Multinomial","Mixed"), font.size = "tiny", single.row = TRUE)
+modelsummary::modelsummary(list("Conditional"=m1,"Multinomial"=m2,"Mixed"=m), stars = TRUE)
 ```
 </small>
 ---

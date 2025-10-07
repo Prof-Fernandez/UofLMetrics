@@ -4,6 +4,7 @@
     <title>Limited Dependent Variables</title>
     <meta charset="utf-8" />
     <meta name="author" content="Jose M. Fernandez" />
+    <script src="libs/header-attrs-2.29/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol.css" rel="stylesheet" />
     <link href="libs/remark-css-0.0.1/uol-fonts.css" rel="stylesheet" />
@@ -13,17 +14,27 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
+.title[
 # Limited Dependent Variables
+]
+.subtitle[
 ## Linear Probability, Probit, Logit
+]
+.author[
 ### Jose M. Fernandez
+]
+.institute[
 ### University of Louisville
-### 2020-7-4 (updated: 2020-07-13)
+]
+.date[
+### 2020-7-4 (updated: 2025-10-07)
+]
 
 ---
 
 ## Introduction (1)
 
-* Previously, we learned how to use binary variables as regressors (independent variables)
+* Previously, we learned how to use binary variables as explanatory variables (dummy/indicator variables)
 * But in some cases we might be interested in learning how entity characteristics influence a binary dependent variable
 * For example, we might be interested in studying whether there is racial discrimination in the provision of loans
     * We are interested in comparing individuals who are identify with different races, but are otherwise identical
@@ -34,8 +45,8 @@ class: center, middle, inverse, title-slide
 
 We will consider two forms of regression to analyze such situations
 
-1.  __Linear Probability Models__, using OLS to do multiple regression analysis with a binary dependent variable
-2.  __Nonlinear Regression Models__, that might be a better fit of such binary models
+1.  __Linear Probability Models__, using linear regression with a binary dependent variable
+2.  __Nonlinear Regression Models__, that might be a better fit of such binary models (Logit/Probit)
 
 ---
 ## The Math of Latent Dependent Variables
@@ -45,8 +56,8 @@ In economics, we believe people choose to do things that makes them better off. 
 Suppose you could go out to eat (option 1) or cook at home (option 2).
 
 Each option gives you different utility.
-- `\(u_1=X_1\beta+e_1\)` is the utility you get from eating out
-- `\(u_2=X_2\beta+e_2\)` is the utility you get from eating out
+- `\(u_1=X\beta_{out}+e_1\)` is the utility you get from eating out
+- `\(u_2=X\beta_{home}+e_2\)` is the utility you get from eating at home
 
 Let `\(y*\)` represent a person's net utility, `\(u_1-u_2\)`. We do not get to observe `\(y*\)`.
 
@@ -116,7 +127,7 @@ The linear probability model is
 
 `$$Y_i = \beta_0 + \beta_1 X_{1i} + \dots + \beta_k X_{ki} + u_i$$`
 
-and therefore
+and therefore, the mean of `\(Y\)` can be interpreted as a probability.
 
 `$$Pr(Y = 1|X_1,\dots, X_k) = \beta_0 + \beta_1 X_{1} + \dots + \beta_k X_{k}$$`
 
@@ -125,15 +136,15 @@ and therefore
 ---
 ## R Squared in a LPM
 
-- A model with a continuous dependent variable one can imagine the possibility of getting `\(R^2 = 1\)`, when all the data lines up on the regression line.
-- This would be impossible if we had a binary dependent variable, unless the regressors are also all binary.
+- If you have a model with a continuous dependent variable, then you can imagine the possibility of getting `\(R^2 = 1\)`, when all the data lines up on the regression line.
+- This would be impossible if we had a binary dependent variable, unless the explanatory variables are also all binary.
 - Therefore, `\(R^2\)` from a LPM regression does not have a useful interpretation.
 
 ---
 ## Application to the Boston HMDA Data
 
 
-```r
+``` r
 library(car)
 library("AER")
 data(HMDA)
@@ -157,7 +168,7 @@ coeftest(fm1, vcov.=vcovHAC(fm1))
 ## Application to the Boston HMDA Data
 
 
-```r
+``` r
 fm2 &lt;- lm(I(as.numeric(deny) - 1) ~ pirat + afam, data = HMDA)
 
 coeftest(fm2, vcov.=vcovHAC(fm2))
@@ -187,7 +198,9 @@ class: center, middle, inverse
 - We use two types of nonlinear models
     
     1.  __Probit regressions__, which uses the CDF of the standard normal
-    2.  __Logit regression__, uses a "logistic" CDF
+    2.  __Logistic regression__, uses a "logistic" CDF
+    
+Fun Fact: Logistic regression is not a regression. Both Logit and Probit are estimated using maximum likelihood, not regression.
 
 ---
 class: middle, inverse, center
@@ -250,7 +263,7 @@ The CDF is nonlinear (remember what a normal distribution looks like), but the Z
 ## Application to Mortgage Data (1)
 
 
-```r
+``` r
 fm3 &lt;- glm(deny ~ pirat, family = binomial(link = "probit"), data = HMDA)
 summary(fm3)
 ```
@@ -260,10 +273,6 @@ summary(fm3)
 ## Call:
 ## glm(formula = deny ~ pirat, family = binomial(link = "probit"), 
 ##     data = HMDA)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.4140  -0.5281  -0.4750  -0.3900   2.8159  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
@@ -285,7 +294,7 @@ summary(fm3)
 ## Application to Mortgage Data (2)
 
 
-```r
+``` r
 fm4 &lt;- glm(deny ~ pirat + afam, family = binomial(link = "probit"), data = HMDA)
 summary(fm4)
 ```
@@ -295,10 +304,6 @@ summary(fm4)
 ## Call:
 ## glm(formula = deny ~ pirat + afam, family = binomial(link = "probit"), 
 ##     data = HMDA)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.1208  -0.4762  -0.4251  -0.3550   2.8799  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
@@ -336,7 +341,7 @@ It is similar to the probit model, except that we use the CDF for a standard log
 ## Application to Mortgage Data (3)
 
 
-```r
+``` r
 fm5 &lt;- glm(deny ~ pirat + afam, family = binomial(link = "logit"), data = HMDA)
 summary(fm5)
 ```
@@ -346,10 +351,6 @@ summary(fm5)
 ## Call:
 ## glm(formula = deny ~ pirat + afam, family = binomial(link = "logit"), 
 ##     data = HMDA)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -2.3709  -0.4732  -0.4219  -0.3556   2.8038  
 ## 
 ## Coefficients:
 ##             Estimate Std. Error z value Pr(&gt;|z|)    
@@ -390,7 +391,7 @@ To perform this task by hand is very difficult. Instead, we will use a package c
 ## Application to Mortgage Data (4)
 
 
-```r
+``` r
 suppressMessages(library("mfx"))
 fm6 &lt;- probitmfx(deny ~ pirat, data = HMDA)
 fm7 &lt;- probitmfx(deny ~ pirat + afam, data = HMDA)
@@ -403,6 +404,15 @@ texreg::htmlreg(list(fm3,fm6,fm2,fm7),
 
 ---
 ## Application to Mortgage Data (4)
+
+
+```
+## Warning: package 'mfx' was built under R version 4.5.1
+```
+
+```
+## Warning: package 'betareg' was built under R version 4.5.1
+```
 
 &lt;table class="texreg" style="margin: 10px auto;border-collapse: collapse;border-spacing: 0px;caption-side: bottom;color: #000000;border-top: 2px solid #000000;"&gt;
 &lt;thead&gt;
@@ -417,9 +427,9 @@ texreg::htmlreg(list(fm3,fm6,fm2,fm7),
 &lt;tbody&gt;
 &lt;tr style="border-top: 1px solid #000000;"&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;(Intercept)&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.19&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-2.19&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.09&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;-0.09&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -431,10 +441,10 @@ texreg::htmlreg(list(fm3,fm6,fm2,fm7),
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;pirat&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.97&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.57&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.56&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.50&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;2.97&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.57&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.56&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.50&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
@@ -447,8 +457,8 @@ texreg::htmlreg(list(fm3,fm6,fm2,fm7),
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;afamyes&lt;/td&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
-&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.17&lt;sup&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.18&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-left: 5px;padding-right: 5px;"&gt;0.17&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style="padding-left: 5px;padding-right: 5px;"&gt;&amp;nbsp;&lt;/td&gt;
@@ -509,7 +519,7 @@ texreg::htmlreg(list(fm3,fm6,fm2,fm7),
 &lt;/tbody&gt;
 &lt;tfoot&gt;
 &lt;tr&gt;
-&lt;td style="font-size: 0.8em;" colspan="5"&gt;&lt;sup&gt;***&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;**&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
+&lt;td style="font-size: 0.8em;" colspan="5"&gt;&lt;sup&gt;&amp;#42;&amp;#42;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.001; &lt;sup&gt;&amp;#42;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.01; &lt;sup&gt;&amp;#42;&lt;/sup&gt;p &amp;lt; 0.05&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tfoot&gt;
 &lt;/table&gt;
@@ -519,16 +529,16 @@ texreg::htmlreg(list(fm3,fm6,fm2,fm7),
 
 Model Type | Advantages | Disadvantages
 -----------|------------|--------------
-LPM | Can use fixed effects and easy to interpret | Can predict outside 0 and 1
+LPM | Can use fixed effects and easy to interpret | Can predict outside 0 and 1. Heteroscedasticity is always present.
 Probit | Prob. bounded between 0 and 1. | You can't use fixed effects and suffers from incidental parameter problem. Coefficients are also hard to interpret.
 Logit | Prob. bounded between 0 and 1. Can use one-way fixed effects (conditional logit) | Suffers Incidental parameter problem. Coefficients are hard to interpret.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
 <script>var slideshow = remark.create({
-"highlightStyle": "github",
-"highlightLines": true,
-"countIncrementalSlides": false
+  "highlightStyle": "github",
+  "highlightLines": true,
+  "countIncrementalSlides": false
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
@@ -569,6 +579,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
